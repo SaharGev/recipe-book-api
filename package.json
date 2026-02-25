@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "tsc && node --env-file=.env.dev ./dist/src/server.js",
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
-    "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts"
+    "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
+    "testAuth": "tsc && node -r ts-node/register ./node_modules/jest/bin/jest.js --config jest.config.ts --runInBand --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "Sahar & Hadas",
