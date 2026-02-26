@@ -8,7 +8,8 @@ const recipeSchema = new mongoose.Schema(
             required: true,
         },
         owner: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
             required: true,
         },
         description: {
@@ -37,6 +38,7 @@ const recipeSchema = new mongoose.Schema(
             required: false,
         },
     },
+    { timestamps: true }
 );
 
 export default mongoose.model("Recipe", recipeSchema);
