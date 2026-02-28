@@ -5,6 +5,7 @@ import authRoute from "./routes/authRoute";
 import recipeRoutes from "./routes/recipeRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { authenticate } from './middlewares/authMiddleware';
 dotenv.config({ path: '.env.dev' });
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(express.json());
 
 app.use("/auth", authRoute);
 
-app.use("/recipes", recipeRoutes);
+app.use("/recipes", authenticate,recipeRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
