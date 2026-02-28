@@ -56,7 +56,7 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
-    if (!recipe.isPublic && recipe.owner !== userId) {
+    if (!recipe.isPublic && recipe.owner.toString() !== userId.toString()) {
       return res.status(403).json({ message: "Forbidden" });
     }
     return res.json(recipe);
