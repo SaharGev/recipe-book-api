@@ -1,4 +1,4 @@
-//routes/authRoutes.ts
+// src/routes/authRoute.ts
 import express from "express";
 import authController from "../controllers/authController";
 const router = express.Router();
