@@ -1,6 +1,43 @@
 //request.rest 
 
+### Register
+POST http://localhost:3000/auth/register
+Content-Type: application/json
 
+{
+  "username": "testUser1",
+  "email": "test1@test.com",
+  "password": "123456"
+}
+
+### Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "test1@test.com",
+  "password": "123456"
+}
+
+### Refresh
+POST http://localhost:3000/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+### Logout
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+### Get all recipes (Protected)
+GET http://localhost:3000/recipes
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
 
 ### Recipe API - TODO: Checking Recipe API after login
 ### Create a new recipe
