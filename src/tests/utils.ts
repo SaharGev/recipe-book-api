@@ -2,6 +2,8 @@
 import request from "supertest";
 import { Express } from "express";
 
+//users
+
 export type UserData = {
   email: string;
   username: string;
@@ -58,6 +60,24 @@ export const getlogedInUser = async (app: Express): Promise<UserData> => {
     return logedUser;
 }
 
+export const getLoggedInCustomUser = async (app: Express, user: { email: string; username: string; password: string }): Promise<UserData> => {
+  let response = await request(app).post("/auth/register").send(user);
+  if (response.status !== 201) {
+    response = await request(app).post("/auth/login").send({ email: user.email, password: user.password });
+  }
+  const loggedUser = {
+    _id: response.body._id,
+    email: user.email,
+    password: user.password,
+    username: user.username,
+    token: response.body.token,
+    refreshToken: response.body.refreshToken,
+  };
+  return loggedUser;
+};
+
+//recipes
+
 export type RecipeData = {
   title: string;
 //   owner: string;
@@ -100,3 +120,54 @@ export const recipesList: RecipeData[] = [
   imageUrl: "http://example.com/image3.jpg",
  }
 ];
+
+//recipe books
+export type ColloboratorData = {
+  user: string;
+  role: "editor" | "viewer";
+};
+
+export type RecipeBookData = {
+  name: string;
+  description?: string;
+  isPublic: boolean;
+  collaborators?: ColloboratorData[];
+};
+
+export const recipeBooksList: RecipeBookData[] = [
+  {
+    name: "Owner Only Book",
+    description: "Only owner can edit",
+    isPublic: false,
+  },
+  {
+    name: "Collaborators Book",
+    description: "Book with collaborators",
+    isPublic: false,
+    collaborators: [
+      {
+        user: "USER_ID_TO_FILL_IN_TEST", 
+        role: "editor",
+      },
+    ],
+  },
+  {
+    name: "Public Book",
+    description: "Everyone can see",
+    isPublic: true,
+  },
+];
+
+export const createRecipeBook = async (
+  app: Express,
+  token: string,
+  bookData: RecipeBookData
+) => {
+  const response = await request(app)
+    .post("/recipe-books")
+    .set("Authorization", "Bearer " + token)
+    .send(bookData);
+
+  return response;
+};
+
