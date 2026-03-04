@@ -37,6 +37,19 @@ const recipeSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+        collaborators: [
+        {
+            user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            },
+            role: {
+            type: String,
+            enum: ["editor", "viewer"],
+            default: "editor",
+            },
+        },
+        ],
     },
     { timestamps: true }
 );

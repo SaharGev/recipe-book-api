@@ -3,6 +3,7 @@ import express, { Express} from 'express';
 import cors from "cors";
 import authRoute from "./routes/authRoute";
 import recipeRoutes from "./routes/recipeRoute";
+import recipeBookRoute from "./routes/recipeBookRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { authenticate } from './middlewares/authMiddleware';
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/auth", authRoute);
 
 app.use("/recipes", authenticate,recipeRoutes);
+app.use("/recipe-books", authenticate, recipeBookRoute);
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
