@@ -3,6 +3,7 @@ import express, { Express} from 'express';
 import cors from "cors";
 import authRoute from "./routes/authRoute";
 import recipeRoutes from "./routes/recipeRoute";
+import likeRoute from "./routes/likeRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { authenticate } from './middlewares/authMiddleware';
@@ -15,12 +16,12 @@ app.use(express.json());
 
 app.use("/auth", authRoute);
 
-app.use("/recipes", authenticate,recipeRoutes);
+app.use("/recipes", recipeRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-
+app.use("/likes", likeRoute);
 
 const initApp = () => {
   const pr = new Promise<Express>((resolve, reject) => {

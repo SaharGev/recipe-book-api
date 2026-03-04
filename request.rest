@@ -79,3 +79,13 @@ Content-Type: application/json
 DELETE http://localhost:3000/recipes/{69a03aadbbdd7d08ddfa5062}
 
 
+###
+
+POST http://localhost:3000/likes
+Content-Type: application/json
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+
+{
+  "targetType": "recipe",
+  "targetId": "PASTE_VALID_OBJECT_ID_HERE"
+}
