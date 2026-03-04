@@ -8,6 +8,7 @@ import likeRoute from "./routes/likeRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { authenticate } from './middlewares/authMiddleware';
+import commentRoute from "./routes/commentRoute";
 dotenv.config({ path: '.env.dev' });
 
 const app = express();
@@ -16,13 +17,14 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoute);
+app.use("/likes", likeRoute);
+app.use("/comments", commentRoute);
 
-app.use("/recipes", authenticate,recipeRoutes);
+app.use("/recipes", recipeRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-app.use("/likes", likeRoute);
 
 const initApp = () => {
   const pr = new Promise<Express>((resolve, reject) => {

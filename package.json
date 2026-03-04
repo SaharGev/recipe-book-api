@@ -11,7 +11,9 @@
     "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
     "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
     "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.register.test.ts",
-    "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts"
+    "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
+    "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
+    "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts"
   },
   "keywords": [],
   "author": "Sahar & Hadas",

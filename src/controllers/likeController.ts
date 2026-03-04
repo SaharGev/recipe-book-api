@@ -24,18 +24,16 @@ const like = async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const likeDoc = await Like.create({
-      userId,
-      targetType,
-      targetId,
-    });
+    const existing = await Like.findOne({ userId, targetType, targetId });
 
-    return res.status(201).json({ _id: likeDoc._id });
-  } catch (err: any) {
-    // duplicate like
-    if (err?.code === 11000) {
-      return res.status(409).json({ message: "Already liked" });
+    if (existing) {
+      await Like.deleteOne({ _id: existing._id });
+      return res.status(200).json({ action: "unliked" });
     }
+
+    const likeDoc = await Like.create({ userId, targetType, targetId });
+    return res.status(201).json({ action: "liked", _id: likeDoc._id });
+  } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
   }
