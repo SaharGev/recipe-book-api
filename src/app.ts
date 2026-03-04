@@ -3,6 +3,7 @@ import express, { Express} from 'express';
 import cors from "cors";
 import authRoute from "./routes/authRoute";
 import recipeRoutes from "./routes/recipeRoute";
+import recipeBookRoute from "./routes/recipeBookRoute";
 import likeRoute from "./routes/likeRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -16,7 +17,7 @@ app.use(express.json());
 
 app.use("/auth", authRoute);
 
-app.use("/recipes", recipeRoutes);
+app.use("/recipes", authenticate,recipeRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });

@@ -35,48 +35,50 @@ Content-Type: application/json
   "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
 }
 
-### Get all recipes (Protected)
+### Get all recipes (public + owned by user)
 GET http://localhost:3000/recipes
-Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
-### Recipe API - TODO: Checking Recipe API after login
 ### Create a new recipe
 POST http://localhost:3000/recipes
 Content-Type: application/json
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
 {
-  "title": "Chocolate Cake",
+  "title": "Chocolate Cookies",
   "description": "A delicious chocolate cake recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "2 eggs"],
   "cookTime": 30,
   "difficulty": "medium",
-  "isPublic": true
+  "isPublic": false
 }
 
-### Get all recipes (public + owned by user)
-GET http://localhost:3000/recipes
 
 ### Get my recipes (owned by user)
 GET http://localhost:3000/recipes/my
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
 ### Get a recipe by ID
-GET http://localhost:3000/recipes/{recipeId}
+GET http://localhost:3000/recipes/69a40fa29a6041eb49ade735
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
 ### Update a recipe
-PUT http://localhost:3000/recipes/{recipeId}
+PUT http://localhost:3000/recipes/69a40fa29a6041eb49ade735
 Content-Type: application/json
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
 {
-  "title": "Updated Chocolate Cake",
+  "title": "Updated Chocolate Cookies 2",
   "description": "An even more delicious chocolate cake recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "3 eggs"],
   "cookTime": 35,
-  "difficulty": "medium",
+  "difficulty": "easy",
   "isPublic": false
 }
 
 ### Delete a recipe
-DELETE http://localhost:3000/recipes/{69a03aadbbdd7d08ddfa5062}
+DELETE http://localhost:3000/recipes/69a40fa29a6041eb49ade735
+Authorization: Bearer "PASTE_TOKEN_HERE"
 
 
 ###
