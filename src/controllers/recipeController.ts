@@ -3,12 +3,21 @@
 import { Request, Response } from 'express';
 import Recipe from '../models/recipeModel';
 import { AuthRequest } from '../middlewares/authMiddleware';
+import RecipeBook from '../models/recipeBookModel';
 
 const createNewRecipe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
+    }
+    const {title} = req.body;
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+    const existingRecipe = await Recipe.findOne({ title, owner: userId });
+    if (existingRecipe) {
+      return res.status(400).json({ message: "You already have a recipe with this title" });
     }
     const recipeData = req.body;
     const newRecipe = await Recipe.create({ ...recipeData, owner: userId });
@@ -60,8 +69,9 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Recipe not found" });
     }
     const isOwner = recipe.owner.toString() === userId.toString();
-    const isCollaborator = recipe.collaborators?.some(
-      (c) => c.user && c.user.toString() === userId.toString());
+    const isCollaborator = recipe.collaborators.some(
+      (c: any) => c.user.toString() === userId.toString()
+    );
     if (!recipe.isPublic && !isOwner && !isCollaborator) {
       return res.status(403).json({ message: "Forbidden" });
     }
@@ -110,11 +120,14 @@ const deleteRecipe = async (req: AuthRequest, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
     const recipeId = req.params.id;
+
     const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
+
     const isOwner = recipe.owner.toString() === userId.toString();
     const isCollaborator = recipe.collaborators.some(
       (c: any) => c.user.toString() === userId.toString()
@@ -124,8 +137,19 @@ const deleteRecipe = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
+    // remove recipe from all recipe books and decrease count
+    await RecipeBook.updateMany(
+      { recipes: recipeId },
+      {
+        $pull: { recipes: recipeId },
+        $inc: { recipesCount: -1 }
+      }
+    );
+
     await Recipe.findByIdAndDelete(recipeId);
+
     return res.json({ message: "Recipe deleted successfully" });
+
   } catch (err: any) {
     console.error(err);
     res.status(500).send("Error deleting recipe");

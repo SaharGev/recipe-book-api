@@ -4,6 +4,7 @@ import e, { Request, Response } from "express";
 import RecipeBook from "../models/recipeBookModel";
 import Recipe from "../models/recipeModel";
 import { AuthRequest } from "../middlewares/authMiddleware";
+import User from "../models/userModel";
 
 const createRecipeBook = async (req: AuthRequest, res: Response) => {
   try {
@@ -14,6 +15,10 @@ const createRecipeBook = async (req: AuthRequest, res: Response) => {
     const { name, description, isPublic } = req.body;
     if (!name) {
       return res.status(400).json({ message: "Book name is required" });
+    }
+    const existingBook = await RecipeBook.findOne({ name, owner: userId });
+    if (existingBook) {
+      return res.status(400).json({ message: "You already have a recipe book with this name" });
     }
     const newRecipeBook = await RecipeBook.create({
       name,
@@ -183,70 +188,181 @@ const deleteRecipeBook = async (req: AuthRequest, res: Response) => {
     }
 };
 
+//   try {
+//     const userId = req.user?._id;
+//     if (!userId) {
+//         return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     const { bookId } = req.params;
+//     const { targetUserId } = req.body;
+//     if (!targetUserId) {
+//         return res.status(400).json({ message: "Target user ID is required" });
+//     }
+//     const recipeBook = await RecipeBook.findById(bookId);
+//     if (!recipeBook) {
+//         return res.status(404).json({ message: "Recipe book not found" });
+//     }
+//     const isOwner = recipeBook.owner.toString() === userId.toString();
+//     if (!isOwner) {
+//         return res.status(403).json({ message: "Only the owner can share the recipe book" });
+//     }
+//     if (targetUserId.toString() === userId.toString()) {
+//         return res.status(400).json({ message: "owner already has full access to the book" });
+//     }
+//     const alreadyCollaborator = recipeBook.collaborators.some((collab: any) => collab.user.toString() === targetUserId.toString());
+//     if (alreadyCollaborator) {
+//         return res.status(400).json({ message: "User is already a collaborator" });
+//     }
+//     recipeBook.collaborators.push({ user: targetUserId });
+//     await recipeBook.save();
+//     res.status(200).json({ message: "Recipe book shared successfully", recipeBook });
+//     }
+//     catch (err: any) {
+//     res.status(500).json({ message: "Error sharing recipe book", error: err.message });
+//     }
+// };
+
+// const unshareRecipeBook = async (req: AuthRequest, res: Response) => {
+//   try {
+//     const userId = req.user?._id;
+//     if (!userId) {
+//         return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     const { bookId } = req.params;
+//     const { targetUserId } = req.body;
+//     if (!targetUserId) {
+//         return res.status(400).json({ message: "Target user ID is required" });
+//     }
+//     const recipeBook = await RecipeBook.findById(bookId);
+//     if (!recipeBook) {
+//         return res.status(404).json({ message: "Recipe book not found" });
+//     }
+//     const isOwner = recipeBook.owner.toString() === userId.toString();
+//     if (!isOwner) {
+//         return res.status(403).json({ message: "Only the owner can remove collaborators" });
+//     }
+//     if (targetUserId.toString() === userId.toString()) {
+//         return res.status(400).json({ message: "owner cannot be removed from collaborators" });
+//     }
+//     const collaboratorIndex = recipeBook.collaborators.findIndex((collab: any) => collab.user.toString() === targetUserId.toString());
+//     if (collaboratorIndex === -1) {
+//         return res.status(404).json({ message: "User is not a collaborator" });
+//     }
+//     recipeBook.collaborators.splice(collaboratorIndex, 1);
+//     await recipeBook.save();
+//     res.status(200).json({ message: "Collaborator removed successfully", recipeBook });
+//   } catch (err: any) {
+//     res.status(500).json({ message: "Error removing collaborator", error: err.message });
+//   }
+// };
+
 const shareRecipeBook = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
     const { bookId } = req.params;
-    const { targetUserId } = req.body;
-    if (!targetUserId) {
-        return res.status(400).json({ message: "Target user ID is required" });
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Target user email is required" });
     }
+
+    const targetUser = await User.findOne({ email });
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const recipeBook = await RecipeBook.findById(bookId);
     if (!recipeBook) {
-        return res.status(404).json({ message: "Recipe book not found" });
+      return res.status(404).json({ message: "Recipe book not found" });
     }
+
     const isOwner = recipeBook.owner.toString() === userId.toString();
     if (!isOwner) {
-        return res.status(403).json({ message: "Only the owner can share the recipe book" });
+      return res.status(403).json({ message: "Only the owner can share the recipe book" });
     }
-    if (targetUserId.toString() === userId.toString()) {
-        return res.status(400).json({ message: "owner already has full access to the book" });
-    }
-    const alreadyCollaborator = recipeBook.collaborators.some((collab: any) => collab.user.toString() === targetUserId.toString());
+
+    const alreadyCollaborator = recipeBook.collaborators.some(
+      (collab: any) => collab.user.toString() === targetUser._id.toString()
+    );
+
     if (alreadyCollaborator) {
-        return res.status(400).json({ message: "User is already a collaborator" });
+      return res.status(400).json({ message: "User is already a collaborator" });
     }
-    recipeBook.collaborators.push({ user: targetUserId });
+
+    // add collaborator to book
+    recipeBook.collaborators.push({ user: targetUser._id });
     await recipeBook.save();
-    res.status(200).json({ message: "Recipe book shared successfully", recipeBook });
-    }
-    catch (err: any) {
+
+    // add collaborator to all recipes in the book
+    await Recipe.updateMany(
+      { _id: { $in: recipeBook.recipes } },
+      { $addToSet: { collaborators: { user: targetUser._id } } }
+    );
+
+    res.status(200).json({
+      message: "Recipe book shared successfully",
+      recipeBook,
+    });
+  } catch (err: any) {
     res.status(500).json({ message: "Error sharing recipe book", error: err.message });
-    }
+  }
 };
 
 const unshareRecipeBook = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
+
     const { bookId } = req.params;
-    const { targetUserId } = req.body;
-    if (!targetUserId) {
-        return res.status(400).json({ message: "Target user ID is required" });
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Target user email is required" });
     }
+
+    const targetUser = await User.findOne({ email });
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const recipeBook = await RecipeBook.findById(bookId);
     if (!recipeBook) {
-        return res.status(404).json({ message: "Recipe book not found" });
+      return res.status(404).json({ message: "Recipe book not found" });
     }
+
     const isOwner = recipeBook.owner.toString() === userId.toString();
     if (!isOwner) {
-        return res.status(403).json({ message: "Only the owner can remove collaborators" });
+      return res.status(403).json({ message: "Only the owner can remove collaborators" });
     }
-    if (targetUserId.toString() === userId.toString()) {
-        return res.status(400).json({ message: "owner cannot be removed from collaborators" });
-    }
-    const collaboratorIndex = recipeBook.collaborators.findIndex((collab: any) => collab.user.toString() === targetUserId.toString());
+
+    const collaboratorIndex = recipeBook.collaborators.findIndex(
+      (collab: any) => collab.user.toString() === targetUser._id.toString()
+    );
+
     if (collaboratorIndex === -1) {
-        return res.status(404).json({ message: "User is not a collaborator" });
+      return res.status(404).json({ message: "User is not a collaborator" });
     }
+
+    // remove collaborator from book
     recipeBook.collaborators.splice(collaboratorIndex, 1);
     await recipeBook.save();
-    res.status(200).json({ message: "Collaborator removed successfully", recipeBook });
+
+    // remove collaborator from recipes
+    await Recipe.updateMany(
+      { _id: { $in: recipeBook.recipes } },
+      { $pull: { collaborators: { user: targetUser._id } } }
+    );
+
+    res.status(200).json({
+      message: "Collaborator removed successfully",
+      recipeBook,
+    });
   } catch (err: any) {
     res.status(500).json({ message: "Error removing collaborator", error: err.message });
   }
@@ -288,36 +404,131 @@ const updateRecipeBook = async (req: AuthRequest, res: Response) => {
     } 
   };
 
-  const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
-    try {
-      const userId = req.user?._id;
-      if (!userId) {
-          return res.status(401).json({ message: "Unauthorized" });
-      }
-      const { bookId } = req.params;
-      const originalBook = await RecipeBook.findById(bookId).populate("recipes");
-      if (!originalBook) {
-          return res.status(404).json({ message: "Recipe book not found" });
-      }
-      const isOwner = originalBook.owner.toString() === userId.toString();
-      const isCollaborator = originalBook.collaborators.some((collab: any) => collab.user.toString() === userId.toString());
-      if (!originalBook.isPublic && !isOwner && !isCollaborator) {
-          return res.status(403).json({ message: "Forbidden" });
-      }
-      const duplicatedBook = await RecipeBook.create({
-        name: `Copy of ${originalBook.name}`,
-        description: originalBook.description,
-        owner: userId,
-        recipes: originalBook.recipes,
-        recipesCount: originalBook.recipesCount,
-        isPublic: false,
-        collaborators: [],
-      });
-      return res.status(201).json({ message: "Recipe book duplicated successfully", recipeBook: duplicatedBook });
-    } catch (err: any) {
-      res.status(500).json({ message: "Error duplicating recipe book", error: err.message });
+// const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
+//   try {
+//     const userId = req.user?._id;
+//     if (!userId) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+
+//     const { bookId } = req.params;
+//     const originalBook = await RecipeBook.findById(bookId).populate("recipes");
+//     if (!originalBook) {
+//       return res.status(404).json({ message: "Recipe book not found" });
+//     }
+
+//     const isOwner = originalBook.owner.toString() === userId.toString();
+//     const isCollaborator = originalBook.collaborators.some(
+//       (collab: any) => collab.user.toString() === userId.toString()
+//     );
+
+//     if (!originalBook.isPublic && !isOwner && !isCollaborator) {
+//       return res.status(403).json({ message: "Forbidden" });
+//     }
+
+//     // 1️⃣ שכפול כל מתכון בספר
+//     const duplicatedRecipes = await Promise.all(
+//       originalBook.recipes.map(async (recipe: any) => {
+//         const newRecipe = await Recipe.create({
+//           ...recipe.toObject(),
+//           _id: undefined,          // כדי שמונגו יצור _id חדש
+//           title: `Copy of ${recipe.title}`,
+//           collaborators: [],       // מתכון חדש בלי שותפים
+//         });
+//         return newRecipe._id;
+//       })
+//     );
+
+//     // 2️⃣ יצירת הספר החדש עם המתכונים המשוכפלים
+//     const duplicatedBook = await RecipeBook.create({
+//       name: `Copy of ${originalBook.name}`,
+//       description: originalBook.description,
+//       owner: userId,
+//       recipes: duplicatedRecipes,
+//       recipesCount: duplicatedRecipes.length,
+//       isPublic: false,
+//       collaborators: [],
+//     });
+
+//     return res.status(201).json({
+//       message: "Recipe book duplicated successfully",
+//       recipeBook: duplicatedBook,
+//     });
+//   } catch (err: any) {
+//     res.status(500).json({ message: "Error duplicating recipe book", error: err.message });
+//   }
+// };
+
+const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
-  };
+
+    const { bookId } = req.params;
+
+    const originalBook = await RecipeBook
+      .findById(bookId)
+      .populate("recipes");
+
+    if (!originalBook) {
+      return res.status(404).json({ message: "Recipe book not found" });
+    }
+
+    const isOwner = originalBook.owner.toString() === userId.toString();
+    const isCollaborator = originalBook.collaborators.some(
+      (c: any) => c.user.toString() === userId.toString()
+    );
+
+    if (!originalBook.isPublic && !isOwner && !isCollaborator) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    // שכפול המתכונים
+    const newRecipeIds = [];
+
+    for (const recipe of originalBook.recipes as any[]) {
+
+      const recipeObj = recipe.toObject();
+
+      delete recipeObj._id;
+      delete recipeObj.createdAt;
+      delete recipeObj.updatedAt;
+
+      const newRecipe = await Recipe.create({
+        ...recipeObj,
+        title: `Copy of ${recipe.title}`, // שינוי שם המתכון
+        owner: userId,
+        collaborators: []
+      });
+
+      newRecipeIds.push(newRecipe._id);
+    }
+
+    // יצירת הספר החדש
+    const newBook = await RecipeBook.create({
+      name: `Copy of ${originalBook.name}`,
+      description: originalBook.description,
+      owner: userId,
+      recipes: newRecipeIds,
+      recipesCount: newRecipeIds.length,
+      isPublic: false,
+      collaborators: []
+    });
+
+    return res.status(201).json({
+      message: "Recipe book duplicated successfully",
+      recipeBook: newBook
+    });
+
+  } catch (err: any) {
+    res.status(500).json({
+      message: "Error duplicating recipe book",
+      error: err.message
+    });
+  }
+};
 
 export default {
   createRecipeBook,

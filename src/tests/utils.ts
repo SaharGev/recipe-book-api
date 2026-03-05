@@ -112,6 +112,7 @@ export const recipesList: RecipeData[] = [
   },
   {
   title: "Private Recipe",
+  description: "A secret private recipe",
 //   owner: "testuser3",
   ingredients: ["secret"],
   cookTime: 10,
@@ -133,30 +134,6 @@ export type RecipeBookData = {
   isPublic: boolean;
   collaborators?: ColloboratorData[];
 };
-
-export const recipeBooksList: RecipeBookData[] = [
-  {
-    name: "Owner Only Book",
-    description: "Only owner can edit",
-    isPublic: false,
-  },
-  {
-    name: "Collaborators Book",
-    description: "Book with collaborators",
-    isPublic: false,
-    collaborators: [
-      {
-        user: "USER_ID_TO_FILL_IN_TEST", 
-        role: "editor",
-      },
-    ],
-  },
-  {
-    name: "Public Book",
-    description: "Everyone can see",
-    isPublic: true,
-  },
-];
 
 export const createRecipeBook = async (
   app: Express,
