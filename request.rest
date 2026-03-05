@@ -19,6 +19,12 @@ Content-Type: application/json
   "password": "123456"
 }
 
+### Google Login
+POST http://localhost:3000/auth/google
+Content-Type: application/json
+
+{}
+
 ### Refresh
 POST http://localhost:3000/auth/refresh
 Content-Type: application/json
