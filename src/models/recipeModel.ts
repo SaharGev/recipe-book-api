@@ -43,11 +43,11 @@ const recipeSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             },
-            role: {
-            type: String,
-            enum: ["editor", "viewer"],
-            default: "editor",
-            },
+            // role: {
+            // type: String,
+            // enum: ["editor", "viewer"],
+            // default: "editor",
+            // },
         },
         ],
     },

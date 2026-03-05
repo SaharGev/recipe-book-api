@@ -15,7 +15,7 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "email": "test1@test.com",
+  "email": "test2@test.com",
   "password": "123456"
 }
 
@@ -35,7 +35,9 @@ Content-Type: application/json
   "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
 }
 
-### Get all recipes (public + owned by user)
+### RECIPE -------------------------
+
+### Get all recipes (public + owned by user + collaborator)
 GET http://localhost:3000/recipes
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
@@ -45,30 +47,29 @@ Content-Type: application/json
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
 {
-  "title": "Chocolate Cookies",
-  "description": "A delicious chocolate cake recipe.",
+  "title": "Chocolate Cake 3 ",
+  "description": "A delicious chocolate Cookie recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "2 eggs"],
   "cookTime": 30,
   "difficulty": "medium",
   "isPublic": false
 }
 
-
 ### Get my recipes (owned by user)
 GET http://localhost:3000/recipes/my
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
-### Get a recipe by ID
-GET http://localhost:3000/recipes/69a40fa29a6041eb49ade735
+### Get a recipe by ID (owner or collaborator)
+GET http://localhost:3000/recipes/69a93743162ec36c1122f5c8
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
-### Update a recipe
-PUT http://localhost:3000/recipes/69a40fa29a6041eb49ade735
+### Update a recipe (owner or collaborator)
+PUT http://localhost:3000/recipes/69a93743162ec36c1122f5c8
 Content-Type: application/json
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
 {
-  "title": "Updated Chocolate Cookies 2",
+  "title": "Chocolate 1 Update",
   "description": "An even more delicious chocolate cake recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "3 eggs"],
   "cookTime": 35,
@@ -76,8 +77,79 @@ Authorization: Bearer "PASTE_TOKEN_HERE"
   "isPublic": false
 }
 
-### Delete a recipe
-DELETE http://localhost:3000/recipes/69a40fa29a6041eb49ade735
+### Delete a recipe (owner or collaborator)
+DELETE http://localhost:3000/recipes/69a93743162ec36c1122f5c8
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+
+## RECIPE BOOK -------------------------
+
+### Get all recipe books (public + owned by user + collaborator)
+GET http://localhost:3000/recipe-books  
+Authorization:  Bearer "PASTE_TOKEN_HERE"
+
+### Create a new recipe book
+POST http://localhost:3000/recipe-books
+Content-Type: application/json
+Authorization:  Bearer "PASTE_TOKEN_HERE"
+
+{
+  "name": "My chocolate Recipe Book 1",
+  "description": "A collection of my favorite recipes.",
+  "isPublic": false
+}
+
+### Add a recipe to a recipe book 
+POST http://localhost:3000/recipe-books/69a99a31aacff322e1ab6630/recipes/69a99a0caacff322e1ab662a
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+### Delete a recipe from a recipe book
+DELETE http://localhost:3000/recipe-books/69a99a31aacff322e1ab6630/recipes/69a93311162ec36c1122f577
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+### Get my recipe books (owned by user)
+GET http://localhost:3000/recipe-books/my
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+### Get a recipe book by ID (owner or collaborator)
+GET http://localhost:3000/recipe-books/69a92e150084ffb2c89b62d2
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+### Update a recipe book
+PUT http://localhost:3000/recipe-books/69a92e150084ffb2c89b62d2
+Content-Type: application/json
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+{
+  "name": "Updated Recipe Book Name",
+  "description": "An updated description for my recipe book.",
+  "isPublic": true
+}
+
+### Delete a recipe book
+DELETE http://localhost:3000/recipe-books/69a9375b162ec36c1122f5cb
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+### Share a recipe book with another user
+POST http://localhost:3000/recipe-books/69a99a31aacff322e1ab6630/share
+Content-Type: application/json
+Authorization: Bearer "PASTE_TOKEN_HERE"
+
+{
+  "email": "test2@test.com"
+}
+
+### Unshare a recipe book with a collaborator
+POST http://localhost:3000/recipe-books/69a80a89c9daf57f3b01ff47/unshare
+Content-Type: application/json
+Authorization: Bearer "PASTE_TOKEN_HERE"
+  
+{
+  "email": "test2@test.com"
+}
+
+### Duplicate a recipe book
+POST http://localhost:3000/recipe-books/69a99d52aacff322e1ab6644/duplicate
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
 
