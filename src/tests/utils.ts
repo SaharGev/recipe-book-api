@@ -171,3 +171,9 @@ export const createRecipeBook = async (
   return response;
 };
 
+//likes
+
+export const createRandomObjectId = () => {
+  const mongoose = require("mongoose");
+  return new mongoose.Types.ObjectId().toString();
+};

@@ -24,7 +24,7 @@ POST http://localhost:3000/auth/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJyYW5kIjo0OTgzOTQsImlhdCI6MTc3MjYyNTE5MCwiZXhwIjoxNzczMjI5OTkwfQ.fQ1DwRUwGPgSfWr1e6XJ7rAiKO0vTvxUZ45L4nmrsYg"
 }
 
 ### Logout
@@ -32,17 +32,17 @@ POST http://localhost:3000/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJyYW5kIjo0OTgzOTQsImlhdCI6MTc3MjYyNTE5MCwiZXhwIjoxNzczMjI5OTkwfQ.fQ1DwRUwGPgSfWr1e6XJ7rAiKO0vTvxUZ45L4nmrsYg"
 }
 
 ### Get all recipes (public + owned by user)
 GET http://localhost:3000/recipes
-Authorization: Bearer "PASTE_TOKEN_HERE"
+Authorization: Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2MjUyMzUsImV4cCI6MTc3MjYyNjEzNX0.CT1t2iRO47O7QXzrCpQij0CMefFo2CMjxjZJA-_RhTU"
 
 ### Create a new recipe
 POST http://localhost:3000/recipes
 Content-Type: application/json
-Authorization: Bearer "PASTE_TOKEN_HERE"
+Authorization: Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2MjUyMzUsImV4cCI6MTc3MjYyNjEzNX0.CT1t2iRO47O7QXzrCpQij0CMefFo2CMjxjZJA-_RhTU"
 
 {
   "title": "Chocolate Cookies",
@@ -81,3 +81,24 @@ DELETE http://localhost:3000/recipes/69a40fa29a6041eb49ade735
 Authorization: Bearer "PASTE_TOKEN_HERE"
 
 
+### likes
+
+POST http://localhost:3000/likes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2Mjc4MzcsImV4cCI6MTc3MjYyODczN30.m8t0TvoX22T5od3CoV6sy2kxIEVGEPJYnmUpc10zSrM
+
+{
+  "targetType": "recipe",
+  "targetId": "69a82659b404fe4a62d3d6c3"
+}
+
+### comments
+POST http://localhost:3000/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2MzMxNzgsImV4cCI6MTc3MjYzNDA3OH0.6OJIBnVisdKv4PRQAcMtpA356XvfZIxPVwuzMcNzSDI
+
+{
+  "targetType": "recipe",
+  "targetId": "507f1f77bcf86cd799439011",
+  "content": "This recipe looks great!"
+}
