@@ -10,7 +10,7 @@
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
     "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
     "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
-    "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.register.test.ts",
+    "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
     "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
     "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts"
@@ -24,6 +24,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "google-auth-library": "^10.6.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1"
   },
