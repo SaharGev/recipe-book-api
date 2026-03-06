@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import User from "../models/userModel";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const sendError = (code: number, message: string, res: Response) => {
   return res.status(code).send({ message });
@@ -104,6 +107,72 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+const googleLogin = async (req: Request, res: Response) => {
+  const idToken = req.body.idToken;
+
+  if (!idToken) {
+    return sendError(400, "idToken is required", res);
+  }
+
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return sendError(500, "GOOGLE_CLIENT_ID is not configured", res);
+  }
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return sendError(401, "Invalid Google token", res);
+    }
+
+    const googleId = payload.sub;
+    const email = payload.email?.toLowerCase();
+    const name = payload.name;
+    const picture = payload.picture;
+
+    if (!googleId || !email) {
+      return sendError(401, "Invalid Google token", res);
+    }
+
+    // find existing user by googleId OR email
+    let user = await User.findOne({ googleId });
+    if (!user) {
+      user = await User.findOne({ email });
+    }
+
+    // if user doesn't exist - create
+    if (!user) {
+      const username = (name || email.split("@")[0]).trim();
+
+      user = await User.create({
+        username,
+        email,
+        googleId,
+        password: undefined,
+        refreshTokens: [],
+        profileImageUrl: picture,
+      });
+    } else {
+      // if exists but missing googleId -> attach it
+      if (!user.googleId) user.googleId = googleId;
+      if (picture && !user.profileImageUrl) user.profileImageUrl = picture;
+    }
+
+    const tokens = generateTokenPair(user._id.toString());
+    user.refreshTokens.push(tokens.refreshToken);
+    await user.save();
+
+    return res.status(200).json({ _id: user._id, ...tokens });
+  } catch (err) {
+    console.error(err);
+    return sendError(401, "Invalid Google token", res);
+  }
+};
+
 const refreshToken = async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken) return sendError(400, "Refresh token is required", res);
@@ -155,4 +224,10 @@ const logout = async (req: Request, res: Response) => {
   }
 };
 
-export default { register, login, refreshToken, logout };
+export default { 
+  register,
+  login,
+  googleLogin,
+  refreshToken,
+  logout
+};
