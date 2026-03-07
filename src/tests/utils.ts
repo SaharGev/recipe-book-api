@@ -8,6 +8,7 @@ export type UserData = {
   email: string;
   username: string;
   password: string;
+  phone?: string;
   _id: string;
   token: string;
   refreshToken: string;
@@ -43,36 +44,64 @@ export const otherUsers: UserData[] = [
 ];
 
 export const getlogedInUser = async (app: Express): Promise<UserData> => {
-    const email = UserData.email;
-    const password = UserData.password;
-    let response = await request(app).post("/auth/register").send({ "email": email, "username": UserData.username, "password": password });
-    if (response.status !== 201) {
-      response = await request(app).post("/auth/login").send({ "email": email, "password": password });
-    }
-    const logedUser = {
-        _id: response.body._id,
-        email: email,
-        password: password,
-        username: UserData.username,
-        token: response.body.token,
-        refreshToken: response.body.refreshToken,
-    };
-    return logedUser;
-}
+  const email = UserData.email;
+  const password = UserData.password;
 
-export const getLoggedInCustomUser = async (app: Express, user: { email: string; username: string; password: string }): Promise<UserData> => {
-  let response = await request(app).post("/auth/register").send(user);
+  let response = await request(app)
+    .post("/auth/register")
+    .send({
+      email: email,
+      username: UserData.username,
+      password: password,
+    });
+
   if (response.status !== 201) {
-    response = await request(app).post("/auth/login").send({ email: user.email, password: user.password });
+    response = await request(app)
+      .post("/auth/login")
+      .send({ email: email, password: password });
   }
+
+  const logedUser = {
+    _id: response.body._id,
+    email: email,
+    password: password,
+    username: UserData.username,
+    phone: undefined,
+    token: response.body.token,
+    refreshToken: response.body.refreshToken,
+  };
+
+  return logedUser;
+};
+
+export const getLoggedInCustomUser = async (
+  app: Express,
+  user: { email: string; username: string; password: string; phone?: string }
+): Promise<UserData> => {
+
+  let response = await request(app)
+    .post("/auth/register")
+    .send(user);
+
+  if (response.status !== 201) {
+    response = await request(app)
+      .post("/auth/login")
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+  }
+
   const loggedUser = {
     _id: response.body._id,
     email: user.email,
     password: user.password,
     username: user.username,
+    phone: user.phone,
     token: response.body.token,
     refreshToken: response.body.refreshToken,
   };
+
   return loggedUser;
 };
 

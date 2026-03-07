@@ -10,10 +10,15 @@
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
     "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
     "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
+    "testUserModel": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
     "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
-    "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
     "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
-    "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts"
+    "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts",
+    "testUpload": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/upload.test.ts",
+    "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
+    "testAi": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/ai.test.ts",
+    "tsoa:spec": "tsoa spec",
+    "tsoa:routes": "tsoa routes"
   },
   "keywords": [],
   "author": "Sahar & Hadas",
@@ -24,9 +29,13 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "joi": "^18.0.2",
     "google-auth-library": "^10.6.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.1"
+    "mongoose": "^9.2.1",
+    "multer": "^2.1.1",
+    "swagger-ui-express": "^5.0.1",
+    "tsoa": "^7.0.0-alpha.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -34,8 +43,10 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^25.3.0",
     "@types/supertest": "^6.0.3",
+    "@types/swagger-ui-express": "^4.1.8",
     "jest": "^30.2.0",
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
