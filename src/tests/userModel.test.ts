@@ -19,4 +19,16 @@ describe("User Model", () => {
     const err = user.validateSync();
     expect(err).toBeUndefined();
     });
+
+  test("User can have profileImageUrl", () => {
+    const user = new User({
+      username: "testUser",
+      email: "test@test.com",
+      profileImageUrl: "/uploads/test.png"
+    });
+
+    const err = user.validateSync();
+    expect(err).toBeUndefined();
+    expect(user.profileImageUrl).toBe("/uploads/test.png");
+  });
 });

@@ -156,5 +156,38 @@ const deleteRecipe = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export default { createNewRecipe, getAllRecipes, getMyRecipes, getRecipeById, updateRecipe, deleteRecipe};
+const updateRecipeImage = async (req: AuthRequest, res: Response) => {
+  try {
+    const recipeId = req.params.id;
+    const userId = req.user?._id;
+    const { imageUrl } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const recipe = await Recipe.findById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    if (recipe.owner.toString() !== userId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: "imageUrl is required" });
+    }
+
+    recipe.imageUrl = imageUrl;
+    await recipe.save();
+
+    return res.status(200).json(recipe);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update recipe image" });
+  }
+};
+
+export default { createNewRecipe, getAllRecipes, getMyRecipes, getRecipeById, updateRecipe, deleteRecipe, updateRecipeImage};
 

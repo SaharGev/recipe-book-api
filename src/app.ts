@@ -7,8 +7,9 @@ import recipeBookRoute from "./routes/recipeBookRoute";
 import likeRoute from "./routes/likeRoute";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { authenticate } from './middlewares/authMiddleware';
 import commentRoute from "./routes/commentRoute";
+import uploadRoute from "./routes/uploadRoute";
+import userRoute from "./routes/userRoute";
 dotenv.config({ path: '.env.dev' });
 
 const app = express();
@@ -19,6 +20,9 @@ app.use(express.json());
 app.use("/auth", authRoute);
 app.use("/likes", likeRoute);
 app.use("/comments", commentRoute);
+app.use("/upload", uploadRoute);
+app.use("/users", userRoute);
+app.use("/recipe-books", recipeBookRoute);
 
 app.use("/recipes", recipeRoutes);
 app.get("/health", (req, res) => {

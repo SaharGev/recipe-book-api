@@ -207,10 +207,15 @@ describe("Comments", () => {
   });
 
   test("DELETE /comments/:id should fail if comment belongs to another user", async () => {
-    const user1 = await getlogedInUser(app);
+    const user1 = await getLoggedInCustomUser(app, {
+        email: "delete-owner@test.com",
+        username: "deleteOwnerUser",
+        password: "testpassword",
+    });
+
     const user2 = await getLoggedInCustomUser(app, {
-        email: "other2@test.com",
-        username: "otheruser2",
+        email: "delete-other@test.com",
+        username: "deleteOtherUser",
         password: "testpassword",
     });
 
@@ -224,6 +229,9 @@ describe("Comments", () => {
         targetId,
         content: "to protect",
         });
+
+    expect(createRes.status).toBe(201);
+    expect(createRes.body._id).toBeDefined();
 
     const commentId = createRes.body._id;
 

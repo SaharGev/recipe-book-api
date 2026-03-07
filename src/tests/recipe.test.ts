@@ -4,7 +4,7 @@ import request from "supertest";
 import initApp from "../app";
 import Recipe from "../models/recipeModel";
 import { Express } from "express";
-import { getlogedInUser, UserData, recipesList, otherUsers } from "./utils";
+import { getLoggedInCustomUser, getlogedInUser, UserData, recipesList, otherUsers } from "./utils";
 
 
 let app: Express;
@@ -416,4 +416,125 @@ describe("Recipe API", () => {
     expect(getAfterDelete.status).toBe(404);
   });
 
+  test("PATCH /recipes/:id/image - owner can update recipe image", async () => {
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + loginUser.token)
+      .send(recipesList[0]);
+
+    expect(createResponse.status).toBe(201);
+
+    const recipeId = createResponse.body._id;
+    const imageUrl = "/uploads/recipe-image.png";
+
+    const updateImageResponse = await request(app)
+      .patch(`/recipes/${recipeId}/image`)
+      .set("Authorization", "Bearer " + loginUser.token)
+      .send({ imageUrl });
+
+    expect(updateImageResponse.status).toBe(200);
+    expect(updateImageResponse.body.imageUrl).toBe(imageUrl);
+
+    const updatedRecipe = await Recipe.findById(recipeId);
+    expect(updatedRecipe?.imageUrl).toBe(imageUrl);
+  });
+
+  test("PATCH /recipes/:id/image fails for non owner", async () => {
+    const owner = await getlogedInUser(app);
+
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + owner.token)
+      .send({
+        ...recipesList[0],
+        title: "Recipe Image Test - Non Owner",
+      });
+
+    expect(createResponse.status).toBe(201);
+
+    const recipeId = createResponse.body._id;
+
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "imageother@test.com",
+      username: "imageOtherUser",
+      password: "testpassword",
+    });
+
+    const response = await request(app)
+      .patch(`/recipes/${recipeId}/image`)
+      .set("Authorization", "Bearer " + otherUser.token)
+      .send({
+        imageUrl: "/uploads/forbidden-image.png",
+      });
+
+    expect(response.status).toBe(403);
+  });
+
+  test("PATCH /recipes/:id/image fails without token", async () => {
+    const owner = await getlogedInUser(app);
+
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + owner.token)
+      .send({
+        ...recipesList[0],
+        title: "Recipe Image Test - No Token",
+      });
+
+    expect(createResponse.status).toBe(201);
+
+    const recipeId = createResponse.body._id;
+
+    const response = await request(app)
+      .patch(`/recipes/${recipeId}/image`)
+      .send({
+        imageUrl: "/uploads/no-token-image.png",
+      });
+
+    expect(response.status).toBe(401);
+  });
+
+  test("PATCH /recipes/:id/image fails when imageUrl is missing", async () => {
+    const owner = await getlogedInUser(app);
+
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + owner.token)
+      .send({
+        ...recipesList[0],
+        title: "Recipe Image Test - Missing ImageUrl",
+      });
+
+    expect(createResponse.status).toBe(201);
+
+    const recipeId = createResponse.body._id;
+
+    const response = await request(app)
+      .patch(`/recipes/${recipeId}/image`)
+      .set("Authorization", "Bearer " + owner.token)
+      .send({});
+
+    expect(response.status).toBe(400);
+  });
+
+  test("PATCH /users/profile-image fails without token", async () => {
+    const response = await request(app)
+      .patch("/users/profile-image")
+      .send({
+        profileImageUrl: "/uploads/no-token-profile.png",
+      });
+
+    expect(response.status).toBe(401);
+  });
+
+  test("PATCH /users/profile-image fails when profileImageUrl is missing", async () => {
+    const user = await getlogedInUser(app);
+
+    const response = await request(app)
+      .patch("/users/profile-image")
+      .set("Authorization", "Bearer " + user.token)
+      .send({});
+
+    expect(response.status).toBe(400);
+  });
 });
