@@ -591,6 +591,62 @@
 				],
 				"type": "object",
 				"additionalProperties": true
+			},
+			"AiRecipeSearchFilters": {
+				"properties": {
+					"ingredients": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"difficulty": {
+						"type": "string",
+						"enum": [
+							"easy",
+							"medium",
+							"hard"
+						]
+					}
+				},
+				"required": [
+					"ingredients"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"AiSearchResponse": {
+				"properties": {
+					"originalQuery": {
+						"type": "string"
+					},
+					"filters": {
+						"$ref": "#/components/schemas/AiRecipeSearchFilters"
+					},
+					"recipes": {
+						"items": {},
+						"type": "array"
+					}
+				},
+				"required": [
+					"originalQuery",
+					"filters",
+					"recipes"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"AiSearchRequest": {
+				"properties": {
+					"query": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"query"
+				],
+				"type": "object",
+				"additionalProperties": true
 			}
 		},
 		"securitySchemes": {}
@@ -2252,6 +2308,38 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/LogoutRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/ai/ai-search": {
+			"post": {
+				"operationId": "AiSearch",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AiSearchResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"AI"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AiSearchRequest"
 							}
 						}
 					}

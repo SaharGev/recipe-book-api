@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import commentRoute from "./routes/commentRoute";
 import uploadRoute from "./routes/uploadRoute";
 import userRoute from "./routes/userRoute";
+import aiRoute from "./routes/aiRoute";
 import swaggerUi from "swagger-ui-express";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("./swagger.json");
@@ -29,6 +30,7 @@ app.use("/upload", uploadRoute);
 app.use("/users", userRoute);
 app.use("/recipe-books", recipeBookRoute);
 app.use("/recipes", recipeRoutes);
+app.use("/ai", aiRoute);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
