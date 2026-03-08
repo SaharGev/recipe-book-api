@@ -17,6 +17,7 @@
     "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts",
     "testUpload": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/upload.test.ts",
     "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
+    "testAi": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/ai.test.ts",
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes"
   },
