@@ -1,0 +1,11 @@
+{
+  "entryFile": "src/server.ts",
+  "controllerPathGlobs": ["src/controllers-tsoa/*.ts"],
+  "spec": {
+    "outputDirectory": "src",
+    "specVersion": 3
+  },
+  "routes": {
+    "routesDir": "src"
+  }
+}
