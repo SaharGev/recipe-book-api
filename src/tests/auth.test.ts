@@ -12,6 +12,27 @@ let userPassword = "";
 process.env.JWT_EXPIRES_IN = "1";
 
 beforeAll(async () => {
+
+process.env.JWT_EXPIRES_IN = "1";
+process.env.GOOGLE_CLIENT_ID = "test-google-client-id";
+
+jest.mock("google-auth-library", () => {
+  const verifyIdTokenMock = jest.fn();
+
+  return {
+    OAuth2Client: jest.fn().mockImplementation(() => ({
+      verifyIdToken: verifyIdTokenMock,
+    })),
+    __verifyIdTokenMock: verifyIdTokenMock,
+  };
+});
+
+const { __verifyIdTokenMock } = jest.requireMock("google-auth-library") as {
+  __verifyIdTokenMock: jest.Mock;
+};
+
+beforeAll(async () => {
+  const { default: initApp } = await import("../app");
   app = await initApp();
   await User.deleteMany({});
 });
@@ -305,5 +326,132 @@ describe("Test Auth Suite", () => {
     expect(res2.status).toBe(409);
     expect(res2.body).toHaveProperty("message");
     expect(res2.body.message).toBe("Username already exists");
+  });
+});
+
+describe("Google Auth", () => {
+  test("POST /auth/google missing idToken should return 400", async () => {
+    const res = await request(app).post("/auth/google").send({});
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("message");
+  });
+
+  test("POST /auth/google invalid token should return 401", async () => {
+    __verifyIdTokenMock.mockRejectedValueOnce(new Error("invalid token"));
+
+    const res = await request(app).post("/auth/google").send({
+      idToken: "fake_token",
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("message");
+  });
+
+  test("POST /auth/google should create user and return tokens", async () => {
+    __verifyIdTokenMock.mockResolvedValueOnce({
+      getPayload: () => ({
+        sub: "google-user-123",
+        email: "google@test.com",
+        name: "Google User",
+        picture: "http://image.test/profile.png",
+      }),
+    });
+
+    const res = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("_id");
+    expect(res.body).toHaveProperty("token");
+    expect(res.body).toHaveProperty("refreshToken");
+  });
+
+  test("POST /auth/google existing user should login", async () => {
+    __verifyIdTokenMock.mockResolvedValueOnce({
+      getPayload: () => ({
+        sub: "google-user-123",
+        email: "google@test.com",
+        name: "Google User",
+        picture: "http://image.test/profile.png",
+      }),
+    });
+
+    const firstLogin = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(firstLogin.status).toBe(200);
+
+    // login again with same google user
+    __verifyIdTokenMock.mockResolvedValueOnce({
+      getPayload: () => ({
+        sub: "google-user-123",
+        email: "google@test.com",
+        name: "Google User",
+        picture: "http://image.test/profile.png",
+      }),
+    });
+
+    const secondLogin = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(secondLogin.status).toBe(200);
+    expect(secondLogin.body).toHaveProperty("_id");
+    expect(secondLogin.body).toHaveProperty("token");
+  });
+
+  test("POST /auth/google should fail if payload missing email", async () => {
+    __verifyIdTokenMock.mockResolvedValueOnce({
+      getPayload: () => ({
+        sub: "google-user-123",
+        email: undefined,
+        name: "Google User",
+      }),
+    });
+
+    const res = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("message");
+  });
+
+  test("POST /auth/google should attach googleId to existing email user", async () => {
+    // create user via regular register
+    const email = `local_${Date.now()}@test.com`;
+    const password = "testpassword";
+    const username = `localuser_${Date.now()}`;
+
+    const regRes = await request(app).post("/auth/register").send({
+      username,
+      email,
+      password,
+    });
+    expect(regRes.status).toBe(201);
+    const existingUserId = regRes.body._id;
+
+    // google login with SAME email but new googleId
+    __verifyIdTokenMock.mockResolvedValueOnce({
+      getPayload: () => ({
+        sub: "google-attached-999",
+        email,
+        name: "Attached User",
+        picture: "http://image.test/p.png",
+      }),
+    });
+
+    const googleRes = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(googleRes.status).toBe(200);
+    expect(googleRes.body).toHaveProperty("_id");
+    expect(googleRes.body._id).toBe(existingUserId);
+    expect(googleRes.body).toHaveProperty("token");
+    expect(googleRes.body).toHaveProperty("refreshToken");
   });
 });

@@ -15,6 +15,7 @@ import swaggerUi from "swagger-ui-express";
 const swaggerDocument = require("./swagger.json");
 
 dotenv.config({ path: ".env.dev" });
+dotenv.config({ path: '.env.dev' });
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/comments", commentRoute);
 app.use("/upload", uploadRoute);
 app.use("/users", userRoute);
 app.use("/recipe-books", recipeBookRoute);
+
 app.use("/recipes", recipeRoutes);
 app.use("/ai", aiRoute);
 
