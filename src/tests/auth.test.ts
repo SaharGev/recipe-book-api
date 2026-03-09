@@ -1,5 +1,6 @@
 import request from "supertest";
 import { Express } from "express";
+import initApp from "../app"; 
 import User from "../models/userModel";
 
 let app: Express;
@@ -8,6 +9,9 @@ let refreshToken = "";
 let userEmail = "";
 let userPassword = "";
 
+process.env.JWT_EXPIRES_IN = "1";
+
+beforeAll(async () => {
 
 process.env.JWT_EXPIRES_IN = "1";
 process.env.GOOGLE_CLIENT_ID = "test-google-client-id";
