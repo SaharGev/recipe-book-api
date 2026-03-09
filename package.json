@@ -10,7 +10,7 @@
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
     "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
     "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
-    "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.register.test.ts",
+    "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testUserModel": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
     "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
     "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts",
@@ -33,6 +33,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "multer": "^2.1.1",
+    "react-router-dom": "^7.13.1",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^7.0.0-alpha.0"
   },
