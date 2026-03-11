@@ -19,10 +19,13 @@ import { CommentSwaggerController } from './controllers-tsoa/commentSwaggerContr
 import { AuthSwaggerController } from './controllers-tsoa/authSwaggerController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AiSwaggerController } from './controllers-tsoa/aiSwaggerController';
+import { expressAuthentication } from './middlewares/tsoaAuthentication';
+// @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 const multer = require('multer');
 
 
+const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, securityName: string, scopes?: string[], res?: ExResponse) => Promise<any>;
 
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
