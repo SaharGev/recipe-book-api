@@ -133,3 +133,9 @@ body {
   color: #8eabeb;
   text-align: center;
 }
+
+.login-error {
+  color: #e53935;
+  font-size: 14px;
+  margin-top: 4px;
+}

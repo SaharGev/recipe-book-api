@@ -3,16 +3,21 @@ import { Link } from "react-router-dom";
 import "./LoginPage.css";
 import { register } from "../services/registerService";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { setToken, setRefreshToken } = useContext(AuthContext);
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  setError("");
 
   try {
     const data = await register(username, email, phone, password);
@@ -20,11 +25,20 @@ const handleSubmit = async (e: React.FormEvent) => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("refreshToken", data.refreshToken);
 
+    setToken(data.token);
+    setRefreshToken(data.refreshToken);
+
     console.log("register response:", data);
 
     navigate("/home");
   } catch (error) {
     console.error("register failed:", error);
+
+    if (error instanceof Error) {
+      setError(error.message);
+    } else {
+      setError("Register failed");
+    }
   }
 };
 
@@ -77,6 +91,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
+          {error && <div className="login-error">{error}</div>}
 
           <button className="login-button" type="submit">
             Sign Up
