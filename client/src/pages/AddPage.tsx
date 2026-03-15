@@ -34,7 +34,7 @@ export default function AddPage() {
 
       let uploadedImageUrl = "";
 
-      // שלב 1: העלאת תמונה
+      // upload image if exists
       if (imageUrl) {
         const imageData = new FormData();
         imageData.append("image", imageUrl);
@@ -55,7 +55,7 @@ export default function AddPage() {
         uploadedImageUrl = uploadResult.url;
       }
 
-      // שלב 2: יצירת מתכון
+      // create recipe
       const res = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: {
