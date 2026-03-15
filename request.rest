@@ -50,12 +50,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE3ZmZjM
 ### Create a new recipe
 POST http://localhost:3000/recipes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE3ZmZjMmM5ZGFmNTdmM2IwMWZmMTUiLCJpYXQiOjE3NzMwNzE3MTIsImV4cCI6MTc3MzA3MjYxMn0._Cw2L08W87H3vwD_QG7E5yVM38O-pvN9etcpLlcbtzU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE3ZmZjMmM5ZGFmNTdmM2IwMWZmMTUiLCJpYXQiOjE3NzM1NzI1NDQsImV4cCI6MTc3MzU3MzQ0NH0.O58d5NyHcef-Lm5KxVAE7GlkE1GGAyH35Lxz7PAtAFc
 
 {
-  "title": "Chocolate Cake",
+  "title": "Chocolateeeeeeee2",
   "description": "A delicious chocolate Cookie recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "2 eggs"],
+  "instructions": "1. Preheat the oven to 350°F (175°C). 2. Mix all ingredients together. 3. Bake for 30 minutes.",
   "cookTime": 30,
   "difficulty": "medium",
   "isPublic": false

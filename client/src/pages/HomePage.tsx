@@ -1,3 +1,4 @@
+// client/src/pages/HomePage.tsx
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
