@@ -6,6 +6,7 @@ import { AuthContext } from "./components/AuthContext";
 import HomePage from "./pages/HomePage";
 import SearchPage from "./pages/SearchPage";
 import AddPage from "./pages/AddPage";
+import MyRecipesPage from "./pages/MyRecipesPage";
 
 export default function AppRoutes() {
   const { token, setToken, setRefreshToken } = useContext(AuthContext);
@@ -18,6 +19,7 @@ export default function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/search" element={token ? <SearchPage /> : <Navigate to="/" />} />
         <Route path="/add" element={token ? <AddPage /> : <Navigate to="/" />} />
+        <Route path="/my-recipes" element={token ? <MyRecipesPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

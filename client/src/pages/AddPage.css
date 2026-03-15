@@ -1,6 +1,5 @@
 /*client/src/pages/AddPage.css */
 
-/* רקע כללי */
 .create-recipe-page {
   background-color: #f4f4f8;
   min-height: 100vh;
@@ -9,7 +8,6 @@
   justify-content: center;
 }
 
-/* כרטיס מרכזי */
 .create-recipe-card {
   max-width: 500px;
   width: 100%;
@@ -19,21 +17,18 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* כותרת */
 .create-recipe-card h1 {
   text-align: center;
   color: #6c5ce7;
   margin-bottom: 24px;
 }
 
-/* טופס */
 .create-recipe-card form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* תוויות */
 .create-recipe-card label {
   color: #6c5ce7;
   font-weight: 500;
@@ -41,7 +36,6 @@
   display: block;
 }
 
-/* קלטים */
 .create-recipe-card input[type="text"],
 .create-recipe-card input[type="number"],
 .create-recipe-card textarea,
@@ -67,12 +61,10 @@
   padding: 0;
 }
 
-/* מרווח בין מרכיבים */
 .ingredient-input {
   margin-bottom: 8px;
 }
 
-/* כפתור להוספת מרכיב */
 .add-ingredient-btn {
   margin-top: 6px;
   background-color: #dfe0ff;
@@ -84,7 +76,6 @@
   font-weight: 500;
 }
 
-/* כפתור שמירת מתכון */
 .save-recipe-btn {
   padding: 14px;
   border-radius: 16px;
