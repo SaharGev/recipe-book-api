@@ -4,6 +4,8 @@ import RegisterPage from "./pages/RegisterPage";
 import { useContext } from "react";
 import { AuthContext } from "./components/AuthContext";
 import HomePage from "./pages/HomePage";
+import SearchPage from "./pages/SearchPage";
+import AddPage from "./pages/AddPage";
 
 export default function AppRoutes() {
   const { token, setToken, setRefreshToken } = useContext(AuthContext);
@@ -14,6 +16,8 @@ export default function AppRoutes() {
         <Route path="/" element={token ? <Navigate to="/home" /> : <LoginPage />} />
         <Route path="/register" element={token ? <Navigate to="/home" /> : <RegisterPage />} />
         <Route path="/home" element={token ? <HomePage /> : <Navigate to="/" />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/add" element={<AddPage />} />
       </Routes>
     </BrowserRouter>
   );

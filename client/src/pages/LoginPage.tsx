@@ -19,6 +19,7 @@ export default function LoginPage() {
 
     try {
       const data = await login(identifier, password);
+      
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);

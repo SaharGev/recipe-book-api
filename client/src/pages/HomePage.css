@@ -1,0 +1,13 @@
+.home-page {
+  min-height: 100vh;
+  padding: 24px 16px 90px;
+  box-sizing: border-box;
+  background-color: #f4f4f4;
+}
+
+.books-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
