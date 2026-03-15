@@ -4,14 +4,18 @@ import "./LoginPage.css";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { setToken, setRefreshToken } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     try {
       const data = await login(identifier, password);
@@ -21,10 +25,18 @@ export default function LoginPage() {
 
       setToken(data.token);
       setRefreshToken(data.refreshToken);
+      
+      navigate("/home");
 
       console.log("login response:", data);
     } catch (error) {
       console.error("login failed:", error);
+
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Login failed");
+      }
     }
   };
 
@@ -44,7 +56,10 @@ export default function LoginPage() {
               type="text"
               placeholder="Email or Mobile"
               value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              onChange={(e) => {
+                setIdentifier(e.target.value);
+                setError("");
+              }}
             />
           </div>
 
@@ -54,12 +69,14 @@ export default function LoginPage() {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
             />
           </div>
 
-          <div className="forgot-password">Forgot password?</div>
-
+          {error && <div className="login-error">{error}</div>}          <div className="forgot-password">Forgot password?</div>
           <button className="login-button" type="submit">
             Login
           </button>
@@ -74,7 +91,7 @@ export default function LoginPage() {
         </button>
 
         <div className="login-footer-text">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>

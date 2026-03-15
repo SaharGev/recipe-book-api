@@ -18,5 +18,9 @@ export async function register(
   });
 
   const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Register failed");
+  }
   return data;
 }
