@@ -13,11 +13,11 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={token ? <Navigate to="/home" /> : <LoginPage />} />
-        <Route path="/register" element={token ? <Navigate to="/home" /> : <RegisterPage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={token ? <HomePage /> : <Navigate to="/" />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/add" element={<AddPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/search" element={token ? <SearchPage /> : <Navigate to="/" />} />
+        <Route path="/add" element={token ? <AddPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,3 +1,4 @@
+// src/routes/uploadRoute.ts
 import express from "express";
 import uploadController from "../controllers/uploadController";
 import { authenticate } from "../middlewares/authMiddleware";

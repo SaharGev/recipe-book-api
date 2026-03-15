@@ -403,8 +403,6 @@ const updateRecipeBook = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Error updating recipe book", error: err.message });
     } 
   };
-
-// const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
 //   try {
 //     const userId = req.user?._id;
 //     if (!userId) {
@@ -485,7 +483,7 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-    // שכפול המתכונים
+    // create new recipes for the new book
     const newRecipeIds = [];
 
     for (const recipe of originalBook.recipes as any[]) {
@@ -498,7 +496,7 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
 
       const newRecipe = await Recipe.create({
         ...recipeObj,
-        title: `Copy of ${recipe.title}`, // שינוי שם המתכון
+        title: `Copy of ${recipe.title}`, 
         owner: userId,
         collaborators: []
       });
@@ -506,7 +504,6 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
       newRecipeIds.push(newRecipe._id);
     }
 
-    // יצירת הספר החדש
     const newBook = await RecipeBook.create({
       name: `Copy of ${originalBook.name}`,
       description: originalBook.description,
