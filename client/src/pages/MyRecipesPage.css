@@ -10,22 +10,49 @@
 }
 
 .page-title {
-  color: black; 
-  margin-bottom: 8px;
-  font-size: 28px;
+  color: #89abf6; 
+  margin-bottom: 6px;
+  font-size: 28px; 
   font-weight: 700;
+  font-family: Arial, sans-serif;
 }
 
 .recipes-count {
-  color: grey; 
-  margin-bottom: 24px;
+  color: #555; 
+  margin-bottom: 20px; 
   font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.add-recipe-button-wrapper {
+  margin-bottom: 20px; 
+  text-align: center;  
+}
+
+.add-recipe-button {
+  width: 100%;           
+  max-width: 480px;      
+  height: 48px;          
+  border: none;
+  border-radius: 14px;   
+  background-color: #8eabeb;  
+  color: white;
+  font-size: 18px;       
+  font-weight: 600;     
+  cursor: pointer;
+  margin-top: 10px;      
+  font-family: Arial, sans-serif; 
+  transition: background-color 0.2s ease;
+}
+
+.add-recipe-button:hover {
+  background-color: #688fe4; 
 }
 
 .recipes-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px; 
   align-items: center; 
 }
 
@@ -43,16 +70,16 @@
   width: 100%;
 }
 
+.recipe-card:hover {
+  transform: scale(1.02);
+}
+
 .recipe-image {
   width: 100px;
   height: 100px;
   object-fit: cover;
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
-}
-
-.recipe-card:hover {
-  transform: scale(1.02);
 }
 
 .recipe-info {
@@ -63,15 +90,17 @@
 .recipe-title {
   margin: 0;
   font-size: 18px;
-  color: black; 
-  text-align: left; 
+  color: #1f2d3d;
+  text-align: left;
+  font-family: Arial, sans-serif;
 }
-
 
 .recipe-description {
   margin: 4px 0;
   font-size: 14px;
   color: #555;
+  text-align: left;
+  font-family: Arial, sans-serif;
 }
 
 .recipe-meta {
@@ -81,40 +110,15 @@
   display: flex;
   gap: 8px;
   justify-content: flex-start;
-}
-
-.recipe-description,
-.recipe-meta {
   text-align: left;
+  font-family: Arial, sans-serif;
 }
 
 .loading-text,
 .error-text,
 .no-recipes-text {
-  color: black; 
+  color: #1f2d3d;
   font-size: 16px;
   margin-top: 32px;
-}
-
-.add-recipe-button-wrapper {
-  margin-bottom: 16px; 
-  text-align: center;  
-}
-
-.add-recipe-button {
-  padding: 12px 20px;
-  border-radius: 12px;
-  background-color: #8eabeb; 
-  color: white;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  max-width: 480px;
-  width: 100%;
-}
-
-.add-recipe-button:hover {
-  background-color: #6c5ce7; 
+  font-family: Arial, sans-serif;
 }
