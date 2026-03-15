@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon  ./src/server.ts",
+    "dev": "nodemon ./src/server.ts",
     "build": "tsc",
     "start": "tsc && node --env-file=.env.dev ./dist/src/server.js",
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
@@ -29,8 +29,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "joi": "^18.0.2",
     "google-auth-library": "^10.6.1",
+    "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "multer": "^2.1.1",
