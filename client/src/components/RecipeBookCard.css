@@ -1,0 +1,30 @@
+.recipe-book-card {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.recipe-book-card h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1f2d3d;
+}
+
+.recipe-book-card p {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: #6f6f6f;
+}
+
+.recipe-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.recipe-thumb {
+  height: 90px;
+  border-radius: 16px;
+  background-color: #e7e7e7;
+}
