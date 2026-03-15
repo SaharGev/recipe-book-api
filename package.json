@@ -12,7 +12,6 @@
     "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
     "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testUserModel": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
-    "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
     "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
     "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts",
     "testUpload": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/upload.test.ts",
@@ -21,19 +20,6 @@
     "tsoa:spec": "tsoa spec",
     "tsoa:routes": "tsoa routes"
   },
-  "dev": "nodemon ./src/server.ts",
-  "build": "tsc",
-  "start": "tsc && node --env-file=.env.dev ./dist/src/server.js",
-  "test": "tsc && jest --runInBand --detectOpenHandles --forceExit",
-  "testRecipes": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipe.test.ts",
-  "testRecipeBooks": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/recipeBook.test.ts",
-  "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/auth.register.test.ts",
-  "testUserModel": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/userModel.test.ts",
-  "testLike": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/like.test.ts",
-  "testComment": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/comment.test.ts",
-  "testUpload": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/upload.test.ts",
-  "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts"
-},
   "keywords": [],
   "author": "Sahar & Hadas",
   "license": "ISC",
@@ -51,7 +37,6 @@
     "react-router-dom": "^7.13.1",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^7.0.0-alpha.0"
-    "multer": "^2.1.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

@@ -15,7 +15,7 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "email": "test2@test.com",
+  "email": "test1@test.com",
   "password": "123456"
 }
 
@@ -45,15 +45,15 @@ Content-Type: application/json
 
 ### Get all recipes (public + owned by user + collaborator)
 GET http://localhost:3000/recipes
-Authorization: Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2MjUyMzUsImV4cCI6MTc3MjYyNjEzNX0.CT1t2iRO47O7QXzrCpQij0CMefFo2CMjxjZJA-_RhTU"
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE3ZmZjMmM5ZGFmNTdmM2IwMWZmMTUiLCJpYXQiOjE3NzMwNzE3MTIsImV4cCI6MTc3MzA3MjYxMn0._Cw2L08W87H3vwD_QG7E5yVM38O-pvN9etcpLlcbtzU
 
 ### Create a new recipe
 POST http://localhost:3000/recipes
 Content-Type: application/json
-Authorization: Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE4MWQwYzQxZTNjODIxNzQ0ZWI4MTgiLCJpYXQiOjE3NzI2MjUyMzUsImV4cCI6MTc3MjYyNjEzNX0.CT1t2iRO47O7QXzrCpQij0CMefFo2CMjxjZJA-_RhTU"
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE3ZmZjMmM5ZGFmNTdmM2IwMWZmMTUiLCJpYXQiOjE3NzMwNzE3MTIsImV4cCI6MTc3MzA3MjYxMn0._Cw2L08W87H3vwD_QG7E5yVM38O-pvN9etcpLlcbtzU
 
 {
-  "title": "Chocolate Cake 3 ",
+  "title": "Chocolate Cake",
   "description": "A delicious chocolate Cookie recipe.",
   "ingredients": ["2 cups flour", "1 cup sugar", "1 cup cocoa powder", "2 eggs"],
   "cookTime": 30,
