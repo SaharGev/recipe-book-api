@@ -1,3 +1,4 @@
+// src/app.ts
 import express, { Express } from "express";
 import cors from "cors";
 import authRoute from "./routes/authRoute";
