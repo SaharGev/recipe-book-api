@@ -14,6 +14,7 @@ type Recipe = {
   imageUrl?: string;
 };
 
+
 export default function MyRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
