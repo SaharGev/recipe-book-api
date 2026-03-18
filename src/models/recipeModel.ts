@@ -37,6 +37,10 @@ const recipeSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+        instructions: {
+            type: String,
+            required: false,
+        },
         collaborators: [
         {
             user: {
