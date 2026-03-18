@@ -14,6 +14,10 @@ export default function HomePage() {
   const { setToken, setRefreshToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const goToMyRecipes = () => {
+    navigate("/my-recipes");
+  };
+
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState("");
 
@@ -37,7 +41,7 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      <ProfileSummaryCard user={user} />
+      <ProfileSummaryCard user={user} onRecipesClick={goToMyRecipes} />
 
       <div className="books-feed">
         <RecipeBookCard title="Desserts" recipesCount={4} />

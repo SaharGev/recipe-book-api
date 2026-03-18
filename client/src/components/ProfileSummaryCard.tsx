@@ -3,10 +3,12 @@ import type { User } from "../types/user";
 
 type ProfileSummaryCardProps = {
   user: User | null;
+  onRecipesClick?: () => void;
 };
 
 export default function ProfileSummaryCard({
   user,
+  onRecipesClick,
 }: ProfileSummaryCardProps) {
   return (
     <div className="profile-summary-card">
@@ -34,7 +36,7 @@ export default function ProfileSummaryCard({
           <p>Books</p>
         </div>
 
-        <div className="profile-stat">
+        <div className="profile-stat" onClick={onRecipesClick} style={{ cursor: "pointer" }}>
           <strong>24</strong>
           <p>Recipes</p>
         </div>

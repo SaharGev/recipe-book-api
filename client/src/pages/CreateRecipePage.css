@@ -1,0 +1,107 @@
+/* client/src/pages/CreateRecipe.css */
+
+.create-recipe-page {
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  padding: 16px 12px 90px; 
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.create-recipe-card {
+  max-width: 520px;
+  width: 100%;
+  background-color: #f7f7f7;
+  border-radius: 28px;
+  padding: 28px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.create-recipe-card h1 {
+  text-align: center;
+  color: #89abf6; 
+  margin-bottom: 22px;
+  font-family: Arial, sans-serif;
+}
+
+.create-recipe-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.create-recipe-card label {
+  color: #1f2d3d;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+  display: block;
+  font-family: Arial, sans-serif;
+}
+
+.create-recipe-card input[type="text"],
+.create-recipe-card input[type="number"],
+.create-recipe-card textarea,
+.create-recipe-card select {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background-color: #efefef;
+  font-size: 16px;
+  font-family: Arial, sans-serif; 
+  color: #1f2d3d;
+  box-sizing: border-box;
+}
+
+.create-recipe-card textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.create-recipe-card select {
+  height: 48px;
+}
+
+.create-recipe-card input[type="file"] {
+  background: transparent;
+  border: none;
+}
+
+.ingredient-input {
+  margin-bottom: 6px;
+  font-family: Arial, sans-serif;
+}
+
+.add-ingredient-btn {
+  background-color: #e6ecfa;
+  color: #8eabeb;
+  border: none;
+  padding: 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+}
+
+.save-recipe-btn {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 14px;
+  background-color: #8eabeb;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+}
+
+@media (max-width: 480px) {
+  .create-recipe-card {
+    padding: 24px 16px;
+    max-width: 100%;
+  }
+}

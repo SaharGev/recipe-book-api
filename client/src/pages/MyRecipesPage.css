@@ -1,0 +1,124 @@
+/* client/src/pages/MyRecipesPage.css */
+
+.my-recipes-page {
+  padding: 16px;
+  padding-bottom: 120px; 
+  background-color: #f4f4f8;
+  min-height: 100vh;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.page-title {
+  color: #89abf6; 
+  margin-bottom: 6px;
+  font-size: 28px; 
+  font-weight: 700;
+  font-family: Arial, sans-serif;
+}
+
+.recipes-count {
+  color: #555; 
+  margin-bottom: 20px; 
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.add-recipe-button-wrapper {
+  margin-bottom: 20px; 
+  text-align: center;  
+}
+
+.add-recipe-button {
+  width: 100%;           
+  max-width: 480px;      
+  height: 48px;          
+  border: none;
+  border-radius: 14px;   
+  background-color: #8eabeb;  
+  color: white;
+  font-size: 18px;       
+  font-weight: 600;     
+  cursor: pointer;
+  margin-top: 10px;      
+  font-family: Arial, sans-serif; 
+  transition: background-color 0.2s ease;
+}
+
+.add-recipe-button:hover {
+  background-color: #688fe4; 
+}
+
+.recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+  align-items: center; 
+}
+
+.recipe-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.1s ease-in-out;
+  max-width: 480px;
+  width: 100%;
+}
+
+.recipe-card:hover {
+  transform: scale(1.02);
+}
+
+.recipe-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.recipe-info {
+  padding: 12px;
+  flex: 1;
+}
+
+.recipe-title {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2d3d;
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+.recipe-description {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+.recipe-meta {
+  font-size: 13px;
+  color: #8a8a8a;
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+.loading-text,
+.error-text,
+.no-recipes-text {
+  color: #1f2d3d;
+  font-size: 16px;
+  margin-top: 32px;
+  font-family: Arial, sans-serif;
+}
