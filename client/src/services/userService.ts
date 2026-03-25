@@ -1,3 +1,4 @@
+// src/services/userService.ts
 import type { User } from "../types/user";
 
 export async function getCurrentUser(token: string): Promise<User> {

@@ -1,3 +1,4 @@
+// src/App.tsx
 import AppRoutes from "./AppRoutes";
 
 function App() {
