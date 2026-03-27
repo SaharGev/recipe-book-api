@@ -1,7 +1,5 @@
 // client/src/pages/HomePage.tsx
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import ProfileSummaryCard from "../components/ProfileSummaryCard";
 import RecipeBookCard from "../components/RecipeBookCard";
@@ -11,9 +9,9 @@ import { getCurrentUser } from "../services/userService";
 import type { User } from "../types/user";
 import { getMyRecipes } from "../services/recipeService";
 import { getMyRecipeBooks } from "../services/recipeBookService";
+import type { RecipeBook } from "../types/recipeBook";
 
 export default function HomePage() {
-  const { setToken, setRefreshToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const goToMyRecipes = () => {
@@ -23,7 +21,7 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [recipesCount, setRecipesCount] = useState(0);
   const [booksCount, setBooksCount] = useState(0);
-  const [books, setBooks] = useState<any[]>([]);
+  const [books, setBooks] = useState<RecipeBook[]>([]);
   const [booksLoading, setBooksLoading] = useState(true);
   const [booksError, setBooksError] = useState("");
 
@@ -49,8 +47,7 @@ export default function HomePage() {
         setBooks(booksData.recipeBooks);
         console.log("books data:", booksData);
 
-      } catch (err) {
-        setError("");
+      } catch {
         setBooksError("Failed to load books");
       } finally {
         setTimeout(() => {
@@ -84,7 +81,7 @@ export default function HomePage() {
           books.map((book) => (
             <RecipeBookCard
               key={book._id}
-              title={book.title}
+              title={book.name}
               recipesCount={book.recipes?.length || 0}
             />
           ))
