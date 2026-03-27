@@ -3,21 +3,35 @@ import type { User } from "../types/user";
 
 type ProfileSummaryCardProps = {
   user: User | null;
+  recipesCount: number;
+  booksCount: number;
   onRecipesClick?: () => void;
 };
 
 export default function ProfileSummaryCard({
   user,
+  recipesCount,
+  booksCount,
   onRecipesClick,
 }: ProfileSummaryCardProps) {
   return (
     <div className="profile-summary-card">
       <div className="profile-summary-header">
-        <div className="profile-avatar" />
+        <div className="profile-user-info">
+          {user?.profileImageUrl ? (
+            <img
+              src={user.profileImageUrl}
+              alt="profile"
+              className="profile-avatar"
+            />
+          ) : (
+            <div className="profile-avatar" />
+          )}
 
-        <div className="profile-summary-text">
-          <h2>{user?.username || "User"}</h2>
-          <p>{user?.email || "No email"}</p>
+          <div className="profile-summary-text">
+            <h2>{user?.username || "User"}</h2>
+            <p>{user?.email || "No email"}</p>
+          </div>
         </div>
 
         <button type="button" className="profile-settings-button">
@@ -27,17 +41,17 @@ export default function ProfileSummaryCard({
 
       <div className="profile-stats">
         <div className="profile-stat">
-          <strong>156</strong>
+          <strong>0</strong>
           <p>Friends</p>
         </div>
 
         <div className="profile-stat">
-          <strong>4</strong>
+          <strong>{booksCount}</strong>
           <p>Books</p>
         </div>
 
         <div className="profile-stat" onClick={onRecipesClick} style={{ cursor: "pointer" }}>
-          <strong>24</strong>
+          <strong>{recipesCount}</strong>
           <p>Recipes</p>
         </div>
       </div>

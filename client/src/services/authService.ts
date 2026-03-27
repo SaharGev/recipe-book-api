@@ -17,6 +17,7 @@ export async function login(identifier: string, password: string) {
   if (!response.ok) {
     throw new Error(data.message || "Login failed");
   }
+  console.log("login response:", data);
   return data;
 }
 
