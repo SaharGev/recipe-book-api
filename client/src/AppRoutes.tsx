@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, Router } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { useContext } from "react";
@@ -11,7 +11,7 @@ import CreateRecipeBookPage from "./pages/CreateRecipeBookPage";
 import CreateRecipe from "./pages/CreateRecipePage";
 
 export default function AppRoutes() {
-  const { token, setToken, setRefreshToken } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   return (
     <BrowserRouter>

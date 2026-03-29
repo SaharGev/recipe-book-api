@@ -8,8 +8,6 @@ type RecipeBookCardProps = {
 export default function RecipeBookCard({ title, recipesCount }: RecipeBookCardProps) {
   return (
     <div className="recipe-book-card">
-      <h3>{title}</h3>
-      <p>{recipesCount} recipes</p>
 
       <div className="recipe-preview">
         <div className="recipe-thumb" />
@@ -17,6 +15,9 @@ export default function RecipeBookCard({ title, recipesCount }: RecipeBookCardPr
         <div className="recipe-thumb" />
         <div className="recipe-thumb" />
       </div>
+      
+      <h3>{title}</h3>
+      <p>{recipesCount} recipes</p>
     </div>
   );
 }

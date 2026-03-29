@@ -1,54 +1,81 @@
 .profile-summary-card {
-  background-color: #ffffff;
-  border-radius: 24px;
-  padding: 18px 16px;
-  box-sizing: border-box;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 .profile-summary-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
+  padding-right: 30px;
+}
+
+.profile-avatar,
+.profile-avatar-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  justify-self: center;
+}
+
+.profile-avatar {
+  background-color: #e9eefc;
+}
+
+.profile-avatar-image {
+  object-fit: cover;
 }
 
 .profile-summary-text {
-  flex: 1;
+  justify-self: start;
+  text-align: left;
 }
 
 .profile-summary-text h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
   color: #1f2d3d;
 }
 
 .profile-summary-text p {
-  margin: 4px 0 0;
+  margin: 6px 0 0;
   font-size: 14px;
   color: #8a8a8a;
 }
 
-.profile-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #e9eefc;
+.profile-settings-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 30px;
+  color: #6f6f6f;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.profile-settings-button:hover {
+  background-color: #e6e6e6;
 }
 
 .profile-stats {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
   text-align: center;
-
-  background-color: #f4f4f4;
-  border-radius: 16px;
-  padding: 12px 8px;
+  padding-top: 8px;
+  margin-bottom: 28px;
 }
 
 .profile-stat strong {
   display: block;
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: 700;
   color: #1f2d3d;
 }
 
@@ -58,11 +85,10 @@
   color: #8a8a8a;
 }
 
-.profile-settings-button {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 20px;
-  color: #6f6f6f;
-  cursor: pointer;
+.profile-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 20px;
 }
+
