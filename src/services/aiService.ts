@@ -1,34 +1,95 @@
 import { AiRecipeSearchFilters, AiSearchResponse } from "../types/aiTypes";
 import { aiClient } from "./aiClient";
-import { aiMockClient } from "./aiMockClient";
 import Recipe from "../models/recipeModel";
+import RecipeBook from "../models/recipeBookModel";
 
-export const aiSearchService = async (query: string): Promise<AiSearchResponse> => {
-    const filters: AiRecipeSearchFilters = await aiClient.analyzeQuery(query);
+export const aiSearchService = async (
+  query: string,
+  userId: string
+): Promise<AiSearchResponse> => {
+  const filters: AiRecipeSearchFilters = await aiClient.analyzeQuery(query);
 
-    if (filters.ingredients.length === 0) {
-        return {
-            originalQuery: query,
-            filters,
-            recipes: [],
-        };
-    }
-    const queryObject: {
-        ingredients: { $all: string[] };
-        difficulty?: "easy" | "medium" | "hard";
-    } = {
-        ingredients: { $all: filters.ingredients },
-    };
+  const hasNoFilters =
+    filters.ingredients.length === 0 &&
+    !filters.difficulty &&
+    !filters.title;
 
-    if (filters.difficulty) {
-        queryObject.difficulty = filters.difficulty;
-    }
+  const queryObject: {
+    ingredients?: { $all: string[] };
+    difficulty?: "easy" | "medium" | "hard";
+    category?: string;
+  } = {};
 
-    const recipes = await Recipe.find(queryObject).limit(10);
+  if (filters.ingredients.length > 0) {
+    queryObject.ingredients = { $all: filters.ingredients };
+  }
 
-    return {
-        originalQuery: query,
-        filters,
-        recipes,
-    };
+  if (filters.difficulty) {
+    queryObject.difficulty = filters.difficulty;
+  }
+
+  const recipeAccessFilter = {
+    $or: [
+      { owner: userId },
+      { isPublic: true },
+      { "collaborators.user": userId },
+    ],
+  };
+
+  const recipes = await Recipe.find({
+    $and: [
+      recipeAccessFilter,
+      {
+        $or: [
+          ...(Object.keys(queryObject).length > 0 ? [queryObject] : []),
+          ...(filters.title
+            ? [{ title: { $regex: filters.title, $options: "i" } }]
+            : []),
+          ...(hasNoFilters
+            ? [{ title: { $regex: query, $options: "i" } }]
+            : []),
+          ...(filters.category
+            ? [
+                { title: { $regex: filters.category, $options: "i" } },
+                { description: { $regex: filters.category, $options: "i" } },
+                { ingredients: { $in: [filters.category] } },
+              ]
+            : []),
+          ...(query
+            ? [
+                {
+                  $or: [
+                    { title: { $regex: query, $options: "i" } },
+                    { description: { $regex: query, $options: "i" } },
+                  ],
+                },
+              ]
+            : []),
+        ],
+      },
+    ],
+  }).limit(10);
+
+  const recipeBooks = await RecipeBook.find({
+    name: { $regex: query, $options: "i" },
+  }).limit(10);
+
+  return {
+    originalQuery: query,
+    filters,
+    recipes,
+    recipeBooks,
+    sections: [
+      {
+        type: "recipes",
+        title: "Recipes",
+        items: recipes,
+      },
+      {
+        type: "recipeBooks",
+        title: "Recipe Books",
+        items: recipeBooks,
+      },
+    ],
+  };
 };
