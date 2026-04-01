@@ -24,12 +24,15 @@ interface AiSearchResponse {
 }
 
 export async function aiSearch(query: string): Promise<AiSearchResponse> {
+  const token = localStorage.getItem("accessToken");
+
   const response = await fetch("/ai/ai-search", {
-    method: "POST",
-    headers: {
+  method: "POST",
+  headers: {
       "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query }),
+      Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify({ query }),
   });
 
   const data = await response.json();

@@ -36,6 +36,14 @@ export const aiSearchService = async (
     ],
   };
 
+  const recipeBookAccessFilter = {
+    $or: [
+        { owner: userId },
+        { isPublic: true },
+        { "collaborators.user": userId },
+    ],
+  };
+
   const recipes = await Recipe.find({
     $and: [
       recipeAccessFilter,
@@ -71,7 +79,12 @@ export const aiSearchService = async (
   }).limit(10);
 
   const recipeBooks = await RecipeBook.find({
-    name: { $regex: query, $options: "i" },
+    $and: [
+        recipeBookAccessFilter,
+        {
+        name: { $regex: query, $options: "i" },
+        },
+    ],
   }).limit(10);
 
   return {

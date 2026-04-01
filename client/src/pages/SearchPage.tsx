@@ -1,6 +1,6 @@
 import BottomNav from "../components/BottomNav";
 import "./SearchPage.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { aiSearch } from "../services/aiSearchService";
 import RecipeCard from "../components/RecipeCard";
 import RecipeBookCard from "../components/RecipeBookCard";
@@ -39,6 +39,19 @@ export default function SearchPage() {
     }
   };
 
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setSections([]);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      handleSearch();
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
   return (
     <div className="search-page">
       <h2 className="search-title">Search</h2>
@@ -50,11 +63,6 @@ export default function SearchPage() {
           placeholder="Search a recipe..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
         />
       </div>
 

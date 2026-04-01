@@ -17,8 +17,11 @@ export const aiSearch = async (req: Request, res: Response) => {
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to perform AI search",
-    });
+  console.error("AI SEARCH ERROR:", error);
+
+  res.status(500).json({
+    message: "Failed to perform AI search",
+    error: error instanceof Error ? error.message : error,
+  });
   }
 };
