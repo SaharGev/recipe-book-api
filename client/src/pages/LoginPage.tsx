@@ -1,3 +1,4 @@
+// client/src/pages/LoginPage.tsx
 import { useState } from "react";
 import { login } from "../services/authService";
 import "./LoginPage.css";
@@ -19,7 +20,6 @@ export default function LoginPage() {
 
     try {
       const data = await login(identifier, password);
-      
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
