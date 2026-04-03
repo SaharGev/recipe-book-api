@@ -6,6 +6,7 @@ type ProfileSummaryCardProps = {
   recipesCount: number;
   booksCount: number;
   onRecipesClick?: () => void;
+  onBooksClick?: () => void;
 };
 
 export default function ProfileSummaryCard({
@@ -13,6 +14,7 @@ export default function ProfileSummaryCard({
   recipesCount,
   booksCount,
   onRecipesClick,
+  onBooksClick,
 }: ProfileSummaryCardProps) {
   return (
     <div className="profile-summary-card">
@@ -45,7 +47,7 @@ export default function ProfileSummaryCard({
           <p>Friends</p>
         </div>
 
-        <div className="profile-stat">
+        <div className="profile-stat" onClick={onBooksClick} style={{ cursor: "pointer" }}>
           <strong>{booksCount}</strong>
           <p>Books</p>
         </div>
