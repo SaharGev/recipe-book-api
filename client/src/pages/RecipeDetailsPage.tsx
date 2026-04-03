@@ -10,6 +10,7 @@ export default function RecipeDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const accessToken = token || localStorage.getItem("accessToken");
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
 
@@ -31,16 +32,24 @@ export default function RecipeDetailsPage() {
   useEffect(() => {
     const fetchRecipe = async () => {
       const res = await fetch(`http://localhost:3000/recipes/${id}`, {
-        headers: { Authorization: "Bearer " + token },
+        headers: { Authorization: "Bearer " + accessToken },
       });
 
+      console.log("recipe details status:", res.status);
+
       const data = await res.json();
+      console.log("recipe details data:", data);
+
+      if (!res.ok) {
+        return;
+      }
+
       setRecipe(data);
       saveRecentlyViewedRecipe(data);
     };
 
     fetchRecipe();
-  }, [id, token]);
+  }, [id, accessToken]);
 
   if (!recipe) return <p>Loading...</p>;
 

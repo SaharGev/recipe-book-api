@@ -5,12 +5,14 @@ import { aiSearch } from "../services/aiSearchService";
 import RecipeCard from "../components/RecipeCard";
 import RecipeBookCard from "../components/RecipeBookCard";
 import type { AiSearchSection } from "../services/aiSearchService";
+import type { Recipe } from "../types/recipe";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [sections, setSections] = useState<AiSearchSection[]>([]);
+  const [recentlyViewedRecipes, setRecentlyViewedRecipes] = useState<Recipe[]>([]);
 
   const recipesSection = sections.find(
     (section): section is Extract<AiSearchSection, { type: "recipes" }> =>
@@ -52,31 +54,19 @@ export default function SearchPage() {
     return () => clearTimeout(timeout);
   }, [query]);
 
+  useEffect(() => {
+    const storedRecipes = localStorage.getItem("recentlyViewedRecipes");
+
+    if (storedRecipes) {
+      setRecentlyViewedRecipes(JSON.parse(storedRecipes));
+    }
+  }, []);
+
   const categories = [
     "Main courses 🍲",
     "Breakfasts 🍳",
   ];
 
-  const recentlyViewedRecipes = [
-    {
-      _id: "recent-1",
-      title: "Shakshuka",
-      description: "Classic tomato shakshuka",
-      ingredients: ["tomato", "egg", "pepper"],
-      cookTime: 30,
-      difficulty: "easy",
-      imageUrl: "",
-    },
-    {
-      _id: "recent-2",
-      title: "Pasta with Cream",
-      description: "Creamy pasta",
-      ingredients: ["pasta", "cream", "mushroom"],
-      cookTime: 40,
-      difficulty: "medium",
-      imageUrl: "",
-    },
-  ];
 
   return (
     <div className="search-page">
@@ -100,17 +90,19 @@ export default function SearchPage() {
         ))}
       </div>
 
-      <div className="search-section">
-        <div className="search-section-header">
-          <h3 className="search-section-title">Recently viewed recipes</h3>
-        </div>
+      {recentlyViewedRecipes.length > 0 && (
+        <div className="search-section">
+          <div className="search-section-header">
+            <h3 className="search-section-title">Recently viewed recipes</h3>
+          </div>
 
-        <div className="search-results-section">
-          {recentlyViewedRecipes.map((recipe) => (
-            <RecipeCard key={recipe._id} recipe={recipe} />
-          ))}
+          <div className="search-results-section">
+            {recentlyViewedRecipes.map((recipe) => (
+              <RecipeCard key={recipe._id} recipe={recipe} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {searchLoading && <p>Searching...</p>}
       {searchError && <p>{searchError}</p>}
