@@ -52,6 +52,32 @@ export default function SearchPage() {
     return () => clearTimeout(timeout);
   }, [query]);
 
+  const categories = [
+    "Main courses 🍲",
+    "Breakfasts 🍳",
+  ];
+
+  const recentlyViewedRecipes = [
+    {
+      _id: "recent-1",
+      title: "Shakshuka",
+      description: "Classic tomato shakshuka",
+      ingredients: ["tomato", "egg", "pepper"],
+      cookTime: 30,
+      difficulty: "easy",
+      imageUrl: "",
+    },
+    {
+      _id: "recent-2",
+      title: "Pasta with Cream",
+      description: "Creamy pasta",
+      ingredients: ["pasta", "cream", "mushroom"],
+      cookTime: 40,
+      difficulty: "medium",
+      imageUrl: "",
+    },
+  ];
+
   return (
     <div className="search-page">
       <h2 className="search-title">Search</h2>
@@ -64,6 +90,26 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+      </div>
+
+      <div className="search-categories">
+        {categories.map((category) => (
+          <div key={category} className="category-chip">
+            {category}
+          </div>
+        ))}
+      </div>
+
+      <div className="search-section">
+        <div className="search-section-header">
+          <h3 className="search-section-title">Recently viewed recipes</h3>
+        </div>
+
+        <div className="search-results-section">
+          {recentlyViewedRecipes.map((recipe) => (
+            <RecipeCard key={recipe._id} recipe={recipe} />
+          ))}
+        </div>
       </div>
 
       {searchLoading && <p>Searching...</p>}

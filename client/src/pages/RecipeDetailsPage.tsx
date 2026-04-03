@@ -13,6 +13,21 @@ export default function RecipeDetailsPage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
 
+  const saveRecentlyViewedRecipe = (recipeToSave: Recipe) => {
+    const storageKey = "recentlyViewedRecipes";
+
+    const existingRaw = localStorage.getItem(storageKey);
+    const existingRecipes: Recipe[] = existingRaw ? JSON.parse(existingRaw) : [];
+
+    const filteredRecipes = existingRecipes.filter(
+      (item) => item._id !== recipeToSave._id
+    );
+
+    const updatedRecipes = [recipeToSave, ...filteredRecipes].slice(0, 10);
+
+    localStorage.setItem(storageKey, JSON.stringify(updatedRecipes));
+  };
+
   useEffect(() => {
     const fetchRecipe = async () => {
       const res = await fetch(`http://localhost:3000/recipes/${id}`, {
@@ -21,6 +36,7 @@ export default function RecipeDetailsPage() {
 
       const data = await res.json();
       setRecipe(data);
+      saveRecentlyViewedRecipe(data);
     };
 
     fetchRecipe();

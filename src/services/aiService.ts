@@ -31,13 +31,15 @@ export const aiSearchService = async (
 
   // recipe query object
   const queryObject: {
-    ingredients?: { $all: string[] };
+    ingredients?: { $all: RegExp[] };
     difficulty?: "easy" | "medium" | "hard";
     category?: string;
   } = {};
 
   if (filters.ingredients.length > 0) {
-    queryObject.ingredients = { $all: filters.ingredients };
+    queryObject.ingredients = {
+      $all: filters.ingredients.map((ing) => new RegExp(ing, "i")),
+    };
   }
 
   if (filters.difficulty) {
