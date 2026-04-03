@@ -1,0 +1,36 @@
+.home-page {
+  min-height: 100vh;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 40px 16px 90px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+.books-feed {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 12px 8px;
+  margin-top: 12px;
+}
+
+.section-title {
+  margin: 28px 0 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2d3d; 
+}
+
+.mybooks-title {
+  color: #89abf6;
+  text-align: center;       
+  font-size: 25px;          
+  font-weight: 700;
+  margin: 28px 0 14px;     
+}
+
+.section-divider {
+  height: 1px;
+  background-color: #e9e9e9;
+  margin: 16px 0 8px;
+}

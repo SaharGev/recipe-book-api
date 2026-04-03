@@ -1,124 +1,113 @@
-/* client/src/pages/MyRecipesPage.css */
+body {
+  background-color: #f4f4f8; 
+}
 
-.my-recipes-page {
-  padding: 16px;
-  padding-bottom: 120px; 
-  background-color: #f4f4f8;
-  min-height: 100vh;
+.myrecipes-page {
+  max-width: 390px; 
+  margin: 0 auto;
+  padding: 40px 16px 120px;
   box-sizing: border-box;
+  background-color: #ffffff; 
+  min-height: 100vh;
   text-align: center;
 }
 
-.page-title {
-  color: #89abf6; 
-  margin-bottom: 6px;
-  font-size: 28px; 
+.myrecipes-page-title {
+  color: #89abf6;
+  font-size: 28px;
   font-weight: 700;
-  font-family: Arial, sans-serif;
+  margin-bottom: 4px;
 }
 
-.recipes-count {
-  color: #555; 
-  margin-bottom: 20px; 
+.myrecipes-recipes-count {
+  color: #555;
   font-size: 16px;
-  font-family: Arial, sans-serif;
+  margin-bottom: 20px;
 }
 
-.add-recipe-button-wrapper {
-  margin-bottom: 20px; 
-  text-align: center;  
+.myrecipes-add-button-wrapper {
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.add-recipe-button {
-  width: 100%;           
-  max-width: 480px;      
-  height: 48px;          
+.myrecipes-add-button {
+  width: 100%;
+  max-width: 390px;
+  height: 48px;
   border: none;
-  border-radius: 14px;   
-  background-color: #8eabeb;  
+  border-radius: 14px;
+  background-color: #8eabeb;
   color: white;
-  font-size: 18px;       
-  font-weight: 600;     
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;      
-  font-family: Arial, sans-serif; 
   transition: background-color 0.2s ease;
 }
 
-.add-recipe-button:hover {
-  background-color: #688fe4; 
+.myrecipes-add-button:hover {
+  background-color: #688fe4;
 }
 
-.recipes-list {
+.myrecipes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 8px;
+  background-color: #ffffff; 
+  padding: 8px; 
+}
+
+.myrecipes-card {
   display: flex;
   flex-direction: column;
-  gap: 16px; 
-  align-items: center; 
-}
-
-.recipe-card {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   background-color: #ffffff;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.1s ease-in-out;
-  max-width: 480px;
-  width: 100%;
 }
 
-.recipe-card:hover {
+.myrecipes-card:hover {
   transform: scale(1.02);
 }
 
-.recipe-image {
-  width: 100px;
-  height: 100px;
+.myrecipes-card-image,
+.myrecipes-card-image-placeholder {
+  width: 100%;
+  height: 120px;
   object-fit: cover;
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
+  background-color: #e9eefc;
+  display: block;
 }
 
-.recipe-info {
-  padding: 12px;
-  flex: 1;
-}
-
-.recipe-title {
-  margin: 0;
-  font-size: 18px;
+.myrecipes-card-title {
+  margin: 6px;
+  font-size: 16px;
+  font-weight: 600;
   color: #1f2d3d;
-  text-align: left;
-  font-family: Arial, sans-serif;
+  text-align: center;
 }
 
-.recipe-description {
-  margin: 4px 0;
+.myrecipes-card-description {
+  margin: 0 6px 6px 6px;
   font-size: 14px;
   color: #555;
-  text-align: left;
-  font-family: Arial, sans-serif;
+  text-align: center;
 }
 
-.recipe-meta {
+.myrecipes-card-meta {
   font-size: 13px;
   color: #8a8a8a;
-  margin-top: 6px;
+  margin: 6px;
   display: flex;
   gap: 8px;
-  justify-content: flex-start;
-  text-align: left;
-  font-family: Arial, sans-serif;
+  justify-content: center;
 }
 
-.loading-text,
-.error-text,
-.no-recipes-text {
+.myrecipes-loading-text,
+.myrecipes-error-text,
+.myrecipes-no-recipes-text {
   color: #1f2d3d;
   font-size: 16px;
   margin-top: 32px;
-  font-family: Arial, sans-serif;
 }
