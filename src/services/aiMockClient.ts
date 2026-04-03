@@ -9,26 +9,43 @@ export const aiMockClient: AiClient = {
       .map((word) => word.trim())
       .filter(Boolean);
 
-
+    // extracted values
     let title: string | undefined;
     let category: string | undefined;
+    let recipeBookName: string | undefined;
+    let favorites: boolean | undefined;
 
     const ingredients: string[] = [];
 
-    let difficulty: "easy" | "medium" | "hard" | undefined;
+    // difficulty detection
+    const difficultyKeywords = ["easy", "medium", "hard"] as const;
 
-    if (lowerQuery.includes("easy")) {
-      difficulty = "easy";
+    const detectedDifficulty = difficultyKeywords.find((keyword) =>
+      words.includes(keyword)
+    );
+
+    // direct keyword detection
+    if (words.includes("pasta") && !ingredients.includes("pasta")) {
+      ingredients.push("pasta");
     }
 
-    if (lowerQuery.includes("medium")) {
-      difficulty = "medium";
+    if (words.includes("tomato") && !ingredients.includes("tomato")) {
+      ingredients.push("tomato");
     }
 
-    if (lowerQuery.includes("hard")) {
-      difficulty = "hard";
+    const isBookSearch = lowerQuery.includes("book");
+    const isFavoritesSearch =
+      lowerQuery.includes("favorite") || lowerQuery.includes("favorites");
+
+    if (isBookSearch) {
+      recipeBookName = query.trim();
     }
 
+    if (isFavoritesSearch) {
+      favorites = true;
+    }
+
+    // knowledge-based detection
     for (const [key, knowledge] of Object.entries(aiSearchKnowledge)) {
       if (knowledge.synonyms.some((synonym) => words.includes(synonym))) {
         category = key;
@@ -44,9 +61,11 @@ export const aiMockClient: AiClient = {
 
     return {
       ingredients,
-      difficulty,
+      difficulty: detectedDifficulty,
       title,
       category,
+      recipeBookName,
+      favorites,
     };
   },
 };

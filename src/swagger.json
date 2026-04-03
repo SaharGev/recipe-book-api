@@ -607,10 +607,53 @@
 							"medium",
 							"hard"
 						]
+					},
+					"title": {
+						"type": "string"
+					},
+					"category": {
+						"type": "string"
+					},
+					"recipeBookName": {
+						"type": "string"
+					},
+					"shared": {
+						"type": "boolean"
+					},
+					"favorites": {
+						"type": "boolean"
+					},
+					"recentlyViewed": {
+						"type": "boolean"
 					}
 				},
 				"required": [
 					"ingredients"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"AiSearchSection": {
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"recipes",
+							"recipeBooks"
+						]
+					},
+					"title": {
+						"type": "string"
+					},
+					"items": {
+						"items": {},
+						"type": "array"
+					}
+				},
+				"required": [
+					"type",
+					"title",
+					"items"
 				],
 				"type": "object",
 				"additionalProperties": true
@@ -626,12 +669,24 @@
 					"recipes": {
 						"items": {},
 						"type": "array"
+					},
+					"recipeBooks": {
+						"items": {},
+						"type": "array"
+					},
+					"sections": {
+						"items": {
+							"$ref": "#/components/schemas/AiSearchSection"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"originalQuery",
 					"filters",
-					"recipes"
+					"recipes",
+					"recipeBooks",
+					"sections"
 				],
 				"type": "object",
 				"additionalProperties": true
@@ -2327,12 +2382,52 @@
 								}
 							}
 						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Failed to perform AI search",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
 					}
 				},
 				"tags": [
 					"AI"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
