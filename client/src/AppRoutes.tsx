@@ -9,6 +9,7 @@ import AddPage from "./pages/AddPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
 import CreateRecipeBookPage from "./pages/CreateRecipeBookPage";
 import CreateRecipe from "./pages/CreateRecipePage";
+import MyRecipeBooksPage from "./pages/MyRecipeBooksPage";
 
 export default function AppRoutes() {
   const { token } = useContext(AuthContext);
@@ -24,6 +25,7 @@ export default function AppRoutes() {
         <Route path="/my-recipes" element={token ? <MyRecipesPage /> : <Navigate to="/" />} />
         <Route path="/createRecipeBook" element={token ? <CreateRecipeBookPage /> : <Navigate to="/" />} />
         <Route path="/createRecipe" element={token ? <CreateRecipe /> : <Navigate to="/" />} />
+        <Route path="/my-recipeBooks" element={token ? <MyRecipeBooksPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

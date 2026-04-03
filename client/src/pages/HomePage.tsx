@@ -18,6 +18,10 @@ export default function HomePage() {
     navigate("/my-recipes");
   };
 
+  const goToMyRecipeBooks = () => {
+    navigate("/my-recipeBooks");
+  };
+
   const [user, setUser] = useState<User | null>(null);
   const [recipesCount, setRecipesCount] = useState(0);
   const [booksCount, setBooksCount] = useState(0);
@@ -67,6 +71,7 @@ export default function HomePage() {
           recipesCount={recipesCount}
           booksCount={booksCount}
           onRecipesClick={goToMyRecipes}
+          onBooksClick={goToMyRecipeBooks}
         />
       <div className="section-divider" />
       <h3 className="section-title">My Books</h3>
