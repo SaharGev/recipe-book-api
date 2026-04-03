@@ -5,6 +5,7 @@ import { AiSearchRequest } from "../types/aiTypes";
 export const aiSearch = async (req: Request, res: Response) => {
   try {
     const { query } = req.body as AiSearchRequest;
+    const typedReq = req as Request & { user: { _id: string } };
 
     if (!query) {
       return res.status(400).json({
@@ -12,12 +13,15 @@ export const aiSearch = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await aiSearchService(query);
+    const result = await aiSearchService(query, typedReq.user._id.toString());
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to perform AI search",
-    });
+  console.error("AI SEARCH ERROR:", error);
+
+  res.status(500).json({
+    message: "Failed to perform AI search",
+    error: error instanceof Error ? error.message : error,
+  });
   }
 };

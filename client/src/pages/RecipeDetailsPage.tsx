@@ -3,17 +3,8 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import "./RecipeDetailsPage.css";
+import type { Recipe } from "../types/recipe";
 
-type Recipe = {
-  _id: string;
-  title: string;
-  description?: string;
-  ingredients: string[];
-  cookTime: number;
-  difficulty: string;
-  instructions?: string;
-  imageUrl?: string;
-};
 
 export default function RecipeDetailsPage() {
   const { id } = useParams();

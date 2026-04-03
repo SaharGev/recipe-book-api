@@ -321,6 +321,22 @@ const models: TsoaRoute.Models = {
         "properties": {
             "ingredients": {"dataType":"array","array":{"dataType":"string"},"required":true},
             "difficulty": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["easy"]},{"dataType":"enum","enums":["medium"]},{"dataType":"enum","enums":["hard"]}]},
+            "title": {"dataType":"string"},
+            "category": {"dataType":"string"},
+            "recipeBookName": {"dataType":"string"},
+            "shared": {"dataType":"boolean"},
+            "favorites": {"dataType":"boolean"},
+            "recentlyViewed": {"dataType":"boolean"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AiSearchSection": {
+        "dataType": "refObject",
+        "properties": {
+            "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["recipes"]},{"dataType":"enum","enums":["recipeBooks"]}],"required":true},
+            "title": {"dataType":"string","required":true},
+            "items": {"dataType":"array","array":{"dataType":"any"},"required":true},
         },
         "additionalProperties": true,
     },
@@ -331,6 +347,8 @@ const models: TsoaRoute.Models = {
             "originalQuery": {"dataType":"string","required":true},
             "filters": {"ref":"AiRecipeSearchFilters","required":true},
             "recipes": {"dataType":"array","array":{"dataType":"any"},"required":true},
+            "recipeBooks": {"dataType":"array","array":{"dataType":"any"},"required":true},
+            "sections": {"dataType":"array","array":{"dataType":"refObject","ref":"AiSearchSection"},"required":true},
         },
         "additionalProperties": true,
     },
@@ -1328,9 +1346,11 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAiSwaggerController_aiSearch: Record<string, TsoaRoute.ParameterSchema> = {
+                req: {"in":"request","name":"req","required":true,"dataType":"object"},
                 body: {"in":"body","name":"body","required":true,"ref":"AiSearchRequest"},
         };
         app.post('/ai/ai-search',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(AiSwaggerController)),
             ...(fetchMiddlewares<RequestHandler>(AiSwaggerController.prototype.aiSearch)),
 
