@@ -158,6 +158,19 @@ const getRecipeBookById = async (req: AuthRequest, res: Response) => {
     if (!recipeBook.isPublic && !isOwner && !isCollaborator) {
         return res.status(403).json({ message: "Forbidden" });
     }
+    await User.findByIdAndUpdate(userId, {
+      $pull: { recentlyViewedBooks: recipeBook._id },
+    });
+
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        recentlyViewedBooks: {
+          $each: [recipeBook._id],
+          $position: 0,
+          $slice: 10,
+        },
+      },
+    });
     res.status(200).json({ message: "Recipe book fetched successfully", recipeBook });
     } catch (err: any) {
     res.status(500).json({ message: "Error fetching recipe book", error: err.message });

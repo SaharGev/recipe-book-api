@@ -31,7 +31,7 @@ describe("RecipeBook API", () => {
             isPublic: false
         };
         const response = await request(app).post("/recipe-books")
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send(newBook);
         expect(response.status).toBe(201);
         expect(response.body.name).toBe(newBook.name);
@@ -46,7 +46,7 @@ describe("RecipeBook API", () => {
       // create recipe book
       const bookResp = await request(app)
         .post("/recipe-books")
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({
           name: "Book for recipes",
           description: "Test book",
@@ -59,7 +59,7 @@ describe("RecipeBook API", () => {
       // create recipe owned by same user
       const recipeResp = await request(app)
         .post("/recipes")
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({
           title: "Test Recipe",
           ingredients: ["egg", "milk"],
@@ -73,7 +73,7 @@ describe("RecipeBook API", () => {
       // add recipe to book
       const addResp = await request(app)
         .post(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
 
       expect(addResp.status).toBe(200);
 
@@ -84,14 +84,14 @@ describe("RecipeBook API", () => {
     });
   
     test("Collaborator can add owner's recipe to Recipe Book", async () => {
-        const bookResp = await createRecipeBook(app, loginUser.token, {
+        const bookResp = await createRecipeBook(app, loginUser.accessToken, {
           name: "Book with Collaborator",
           description: "Test collaborator adding recipe",
           isPublic: false
         });
         const recipeBookId = bookResp.body._id;
 
-        const collabUser = { email: "collab@example.com", username: "collabuser", password: "testpassword" };
+        const collabUser = { email: "collab@example.com", username: "collabUser", password: "testpassword" };
         const collabLogged = await getLoggedInCustomUser(app, collabUser);
         await RecipeBook.findByIdAndUpdate(recipeBookId, {
           $push: { collaborators: { user: collabLogged._id, role: "editor" } },
@@ -99,13 +99,13 @@ describe("RecipeBook API", () => {
 
         const recipeResp = await request(app)
           .post("/recipes")
-          .set("Authorization", "Bearer " + loginUser.token)
+          .set("Authorization", "Bearer " + loginUser.accessToken)
           .send(recipesList[1]);
         const recipeId = recipeResp.body._id;
 
         const addResp = await request(app)
           .post(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-          .set("Authorization", "Bearer " + collabLogged.token);
+          .set("Authorization", "Bearer " + collabLogged.accessToken);
 
         expect(addResp.status).toBe(200);
         expect(addResp.body.recipeBook.recipes).toContain(recipeId);
@@ -113,7 +113,7 @@ describe("RecipeBook API", () => {
     });
 
     test("Remove a recipe from a Recipe Book", async () => {
-      const bookResp = await createRecipeBook(app, loginUser.token, {
+      const bookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Book for Removing Recipes",
         description: "Test removing recipes",
         isPublic: false,
@@ -122,21 +122,21 @@ describe("RecipeBook API", () => {
 
       const recipeResp = await request(app)
         .post("/recipes")
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send(recipesList[0]);
       expect(recipeResp.status).toBe(201);
       const recipeId = recipeResp.body._id;
 
       const addResp = await request(app)
         .post(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
       expect(addResp.status).toBe(200);
       expect(addResp.body.recipeBook.recipes).toContain(recipeId);
       expect(addResp.body.recipeBook.recipesCount).toBe(1);
 
       const removeResp = await request(app)
         .delete(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
 
       expect(removeResp.status).toBe(200);
       expect(removeResp.body.recipeBook.recipes).not.toContain(recipeId);
@@ -144,11 +144,11 @@ describe("RecipeBook API", () => {
 
       const removeAgainResp = await request(app)
         .delete(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
       expect(removeAgainResp.status).toBe(404);
       expect(removeAgainResp.body.message).toBe("Recipe not in book");
 
-      const collabUser = { email: "collab3@example.com", username: "collabuser3", password: "testpassword" };
+      const collabUser = { email: "collab3@example.com", username: "collabUser3", password: "testpassword" };
       const collabLogged = await getLoggedInCustomUser(app, collabUser);
 
       await RecipeBook.findByIdAndUpdate(recipeBookId, {
@@ -157,11 +157,11 @@ describe("RecipeBook API", () => {
 
       await request(app)
         .post(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
 
       const collabRemoveResp = await request(app)
         .delete(`/recipe-books/${recipeBookId}/recipes/${recipeId}`)
-        .set("Authorization", "Bearer " + collabLogged.token);
+        .set("Authorization", "Bearer " + collabLogged.accessToken);
 
       expect(collabRemoveResp.status).toBe(200);
       expect(collabRemoveResp.body.recipeBook.recipes).not.toContain(recipeId);
@@ -169,24 +169,24 @@ describe("RecipeBook API", () => {
     });
 
     test("Get all recipe books for a user", async () => {
-      const ownedBookResp = await createRecipeBook(app, loginUser.token, {
+      const ownedBookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Owned Book",
         description: "Book owned by user",
         isPublic: false,
       });
       const ownedBookId = ownedBookResp.body._id;
 
-      const publicBookResp = await createRecipeBook(app, loginUser.token, {
+      const publicBookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Public Book",
         description: "This book is public",
         isPublic: true,
       });
       const publicBookId = publicBookResp.body._id;
 
-      const collabUser = { email: "collab2@example.com", username: "collabuser2", password: "testpassword" };
+      const collabUser = { email: "collab2@example.com", username: "collabUser2", password: "testpassword" };
       const collabLogged = await getLoggedInCustomUser(app, collabUser);
 
-      const collabBookResp = await createRecipeBook(app, loginUser.token, {
+      const collabBookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Book with collaborator",
         description: "Shared book",
         isPublic: false,
@@ -198,7 +198,7 @@ describe("RecipeBook API", () => {
 
       const response = await request(app)
         .get("/recipe-books")
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
 
       expect(response.status).toBe(200);
       expect(response.body.recipeBooks).toEqual(
@@ -217,12 +217,12 @@ describe("RecipeBook API", () => {
 
     test("Get only my recipe books", async () => {
       // Books owned by the user
-      const ownedBookResp1 = await createRecipeBook(app, loginUser.token, {
+      const ownedBookResp1 = await createRecipeBook(app, loginUser.accessToken, {
         name: "My Book 1",
         description: "First book",
         isPublic: false,
       });
-      const ownedBookResp2 = await createRecipeBook(app, loginUser.token, {
+      const ownedBookResp2 = await createRecipeBook(app, loginUser.accessToken, {
         name: "My Book 2",
         description: "Second book",
         isPublic: true, 
@@ -231,10 +231,10 @@ describe("RecipeBook API", () => {
       const ownedBookIds = [ownedBookResp1.body._id, ownedBookResp2.body._id];
 
       // Book owned by another user
-      const otherUser = { email: "otheruser@example.com", username: "otheruser", password: "password123" };
+      const otherUser = { email: "otherUser@example.com", username: "otherUser", password: "password123" };
       const otherLogged = await getLoggedInCustomUser(app, otherUser);
 
-      const publicBookResp = await createRecipeBook(app, otherLogged.token, {
+      const publicBookResp = await createRecipeBook(app, otherLogged.accessToken, {
         name: "Other User Public Book",
         description: "Not mine",
         isPublic: true,
@@ -242,7 +242,7 @@ describe("RecipeBook API", () => {
 
       const response = await request(app)
         .get("/recipe-books/my")
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
 
       expect(response.status).toBe(200);
 
@@ -259,7 +259,7 @@ describe("RecipeBook API", () => {
 
     test("Get a recipe book by ID", async () => {
       // create a recipe book
-      const bookResp = await createRecipeBook(app, loginUser.token, {
+      const bookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Book for GetById",
         description: "Testing get by ID",
         isPublic: false,
@@ -269,7 +269,7 @@ describe("RecipeBook API", () => {
       // owner should be able to get the book
       const ownerResp = await request(app)
         .get(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
       
       expect(ownerResp.status).toBe(200);
       expect(ownerResp.body.recipeBook._id).toBe(bookId);
@@ -285,7 +285,7 @@ describe("RecipeBook API", () => {
       // collaborator should be able to get the book
       const collabResp = await request(app)
         .get(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + collabLogged.token);
+        .set("Authorization", "Bearer " + collabLogged.accessToken);
 
       expect(collabResp.status).toBe(200);
       expect(collabResp.body.recipeBook._id).toBe(bookId);
@@ -296,13 +296,13 @@ describe("RecipeBook API", () => {
       
       const forbiddenResp = await request(app)
         .get(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + otherLogged.token);
+        .set("Authorization", "Bearer " + otherLogged.accessToken);
 
       expect(forbiddenResp.status).toBe(403);
       expect(forbiddenResp.body.message).toBe("Forbidden");
 
       // public book should be accessible by other user
-      const publicBookResp = await createRecipeBook(app, loginUser.token, {
+      const publicBookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Public Book for GetById",
         description: "Public book",
         isPublic: true,
@@ -311,15 +311,90 @@ describe("RecipeBook API", () => {
 
       const publicResp = await request(app)
         .get(`/recipe-books/${publicBookId}`)
-        .set("Authorization", "Bearer " + otherLogged.token);
+        .set("Authorization", "Bearer " + otherLogged.accessToken);
 
       expect(publicResp.status).toBe(200);
       expect(publicResp.body.recipeBook._id).toBe(publicBookId);
     });
 
+    test("Get Recipe Book By Id updates recently viewed books", async () => {
+      await RecipeBook.deleteMany();
+
+      const createResp = await request(app)
+        .post("/recipe-books")
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({
+          name: "Recently Viewed Book Test",
+          description: "test",
+          isPublic: true,
+        });
+
+      expect(createResp.status).toBe(201);
+      const bookId = createResp.body._id;
+
+      const getResp = await request(app)
+        .get(`/recipe-books/${bookId}`)
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(getResp.status).toBe(200);
+
+      const UserModel = (await import("../models/userModel")).default;
+      const userFromDb = await UserModel.findById(loginUser._id);
+
+      expect(userFromDb?.recentlyViewedBooks.length).toBeGreaterThan(0);
+
+      expect(userFromDb?.recentlyViewedBooks[0].toString()).toBe(bookId);
+    });
+
+    test("Recently viewed books keeps order, no duplicates and max 10", async () => {
+      await RecipeBook.deleteMany();
+
+      const createdBooks: string[] = [];
+
+      for (let i = 0; i < 12; i++) {
+        const resp = await request(app)
+          .post("/recipe-books")
+          .set("Authorization", "Bearer " + loginUser.accessToken)
+          .send({
+            name: "Book " + i,
+            description: "test",
+            isPublic: true,
+          });
+
+        expect(resp.status).toBe(201);
+        createdBooks.push(resp.body._id);
+      }
+
+      for (const id of createdBooks) {
+        const getResp = await request(app)
+          .get(`/recipe-books/${id}`)
+          .set("Authorization", "Bearer " + loginUser.accessToken);
+
+        expect(getResp.status).toBe(200);
+      }
+
+      const repeatedId = createdBooks[5];
+      const repeatResp = await request(app)
+        .get(`/recipe-books/${repeatedId}`)
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(repeatResp.status).toBe(200);
+
+      const UserModel = (await import("../models/userModel")).default;
+      const user = await UserModel.findById(loginUser._id);
+
+      const viewed = (user?.recentlyViewedBooks ?? []).map((id: any) => id.toString());
+
+      expect(viewed.length).toBeLessThanOrEqual(10);
+      expect(viewed[0]).toBe(repeatedId);
+
+      const unique = new Set(viewed);
+      expect(unique.size).toBe(viewed.length);
+    });
+
     test("Delete Recipe Book - owner and collaborator can delete, other users cannot", async () => {
       // Owner creates a recipe book
-      const createResp = await createRecipeBook(app, loginUser.token, {
+      const createResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Test Book",
         description: "Test Desc",
         isPublic: false,
@@ -339,12 +414,12 @@ describe("RecipeBook API", () => {
       // Collaborator deletes the book - should succeed
       const deleteByCollabResp = await request(app)
         .delete(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + collaboratorUser.token);
+        .set("Authorization", "Bearer " + collaboratorUser.accessToken);
       expect(deleteByCollabResp.status).toBe(200);
       expect(deleteByCollabResp.body.message).toBe("Recipe book deleted successfully");
 
       // Owner creates another book
-      const createResp2 = await createRecipeBook(app, loginUser.token, {
+      const createResp2 = await createRecipeBook(app, loginUser.accessToken, {
         name: "Test Book 2",
         description: "Desc 2",
         isPublic: false,
@@ -358,21 +433,21 @@ describe("RecipeBook API", () => {
 
       const deleteByOtherResp = await request(app)
         .delete(`/recipe-books/${bookId2}`)
-        .set("Authorization", "Bearer " + otherUser.token);
+        .set("Authorization", "Bearer " + otherUser.accessToken);
       expect(deleteByOtherResp.status).toBe(403);
       expect(deleteByOtherResp.body.message).toBe("Forbidden");
 
       // Owner deletes the second book - should succeed
       const deleteByOwnerResp = await request(app)
         .delete(`/recipe-books/${bookId2}`)
-        .set("Authorization", "Bearer " + loginUser.token);
+        .set("Authorization", "Bearer " + loginUser.accessToken);
       expect(deleteByOwnerResp.status).toBe(200);
       expect(deleteByOwnerResp.body.message).toBe("Recipe book deleted successfully");
     });
 
     test("Share recipe book - only owner can share and collaborator gets access", async () => {
       // Owner creates a book
-      const bookResp = await createRecipeBook(app, loginUser.token, {
+      const bookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Book to Share",
         description: "Sharing test",
         isPublic: false,
@@ -391,7 +466,7 @@ describe("RecipeBook API", () => {
       // Owner shares the book using email
       const shareResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({ email: targetUser.email });
 
       expect(shareResp.status).toBe(200);
@@ -405,7 +480,7 @@ describe("RecipeBook API", () => {
       // Collaborator should now be able to access the book
       const collabGetResp = await request(app)
         .get(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + targetUser.token);
+        .set("Authorization", "Bearer " + targetUser.accessToken);
 
       expect(collabGetResp.status).toBe(200);
       expect(collabGetResp.body.recipeBook._id).toBe(bookId);
@@ -420,7 +495,7 @@ describe("RecipeBook API", () => {
 
       const forbiddenShareResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
-        .set("Authorization", "Bearer " + otherUser.token)
+        .set("Authorization", "Bearer " + otherUser.accessToken)
         .send({ email: otherUser.email });
 
       expect(forbiddenShareResp.status).toBe(403);
@@ -431,7 +506,7 @@ describe("RecipeBook API", () => {
       // Sharing same user again should fail
       const shareAgainResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({ email: targetUser.email });
 
       expect(shareAgainResp.status).toBe(400);
@@ -440,7 +515,7 @@ describe("RecipeBook API", () => {
 
     test("Unshare recipe book - only owner can remove collaborator", async () => {
       // Owner creates a book
-      const bookResp = await createRecipeBook(app, loginUser.token, {
+      const bookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Book to Unshare",
         description: "Unshare test",
         isPublic: false,
@@ -459,7 +534,7 @@ describe("RecipeBook API", () => {
       // Owner shares the book
       await request(app)
         .post(`/recipe-books/${bookId}/share`)
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({ email: collabUser.email });
 
       // Verify collaborator exists
@@ -471,7 +546,7 @@ describe("RecipeBook API", () => {
       // Owner unshares (removes collaborator) using email
       const unshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({ email: collabUser.email });
 
       expect(unshareResp.status).toBe(200);
@@ -486,7 +561,7 @@ describe("RecipeBook API", () => {
       // Removed collaborator should NOT be able to access the book
       const forbiddenGetResp = await request(app)
         .get(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + collabUser.token);
+        .set("Authorization", "Bearer " + collabUser.accessToken);
 
       expect(forbiddenGetResp.status).toBe(403);
 
@@ -500,7 +575,7 @@ describe("RecipeBook API", () => {
 
       const forbiddenUnshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
-        .set("Authorization", "Bearer " + otherUser.token)
+        .set("Authorization", "Bearer " + otherUser.accessToken)
         .send({ email: collabUser.email });
 
       expect(forbiddenUnshareResp.status).toBe(403);
@@ -509,24 +584,24 @@ describe("RecipeBook API", () => {
       );
 
       // Trying to unshare a user that is not a collaborator
-      const notCollabUserData = {
+      const notcollabUserData = {
         email: "notcollab@example.com",
         username: "notcollab",
         password: "password123",
       };
-      const notCollabUser = await getLoggedInCustomUser(app, notCollabUserData);
+      const notcollabUser = await getLoggedInCustomUser(app, notcollabUserData);
 
       const notFoundUnshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
-        .set("Authorization", "Bearer " + loginUser.token)
-        .send({ email: notCollabUser.email });
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({ email: notcollabUser.email });
 
       expect(notFoundUnshareResp.status).toBe(404);
       expect(notFoundUnshareResp.body.message).toBe("User is not a collaborator");
     });
 
     test("Owner and collaborator can update recipe book", async () => {
-      const bookResp = await createRecipeBook(app, loginUser.token, {
+      const bookResp = await createRecipeBook(app, loginUser.accessToken, {
         name: "Original Name",
         description: "Original Desc",
         isPublic: false,
@@ -548,7 +623,7 @@ describe("RecipeBook API", () => {
       // owner update
       const ownerUpdate = await request(app)
         .put(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + loginUser.token)
+        .set("Authorization", "Bearer " + loginUser.accessToken)
         .send({ name: "Updated by Owner" });
 
       expect(ownerUpdate.status).toBe(200);
@@ -556,7 +631,7 @@ describe("RecipeBook API", () => {
       // collaborator update
       const collabUpdate = await request(app)
         .put(`/recipe-books/${bookId}`)
-        .set("Authorization", "Bearer " + collabLogged.token)
+        .set("Authorization", "Bearer " + collabLogged.accessToken)
         .send({ description: "Updated by Collaborator" });
 
       expect(collabUpdate.status).toBe(200);
@@ -571,7 +646,7 @@ describe("RecipeBook API", () => {
         // create original recipe book
         const bookResp = await request(app)
           .post("/recipe-books")
-          .set("Authorization", "Bearer " + loginUser.token)
+          .set("Authorization", "Bearer " + loginUser.accessToken)
           .send({
             name: "Original Book",
             description: "Test duplication",
@@ -584,12 +659,12 @@ describe("RecipeBook API", () => {
         // create recipes
         const recipe1Resp = await request(app)
           .post("/recipes")
-          .set("Authorization", "Bearer " + loginUser.token)
+          .set("Authorization", "Bearer " + loginUser.accessToken)
           .send(recipesList[0]);
 
         const recipe2Resp = await request(app)
           .post("/recipes")
-          .set("Authorization", "Bearer " + loginUser.token)
+          .set("Authorization", "Bearer " + loginUser.accessToken)
           .send(recipesList[1]);
 
         expect(recipe1Resp.status).toBe(201);
@@ -601,16 +676,16 @@ describe("RecipeBook API", () => {
         // add recipes to book
         await request(app)
           .post(`/recipe-books/${originalBookId}/recipes/${recipeId1}`)
-          .set("Authorization", "Bearer " + loginUser.token);
+          .set("Authorization", "Bearer " + loginUser.accessToken);
 
         await request(app)
           .post(`/recipe-books/${originalBookId}/recipes/${recipeId2}`)
-          .set("Authorization", "Bearer " + loginUser.token);
+          .set("Authorization", "Bearer " + loginUser.accessToken);
 
         // duplicate book
         const duplicateResp = await request(app)
           .post(`/recipe-books/${originalBookId}/duplicate`)
-          .set("Authorization", "Bearer " + loginUser.token);
+          .set("Authorization", "Bearer " + loginUser.accessToken);
 
         expect(duplicateResp.status).toBe(201);
 

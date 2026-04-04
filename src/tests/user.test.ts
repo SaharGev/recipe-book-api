@@ -23,7 +23,7 @@ describe("User API", () => {
 
     const response = await request(app)
       .patch("/users/profile-image")
-      .set("Authorization", "Bearer " + user.token)
+      .set("Authorization", "Bearer " + user.accessToken)
       .send({ profileImageUrl: imageUrl });
 
     expect(response.status).toBe(200);
@@ -38,7 +38,7 @@ describe("User API", () => {
 
     const response = await request(app)
         .get("/users/me")
-        .set("Authorization", "Bearer " + user.token);
+        .set("Authorization", "Bearer " + user.accessToken);
 
     expect(response.status).toBe(200);
     expect(response.body._id).toBe(user._id);
@@ -51,7 +51,7 @@ describe("User API", () => {
 
     const response = await request(app)
         .patch("/users/me")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         username: "updatedUserName",
         phone: "0501234567",
@@ -78,7 +78,7 @@ describe("User API", () => {
 
     const response = await request(app)
         .patch("/users/me")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({});
 
     expect(response.status).toBe(400);
@@ -105,7 +105,7 @@ describe("User API", () => {
 
     const response = await request(app)
         .patch("/users/me")
-        .set("Authorization", "Bearer " + user1.token)
+        .set("Authorization", "Bearer " + user1.accessToken)
         .send({
         username: user2.username,
         });
@@ -125,11 +125,61 @@ describe("User API", () => {
 
     const response = await request(app)
         .patch("/users/me")
-        .set("Authorization", "Bearer " + user1.token)
+        .set("Authorization", "Bearer " + user1.accessToken)
         .send({
         phone: "0509999999",
         });
 
     expect(response.status).toBe(409);
   });
+
+  test("GET /users/me/recently-viewed returns recipes and books", async () => {
+    const user = await getlogedInUser(app);
+
+    const recipeResp = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + user.accessToken)
+      .send({
+        title: "User Recently Recipe",
+        ingredients: ["egg"],
+        cookTime: 5,
+        difficulty: "easy",
+      });
+
+    expect(recipeResp.status).toBe(201);
+    const recipeId = recipeResp.body._id;
+
+    const bookResp = await request(app)
+      .post("/recipe-books")
+      .set("Authorization", "Bearer " + user.accessToken)
+      .send({
+        name: "User Recently Book",
+        description: "test",
+        isPublic: true,
+      });
+
+    expect(bookResp.status).toBe(201);
+    const bookId = bookResp.body._id;
+
+    await request(app)
+      .get(`/recipes/${recipeId}`)
+      .set("Authorization", "Bearer " + user.accessToken);
+
+    await request(app)
+      .get(`/recipe-books/${bookId}`)
+      .set("Authorization", "Bearer " + user.accessToken);
+
+    const response = await request(app)
+      .get("/users/me/recently-viewed")
+      .set("Authorization", "Bearer " + user.accessToken);
+
+    expect(response.status).toBe(200);
+
+    expect(response.body.recentlyViewedRecipes.length).toBeGreaterThan(0);
+    expect(response.body.recentlyViewedBooks.length).toBeGreaterThan(0);
+
+    expect(response.body.recentlyViewedRecipes[0]._id).toBe(recipeId);
+    expect(response.body.recentlyViewedBooks[0]._id).toBe(bookId);
+  });
+
 });

@@ -60,6 +60,38 @@
 				"type": "object",
 				"additionalProperties": true
 			},
+			"RecentlyViewedRecipeSwaggerItem": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"title"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"RecentlyViewedBookSwaggerItem": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
 			"UpdateProfileImageRequest": {
 				"properties": {
 					"profileImageUrl": {
@@ -837,6 +869,61 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/me/recently-viewed": {
+			"get": {
+				"operationId": "GetRecentlyViewed",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"recentlyViewedBooks": {
+											"items": {
+												"$ref": "#/components/schemas/RecentlyViewedBookSwaggerItem"
+											},
+											"type": "array"
+										},
+										"recentlyViewedRecipes": {
+											"items": {
+												"$ref": "#/components/schemas/RecentlyViewedRecipeSwaggerItem"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"recentlyViewedBooks",
+										"recentlyViewedRecipes"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get recently viewed recipes and recipe books of current user",
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/users/profile-image": {
@@ -1839,6 +1926,41 @@
 			}
 		},
 		"/likes": {
+			"get": {
+				"operationId": "GetMyLikes",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LikeSwaggerResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LikeSwaggerResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get all likes of the current user",
+				"tags": [
+					"Likes"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": []
+			},
 			"post": {
 				"operationId": "Like",
 				"responses": {

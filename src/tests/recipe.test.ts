@@ -27,7 +27,7 @@ describe("Recipe API", () => {
   test("Create Recipe", async () => {
     for (const recipe of recipesList) {
       const response = await request(app).post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipe);
       expect(response.status).toBe(201);
       expect(response.body.title).toBe(recipe.title);
@@ -44,7 +44,7 @@ describe("Recipe API", () => {
 
   test("Get All Recipes - returns only public recipes", async () => {
   const response = await request(app).get("/recipes")
-    .set("Authorization", "Bearer " + loginUser.token)  ;
+    .set("Authorization", "Bearer " + loginUser.accessToken)  ;
   expect(response.status).toBe(200);
   const publicRecipes = recipesList.filter(r => r.isPublic);
   const myRecipes = recipesList;
@@ -64,12 +64,12 @@ describe("Recipe API", () => {
       .send({ email: otherUser.email, username: otherUser.username, password: otherUser.password });
 
     if (otherUserLoginResponse.status === 201) {
-      token = otherUserLoginResponse.body.token;
+      token = otherUserLoginResponse.body.accessToken;
     } else {
       const loginResp = await request(app)
         .post("/auth/login")
         .send({ email: otherUser.email, password: otherUser.password });
-      token = loginResp.body.token;
+      token = loginResp.body.accessToken;
     }
 
     // other user creates a private recipe
@@ -89,7 +89,7 @@ describe("Recipe API", () => {
     // check: the owner can see the other user's private recipe in the list of all recipes
     const response = await request(app)
       .get("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(response.status).toBe(200);
 
     // check that the other user's private recipe is included in the response
@@ -104,7 +104,7 @@ describe("Recipe API", () => {
 
   test("Get My Recipes of the owner who send the request - public and private", async () => {
     const response = await request(app).get("/recipes/my")
-    .set("Authorization", "Bearer " + loginUser.token)  ;
+    .set("Authorization", "Bearer " + loginUser.accessToken)  ;
     expect(response.status).toBe(200);
     const myRecipes = response.body;
     expect(myRecipes.length).toBe(recipesList.length);
@@ -121,7 +121,7 @@ describe("Recipe API", () => {
     // owner creates a public recipe
     const publicRecipeResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send({ ...recipesList[0], title: "Public Recipe Test" });
 
     expect(publicRecipeResponse.status).toBe(201);
@@ -130,7 +130,7 @@ describe("Recipe API", () => {
     // owner can access public recipe
     const getPublic = await request(app)
       .get(`/recipes/${publicRecipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
 
     expect(getPublic.status).toBe(200);
     expect(getPublic.body._id).toBe(publicRecipeId);
@@ -139,7 +139,7 @@ describe("Recipe API", () => {
     // owner creates a private recipe
     const privateRecipeResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send({ ...recipesList[1], title: "Private Recipe Test", isPublic: false });
 
     expect(privateRecipeResponse.status).toBe(201);
@@ -148,7 +148,7 @@ describe("Recipe API", () => {
     // owner can access private recipe
     const getPrivate = await request(app)
       .get(`/recipes/${privateRecipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
 
     expect(getPrivate.status).toBe(200);
     expect(getPrivate.body._id).toBe(privateRecipeId);
@@ -165,7 +165,7 @@ describe("Recipe API", () => {
         password: otherUser.password
       });
 
-    let otherToken = registerResp.body.token;
+    let otherToken = registerResp.body.accessToken;
 
     if (!otherToken) {
       const loginResp = await request(app)
@@ -175,7 +175,7 @@ describe("Recipe API", () => {
           password: otherUser.password
         });
 
-      otherToken = loginResp.body.token;
+      otherToken = loginResp.body.accessToken;
     }
 
 
@@ -192,7 +192,7 @@ describe("Recipe API", () => {
     // loginUser cannot access it
     const getOther = await request(app)
       .get(`/recipes/${otherRecipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
 
     expect(getOther.status).toBe(403);
 
@@ -211,7 +211,7 @@ describe("Recipe API", () => {
     // collaborator can access the recipe
     const getAsCollaborator = await request(app)
       .get(`/recipes/${otherRecipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
 
     expect(getAsCollaborator.status).toBe(200);
     expect(getAsCollaborator.body._id).toBe(otherRecipeId);
@@ -222,7 +222,7 @@ describe("Recipe API", () => {
     // Owner creates a recipe
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[0]);
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
@@ -230,7 +230,7 @@ describe("Recipe API", () => {
     // Owner updates the recipe
     const updateResponse = await request(app)
       .put(`/recipes/${recipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send({ title: "Updated By Owner" });
 
     expect(updateResponse.status).toBe(200);
@@ -243,7 +243,7 @@ describe("Recipe API", () => {
     // Owner creates a recipe
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[1]);
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
@@ -257,13 +257,13 @@ describe("Recipe API", () => {
       .send({ email: collaborator.email, username: collaborator.username, password: collaborator.password });
 
     if (collaboratorRegisterResp.status === 201) {
-      collaboratorToken = collaboratorRegisterResp.body.token;
+      collaboratorToken = collaboratorRegisterResp.body.accessToken;
       collaboratorId = collaboratorRegisterResp.body._id; // _id מהמסד
     } else {
       const loginResp = await request(app)
         .post("/auth/login")
         .send({ email: collaborator.email, password: collaborator.password });
-      collaboratorToken = loginResp.body.token;
+      collaboratorToken = loginResp.body.accessToken;
       collaboratorId = loginResp.body._id;
     }
 
@@ -288,7 +288,7 @@ describe("Recipe API", () => {
     // Owner creates a recipe
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[2]);
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
@@ -300,12 +300,12 @@ describe("Recipe API", () => {
       .send({ email: otherUser.email, username: otherUser.username, password: otherUser.password });
 
     if (otherUserRegisterResp.status === 201) {
-      token = otherUserRegisterResp.body.token;
+      token = otherUserRegisterResp.body.accessToken;
     } else {
       const loginResp = await request(app)
         .post("/auth/login")
         .send({ email: otherUser.email, password: otherUser.password });
-      token = loginResp.body.token;
+      token = loginResp.body.accessToken;
     }
 
     // Other user trying to update the recipe
@@ -321,22 +321,22 @@ describe("Recipe API", () => {
     await Recipe.deleteMany();
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[1]);
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
     const deleteResponse = await request(app)
       .delete(`/recipes/${recipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(deleteResponse.status).toBe(200);
     expect(deleteResponse.body.message).toBe("Recipe deleted successfully");
     const getAfterDelete = await request(app).get(`/recipes/${recipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(getAfterDelete.status).toBe(404);
 
     const createResponse2 = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[2]);
     expect(createResponse2.status).toBe(201);
     const recipeId2 = createResponse2.body._id;
@@ -346,12 +346,12 @@ describe("Recipe API", () => {
       .post("/auth/register")
       .send({ email: otherUser.email, username: otherUser.username, password: otherUser.password });
     if (otherUserLoginResponse.status === 201) {
-      token = otherUserLoginResponse.body.token;
+      token = otherUserLoginResponse.body.accessToken;
     } else {
       const loginResp = await request(app)
         .post("/auth/login")
         .send({ email: otherUser.email, password: otherUser.password });
-      token = loginResp.body.token;
+      token = loginResp.body.accessToken;
     }
     const otherDeleteResponse = await request(app)
       .delete(`/recipes/${recipeId2}`)
@@ -359,7 +359,7 @@ describe("Recipe API", () => {
     expect(otherDeleteResponse.status).toBe(403);
 
     const finalGet = await request(app).get(`/recipes/${recipeId2}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(finalGet.status).toBe(200);
   });
 
@@ -368,7 +368,7 @@ describe("Recipe API", () => {
     // Owner creates a recipe
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[1]);
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
@@ -386,19 +386,19 @@ describe("Recipe API", () => {
       });
 
     if (collaboratorRegister.status === 201) {
-      collaboratorToken = collaboratorRegister.body.token;
+      collaboratorToken = collaboratorRegister.body.accessToken;
       collaboratorId = collaboratorRegister.body._id; 
     } else {
       const loginResp = await request(app)
         .post("/auth/login")
         .send({ email: collaboratorData.email, password: collaboratorData.password });
-      collaboratorToken = loginResp.body.token;
+      collaboratorToken = loginResp.body.accessToken;
       collaboratorId = loginResp.body._id; 
     }
 
     const addCollaboratorResponse = await request(app)
       .put(`/recipes/${recipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token) 
+      .set("Authorization", "Bearer " + loginUser.accessToken) 
       .send({
         collaborators: [{ user: collaboratorId, role: "editor" }],
       });
@@ -412,14 +412,14 @@ describe("Recipe API", () => {
 
     const getAfterDelete = await request(app)
       .get(`/recipes/${recipeId}`)
-      .set("Authorization", "Bearer " + loginUser.token);
+      .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(getAfterDelete.status).toBe(404);
   });
 
   test("PATCH /recipes/:id/image - owner can update recipe image", async () => {
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send(recipesList[0]);
 
     expect(createResponse.status).toBe(201);
@@ -429,7 +429,7 @@ describe("Recipe API", () => {
 
     const updateImageResponse = await request(app)
       .patch(`/recipes/${recipeId}/image`)
-      .set("Authorization", "Bearer " + loginUser.token)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
       .send({ imageUrl });
 
     expect(updateImageResponse.status).toBe(200);
@@ -444,7 +444,7 @@ describe("Recipe API", () => {
 
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + owner.token)
+      .set("Authorization", "Bearer " + owner.accessToken)
       .send({
         ...recipesList[0],
         title: "Recipe Image Test - Non Owner",
@@ -456,13 +456,13 @@ describe("Recipe API", () => {
 
     const otherUser = await getLoggedInCustomUser(app, {
       email: "imageother@test.com",
-      username: "imageOtherUser",
+      username: "imageotherUser",
       password: "testpassword",
     });
 
     const response = await request(app)
       .patch(`/recipes/${recipeId}/image`)
-      .set("Authorization", "Bearer " + otherUser.token)
+      .set("Authorization", "Bearer " + otherUser.accessToken)
       .send({
         imageUrl: "/uploads/forbidden-image.png",
       });
@@ -475,7 +475,7 @@ describe("Recipe API", () => {
 
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + owner.token)
+      .set("Authorization", "Bearer " + owner.accessToken)
       .send({
         ...recipesList[0],
         title: "Recipe Image Test - No Token",
@@ -499,7 +499,7 @@ describe("Recipe API", () => {
 
     const createResponse = await request(app)
       .post("/recipes")
-      .set("Authorization", "Bearer " + owner.token)
+      .set("Authorization", "Bearer " + owner.accessToken)
       .send({
         ...recipesList[0],
         title: "Recipe Image Test - Missing ImageUrl",
@@ -511,7 +511,7 @@ describe("Recipe API", () => {
 
     const response = await request(app)
       .patch(`/recipes/${recipeId}/image`)
-      .set("Authorization", "Bearer " + owner.token)
+      .set("Authorization", "Bearer " + owner.accessToken)
       .send({});
 
     expect(response.status).toBe(400);
@@ -532,9 +532,81 @@ describe("Recipe API", () => {
 
     const response = await request(app)
       .patch("/users/profile-image")
-      .set("Authorization", "Bearer " + user.token)
+      .set("Authorization", "Bearer " + user.accessToken)
       .send({});
 
     expect(response.status).toBe(400);
+  });
+
+  test("Get Recipe By Id updates recently viewed recipes", async () => {
+    await Recipe.deleteMany();
+
+    // create recipe
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ ...recipesList[0], title: "Recently Viewed Test" });
+
+    expect(createResponse.status).toBe(201);
+    const recipeId = createResponse.body._id;
+
+    const getResponse = await request(app)
+      .get(`/recipes/${recipeId}`)
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(getResponse.status).toBe(200);
+
+    const userResponse = await request(app)
+      .get("/users/me")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(userResponse.status).toBe(200);
+
+    const userFromDb = await (await import("../models/userModel")).default.findById(loginUser._id);
+
+    expect(userFromDb?.recentlyViewedRecipes).toContainEqual(
+      expect.anything()
+    );
+  });
+
+  test("Recently viewed recipes keeps order, no duplicates and max 10", async () => {
+    await Recipe.deleteMany();
+
+    const createdRecipes: string[] = [];
+
+    for (let i = 0; i < 12; i++) {
+      const resp = await request(app)
+        .post("/recipes")
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({
+          ...recipesList[0],
+          title: "Recipe " + i,
+        });
+
+      createdRecipes.push(resp.body._id);
+    }
+
+    for (const id of createdRecipes) {
+      await request(app)
+        .get(`/recipes/${id}`)
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+    }
+
+    const repeatedId = createdRecipes[5];
+    await request(app)
+      .get(`/recipes/${repeatedId}`)
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    const UserModel = (await import("../models/userModel")).default;
+    const user = await UserModel.findById(loginUser._id);
+
+    const viewed = (user?.recentlyViewedRecipes ?? []).map((id: any) => id.toString());
+
+    expect(viewed.length).toBeLessThanOrEqual(10);
+
+    expect(viewed[0]).toBe(repeatedId);
+
+    const unique = new Set(viewed);
+    expect(unique.size).toBe(viewed.length);
   });
 });

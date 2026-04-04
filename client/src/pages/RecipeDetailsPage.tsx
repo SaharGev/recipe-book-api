@@ -10,21 +10,28 @@ export default function RecipeDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const accessToken = token || localStorage.getItem("accessToken");
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+
 
   useEffect(() => {
     const fetchRecipe = async () => {
       const res = await fetch(`http://localhost:3000/recipes/${id}`, {
-        headers: { Authorization: "Bearer " + token },
+        headers: { Authorization: "Bearer " + accessToken },
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        return;
+      }
+
       setRecipe(data);
     };
 
     fetchRecipe();
-  }, [id, token]);
+  }, [id, accessToken]);
 
   if (!recipe) return <p>Loading...</p>;
 
@@ -35,7 +42,7 @@ export default function RecipeDetailsPage() {
       <div className="image-wrapper">
         {recipe.imageUrl && (
           <img
-            src={`http://localhost:3000${recipe.imageUrl}`}
+            src={recipe.imageUrl}
             alt={recipe.title}
             className="recipe-main-image"
           />
@@ -78,8 +85,12 @@ export default function RecipeDetailsPage() {
         {/* INGREDIENTS */}
         <h3>Ingredients</h3>
         <ul className="ingredients-list">
-          {recipe.ingredients.map((ing, i) => (
-            <li key={i}>{ing}</li>
+          {(Array.isArray(recipe.ingredients) ? recipe.ingredients : []).map((ing, i) => (
+            <li key={i}>
+              {typeof ing === "string"
+                ? ing
+                : `${ing.quantity ?? ""} ${ing.unit ?? ""} ${ing.name ?? ""}`.trim()}
+            </li>
           ))}
         </ul>
 

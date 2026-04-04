@@ -61,6 +61,31 @@ const getCurrentUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const getRecentlyViewed = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId)
+      .populate("recentlyViewedRecipes")
+      .populate("recentlyViewedBooks");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      recentlyViewedRecipes: user.recentlyViewedRecipes || [],
+      recentlyViewedBooks: user.recentlyViewedBooks || [],
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to get recently viewed items" });
+  }
+};
+
 const updateCurrentUser = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
@@ -130,4 +155,5 @@ export default {
   updateProfileImage,
   getCurrentUser,
   updateCurrentUser,
+  getRecentlyViewed,
 };

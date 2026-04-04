@@ -5,8 +5,11 @@ import RecipeBookCard from "../components/RecipeBookCard";
 import { getMyRecipeBooks } from "../services/recipeBookService";
 import type { RecipeBook } from "../types/recipeBook";
 import "./MyRecipeBooksPage.css";
+import { useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 
 export default function MyRecipeBooksPage() {
+  const { token } = useContext(AuthContext);
   const [books, setBooks] = useState<RecipeBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,7 +19,6 @@ export default function MyRecipeBooksPage() {
       try {
         setLoading(true);
         setError("");
-        const token = localStorage.getItem("token");
         if (!token) return;
 
         const data = await getMyRecipeBooks(token);
@@ -46,6 +48,7 @@ export default function MyRecipeBooksPage() {
           books.map((book) => (
             <RecipeBookCard
               key={book._id}
+              _id={book._id}
               title={book.name}
               recipesCount={book.recipes?.length || 0}
             />

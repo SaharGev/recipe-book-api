@@ -32,6 +32,16 @@ interface UserSwaggerMessageResponse {
   message: string;
 }
 
+interface RecentlyViewedRecipeSwaggerItem {
+  _id: string;
+  title: string;
+}
+
+interface RecentlyViewedBookSwaggerItem {
+  _id: string;
+  name: string;
+}
+
 @Route("users")
 @Tags("Users")
 export class UserSwaggerController extends Controller {
@@ -72,6 +82,23 @@ export class UserSwaggerController extends Controller {
       email: "string",
       phone: "string",
       profileImageUrl: "string",
+    };
+  }
+
+  /**
+   * Get recently viewed recipes and recipe books of current user
+   */
+  @SuccessResponse("200", "OK")
+  @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("me/recently-viewed")
+  public async getRecentlyViewed(): Promise<{
+    recentlyViewedRecipes: RecentlyViewedRecipeSwaggerItem[];
+    recentlyViewedBooks: RecentlyViewedBookSwaggerItem[];
+  }> {
+    return {
+      recentlyViewedRecipes: [],
+      recentlyViewedBooks: [],
     };
   }
 

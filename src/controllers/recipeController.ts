@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import Recipe from '../models/recipeModel';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import RecipeBook from '../models/recipeBookModel';
+import User from "../models/userModel";
 
 const createNewRecipe = async (req: AuthRequest, res: Response) => {
   try {
@@ -75,6 +76,21 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
     if (!recipe.isPublic && !isOwner && !isCollaborator) {
       return res.status(403).json({ message: "Forbidden" });
     }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { recentlyViewedRecipes: recipe._id },
+    });
+
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        recentlyViewedRecipes: {
+          $each: [recipe._id],
+          $position: 0,
+          $slice: 10,
+        },
+      },
+    });
+
     return res.json(recipe);
   } catch (err: any) {
     res.status(500).send('Error fetching recipe');

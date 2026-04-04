@@ -31,7 +31,7 @@ describe("Image Upload", () => {
 
     const res = await request(app)
       .post("/upload/image")
-      .set("Authorization", "Bearer " + user.token)
+      .set("Authorization", "Bearer " + user.accessToken)
       .attach("image", filePath);
 
     expect(res.status).toBe(201);
@@ -52,7 +52,7 @@ describe("Image Upload", () => {
 
     const response = await request(app)
       .post("/upload/image")
-      .set("Authorization", "Bearer " + user.token);
+      .set("Authorization", "Bearer " + user.accessToken);
 
     expect(response.status).toBe(400);
   });
@@ -71,7 +71,7 @@ describe("Image Upload", () => {
 
     const response = await request(app)
       .post("/upload/image")
-      .set("Authorization", "Bearer " + user.token)
+      .set("Authorization", "Bearer " + user.accessToken)
       .attach("image", filePath);
 
     expect(response.status).toBe(201);

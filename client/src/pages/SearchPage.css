@@ -96,3 +96,45 @@
   font-size: 13px;
   color: #888;
 }
+
+.search-categories {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.category-chip {
+  padding: 6px 12px;
+  background: #f2f2f7;
+  border-radius: 16px;
+  font-size: 13px;
+  color: #6b5fcf;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-chip:hover {
+  background: #e6e6ff;
+}
+
+.search-section {
+  margin-top: 24px;
+}
+
+.search-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.search-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #1f1f1f;
+}

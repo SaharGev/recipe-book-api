@@ -1069,6 +1069,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsLikeSwaggerController_getMyLikes: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/likes',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(LikeSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(LikeSwaggerController.prototype.getMyLikes)),
+
+            async function LikeSwaggerController_getMyLikes(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsLikeSwaggerController_getMyLikes, request, response });
+
+                const controller = new LikeSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getMyLikes',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsLikeSwaggerController_like: Record<string, TsoaRoute.ParameterSchema> = {
                 _body: {"in":"body","name":"_body","required":true,"ref":"LikeRequest"},
         };

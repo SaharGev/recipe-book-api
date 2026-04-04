@@ -15,8 +15,9 @@ import swaggerUi from "swagger-ui-express";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const swaggerDocument = require("./swagger.json");
 
-dotenv.config({ path: ".env.dev" });
-dotenv.config({ path: '.env.dev' });
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? ".env.test" : ".env.dev",
+});
 
 const app = express();
 

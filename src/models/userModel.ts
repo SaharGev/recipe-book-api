@@ -37,6 +37,17 @@ const userSchema = new mongoose.Schema(
     profileImageUrl: {
       type: String,
     },
+    recentlyViewedRecipes: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Recipe",
+      default: [],
+    },
+
+    recentlyViewedBooks: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "RecipeBook",
+      default: [],
+    },
   },
   { timestamps: true }
 );

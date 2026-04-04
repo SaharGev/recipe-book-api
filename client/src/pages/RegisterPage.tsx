@@ -23,10 +23,7 @@ export default function RegisterPage() {
   try {
     const data = await register(username, email, phone, password);
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("refreshToken", data.refreshToken);
-
-    setToken(data.token);
+    setToken(data.accessToken);
     setRefreshToken(data.refreshToken);
 
     console.log("register response:", data);

@@ -24,13 +24,28 @@ export const aiMockClient: AiClient = {
       words.includes(keyword)
     );
 
-    // direct keyword detection
-    if (words.includes("pasta") && !ingredients.includes("pasta")) {
-      ingredients.push("pasta");
-    }
+    const ignoredWords = [
+      "i",
+      "have",
+      "with",
+      "and",
+      "recipe",
+      "recipes",
+      "favorite",
+      "favorites",
+      "book",
+      "books",
+      "easy",
+      "medium",
+      "hard",
+    ] as const;
 
-    if (words.includes("tomato") && !ingredients.includes("tomato")) {
-      ingredients.push("tomato");
+    for (const word of words) {
+      if (!ignoredWords.includes(word as (typeof ignoredWords)[number])) {
+        if (!ingredients.includes(word)) {
+          ingredients.push(word);
+        }
+      }
     }
 
     const isBookSearch = lowerQuery.includes("book");
