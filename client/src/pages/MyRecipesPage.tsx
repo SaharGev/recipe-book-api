@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
+import { getMyLikes } from "../services/recipeService";
 
 type Recipe = {
   _id: string;
@@ -13,10 +14,16 @@ type Recipe = {
   imageUrl?: string;
 };
 
+type LikeItem = {
+  targetType: string;
+  targetId: string;
+};
+
 export default function MyRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [likedIds, setLikedIds] = useState<string[]>([]);
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
 
@@ -40,6 +47,18 @@ export default function MyRecipesPage() {
 
         const data: Recipe[] = await res.json();
         setRecipes(data);
+
+        const likes = await getMyLikes(token);
+
+        const likedRecipeIds = (likes as LikeItem[])
+          .filter((l) => l.targetType === "recipe")
+          .map((l) => l.targetId.toString());
+
+        setLikedIds(likedRecipeIds);
+
+        console.log("likedRecipeIds:", likedRecipeIds);
+        console.log("recipes ids:", data.map((recipe) => recipe._id));
+        
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
         else setError("Unknown error occurred");
@@ -70,38 +89,44 @@ export default function MyRecipesPage() {
       </div>
 
       <div className="myrecipes-grid">
-        {recipes.map((recipe) => (
-          <div
-            key={recipe._id}
-            className="myrecipes-card"
-            onClick={() => navigate(`/recipe/${recipe._id}`)}
-          >
-            {recipe.imageUrl ? (
-              <img
-                src={`http://localhost:3000${recipe.imageUrl}`}
-                alt={recipe.title}
-                className="myrecipes-card-image"
-              />
-            ) : (
-              <div className="myrecipes-card-image-placeholder" />
-            )}
+        {recipes.map((recipe) => {
+          const isLiked = likedIds.includes(recipe._id);
 
-            <h3 className="myrecipes-card-title">{recipe.title}</h3>
+          return (
+            <div
+              key={recipe._id}
+              className="myrecipes-card"
+              onClick={() => navigate(`/recipes/${recipe._id}`)}
+            >
+              {recipe.imageUrl ? (
+                <img
+                  src={`http://localhost:3000${recipe.imageUrl}`}
+                  alt={recipe.title}
+                  className="myrecipes-card-image"
+                />
+              ) : (
+                <div className="myrecipes-card-image-placeholder" />
+              )}
 
-            {recipe.instructions && (
-              <p className="myrecipes-card-description">
-                {recipe.instructions.length > 80
-                  ? recipe.instructions.slice(0, 80) + "..."
-                  : recipe.instructions}
-              </p>
-            )}
+              <span>{isLiked ? "❤️" : "♡"}</span>
 
-            <div className="myrecipes-card-meta">
-              {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
-              {recipe.difficulty && <span>• {recipe.difficulty}</span>}
+              <h3 className="myrecipes-card-title">{recipe.title}</h3>
+
+              {recipe.instructions && (
+                <p className="myrecipes-card-description">
+                  {recipe.instructions.length > 80
+                    ? recipe.instructions.slice(0, 80) + "..."
+                    : recipe.instructions}
+                </p>
+              )}
+
+              <div className="myrecipes-card-meta">
+                {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
+                {recipe.difficulty && <span>• {recipe.difficulty}</span>}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <BottomNav />

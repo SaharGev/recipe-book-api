@@ -1,4 +1,3 @@
-// src/controllers/authController.ts
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
@@ -12,25 +11,36 @@ const sendError = (code: number, message: string, res: Response) => {
 };
 
 type TokenPair = {
-  token: string;
+  accessToken: string;
   refreshToken: string;
 };
 
-const generateTokenPair = (userId: string) => {
-  const accessSecret: Secret = process.env.JWT_SECRET ?? "default_access_secret";
-  const refreshSecret: Secret = process.env.JWT_REFRESH_SECRET ?? "default_refresh_secret";
+const generateTokenPair = (userId: string): TokenPair => {
+  const accessSecret: Secret =
+    process.env.JWT_SECRET ?? "default_access_secret";
+  const refreshSecret: Secret =
+    process.env.JWT_REFRESH_SECRET ?? "default_refresh_secret";
 
   const accessExpiresIn: SignOptions["expiresIn"] =
-  process.env.JWT_EXPIRES_IN ? Number(process.env.JWT_EXPIRES_IN) : 900; // 15 minutes in seconds
+    process.env.JWT_EXPIRES_IN
+      ? Number(process.env.JWT_EXPIRES_IN)
+      : 900;
 
   const refreshExpiresIn: SignOptions["expiresIn"] =
-  process.env.JWT_REFRESH_EXPIRES_IN ? Number(process.env.JWT_REFRESH_EXPIRES_IN) : 60 * 60 * 24 * 7; // 7 days in seconds
+    process.env.JWT_REFRESH_EXPIRES_IN
+      ? Number(process.env.JWT_REFRESH_EXPIRES_IN)
+      : 60 * 60 * 24 * 7;
 
-  const token = jwt.sign({ _id: userId }, accessSecret, { expiresIn: accessExpiresIn });
+  const token = jwt.sign({ _id: userId }, accessSecret, {
+    expiresIn: accessExpiresIn,
+  });
+
   const rand = Math.floor(Math.random() * 1000000);
-  const refreshToken = jwt.sign({ _id: userId, rand }, refreshSecret, { expiresIn: refreshExpiresIn });
+  const refreshToken = jwt.sign({ _id: userId, rand }, refreshSecret, {
+    expiresIn: refreshExpiresIn,
+  });
 
-  return { token, refreshToken };
+  return { accessToken: token, refreshToken };
 };
 
 const register = async (req: Request, res: Response) => {
@@ -86,12 +96,12 @@ const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = email ? await User.findOne({ email }) : await User.findOne({ phone });
-    if (!user) return sendError(401, "Invalid credentials", res);
+    const user = email
+      ? await User.findOne({ email })
+      : await User.findOne({ phone });
 
-    if (!user.password) {
-    return sendError(401, "Invalid credentials", res);
-    }
+    if (!user) return sendError(401, "Invalid credentials", res);
+    if (!user.password) return sendError(401, "Invalid credentials", res);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return sendError(401, "Invalid credentials", res);
@@ -138,13 +148,11 @@ const googleLogin = async (req: Request, res: Response) => {
       return sendError(401, "Invalid Google token", res);
     }
 
-    // find existing user by googleId OR email
     let user = await User.findOne({ googleId });
     if (!user) {
       user = await User.findOne({ email });
     }
 
-    // if user doesn't exist - create
     if (!user) {
       const username = (name || email.split("@")[0]).trim();
 
@@ -157,9 +165,10 @@ const googleLogin = async (req: Request, res: Response) => {
         profileImageUrl: picture,
       });
     } else {
-      // if exists but missing googleId -> attach it
       if (!user.googleId) user.googleId = googleId;
-      if (picture && !user.profileImageUrl) user.profileImageUrl = picture;
+      if (picture && !user.profileImageUrl) {
+        user.profileImageUrl = picture;
+      }
     }
 
     const tokens = generateTokenPair(user._id.toString());
@@ -174,25 +183,33 @@ const googleLogin = async (req: Request, res: Response) => {
 };
 
 const refreshToken = async (req: Request, res: Response) => {
-  const refreshToken = req.body.refreshToken;
-  if (!refreshToken) return sendError(400, "Refresh token is required", res);
+  const refreshTokenFromBody = req.body.refreshToken;
+  if (!refreshTokenFromBody) {
+    return sendError(400, "Refresh token is required", res);
+  }
 
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
+  const refreshSecret =
+    process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
 
   try {
-    const decoded = jwt.verify(refreshToken, refreshSecret) as { _id: string; rand?: number };
+    const decoded = jwt.verify(refreshTokenFromBody, refreshSecret) as {
+      _id: string;
+      rand?: number;
+    };
 
     const user = await User.findById(decoded._id);
     if (!user) return sendError(401, "Invalid refresh token", res);
 
-    if (!user.refreshTokens.includes(refreshToken)) {
+    if (!user.refreshTokens.includes(refreshTokenFromBody)) {
       user.refreshTokens = [];
       await user.save();
       return sendError(401, "Invalid refresh token", res);
     }
 
     const tokens = generateTokenPair(user._id.toString());
-    user.refreshTokens = user.refreshTokens.filter((t: string) => t !== refreshToken);
+    user.refreshTokens = user.refreshTokens.filter(
+      (t: string) => t !== refreshTokenFromBody
+    );
     user.refreshTokens.push(tokens.refreshToken);
     await user.save();
 
@@ -204,17 +221,25 @@ const refreshToken = async (req: Request, res: Response) => {
 };
 
 const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.body.refreshToken;
-  if (!refreshToken) return sendError(400, "Refresh token is required", res);
+  const refreshTokenFromBody = req.body.refreshToken;
+  if (!refreshTokenFromBody) {
+    return sendError(400, "Refresh token is required", res);
+  }
 
-  const refreshSecret = process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
+  const refreshSecret =
+    process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
 
   try {
-    const decoded = jwt.verify(refreshToken, refreshSecret) as { _id: string };
+    const decoded = jwt.verify(refreshTokenFromBody, refreshSecret) as {
+      _id: string;
+    };
+
     const user = await User.findById(decoded._id);
     if (!user) return sendError(401, "Invalid refresh token", res);
 
-    user.refreshTokens = user.refreshTokens.filter((t: string) => t !== refreshToken);
+    user.refreshTokens = user.refreshTokens.filter(
+      (t: string) => t !== refreshTokenFromBody
+    );
     await user.save();
 
     return res.status(200).json({ message: "Logged out successfully" });
@@ -224,10 +249,10 @@ const logout = async (req: Request, res: Response) => {
   }
 };
 
-export default { 
+export default {
   register,
   login,
   googleLogin,
   refreshToken,
-  logout
+  logout,
 };

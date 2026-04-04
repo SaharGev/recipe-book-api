@@ -14,20 +14,6 @@ export default function RecipeDetailsPage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
 
-  const saveRecentlyViewedRecipe = (recipeToSave: Recipe) => {
-    const storageKey = "recentlyViewedRecipes";
-
-    const existingRaw = localStorage.getItem(storageKey);
-    const existingRecipes: Recipe[] = existingRaw ? JSON.parse(existingRaw) : [];
-
-    const filteredRecipes = existingRecipes.filter(
-      (item) => item._id !== recipeToSave._id
-    );
-
-    const updatedRecipes = [recipeToSave, ...filteredRecipes].slice(0, 10);
-
-    localStorage.setItem(storageKey, JSON.stringify(updatedRecipes));
-  };
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -35,17 +21,13 @@ export default function RecipeDetailsPage() {
         headers: { Authorization: "Bearer " + accessToken },
       });
 
-      console.log("recipe details status:", res.status);
-
       const data = await res.json();
-      console.log("recipe details data:", data);
 
       if (!res.ok) {
         return;
       }
 
       setRecipe(data);
-      saveRecentlyViewedRecipe(data);
     };
 
     fetchRecipe();
@@ -60,7 +42,7 @@ export default function RecipeDetailsPage() {
       <div className="image-wrapper">
         {recipe.imageUrl && (
           <img
-            src={`http://localhost:3000${recipe.imageUrl}`}
+            src={recipe.imageUrl}
             alt={recipe.title}
             className="recipe-main-image"
           />
@@ -103,8 +85,12 @@ export default function RecipeDetailsPage() {
         {/* INGREDIENTS */}
         <h3>Ingredients</h3>
         <ul className="ingredients-list">
-          {recipe.ingredients.map((ing, i) => (
-            <li key={i}>{ing}</li>
+          {(Array.isArray(recipe.ingredients) ? recipe.ingredients : []).map((ing, i) => (
+            <li key={i}>
+              {typeof ing === "string"
+                ? ing
+                : `${ing.quantity ?? ""} ${ing.unit ?? ""} ${ing.name ?? ""}`.trim()}
+            </li>
           ))}
         </ul>
 

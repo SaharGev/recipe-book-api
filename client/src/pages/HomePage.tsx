@@ -10,9 +10,12 @@ import type { User } from "../types/user";
 import { getMyRecipes } from "../services/recipeService";
 import { getMyRecipeBooks } from "../services/recipeBookService";
 import type { RecipeBook } from "../types/recipeBook";
+import { useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   const goToMyRecipes = () => {
     navigate("/my-recipes");
@@ -34,7 +37,6 @@ export default function HomePage() {
       try {
         setBooksLoading(true);
         setBooksError("");
-        const token = localStorage.getItem("token");
 
         if (!token) return;
 
@@ -86,6 +88,7 @@ export default function HomePage() {
           books.map((book) => (
             <RecipeBookCard
               key={book._id}
+              _id={book._id}
               title={book.name}
               recipesCount={book.recipes?.length || 0}
             />

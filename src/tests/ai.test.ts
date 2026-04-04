@@ -13,7 +13,7 @@ beforeAll(async () => {
   app = await initApp();
 
   const user = await getlogedInUser(app);
-  accessToken = user.token;
+  accessToken = user.accessToken;
 });
 
 beforeEach(async () => {
@@ -302,7 +302,7 @@ describe("AI tests", () => {
 
     const response = await request(app)
       .post("/ai/ai-search")
-      .set("Authorization", `Bearer ${user.token}`)
+      .set("Authorization", `Bearer ${user.accessToken}`)
       .send({
         query: "favorite pasta",
       });
@@ -345,7 +345,7 @@ describe("AI tests", () => {
 
     const response = await request(app)
       .post("/ai/ai-search")
-      .set("Authorization", `Bearer ${user.token}`)
+      .set("Authorization", `Bearer ${user.accessToken}`)
       .send({
         query: "pasta",
       });
@@ -397,7 +397,7 @@ describe("AI tests", () => {
 
     const response = await request(app)
       .post("/ai/ai-search")
-      .set("Authorization", `Bearer ${user.token}`)
+      .set("Authorization", `Bearer ${user.accessToken}`)
       .send({
         query: "favorite pasta easy",
       });
@@ -416,7 +416,7 @@ describe("AI tests", () => {
     
     const otherUser = await getLoggedInCustomUser(app, {
       email: "other@example.com",
-      username: "otheruser",
+      username: "otherUser",
       password: "testpassword",
     });
 
@@ -444,7 +444,7 @@ describe("AI tests", () => {
 
     const response = await request(app)
       .post("/ai/ai-search")
-      .set("Authorization", `Bearer ${user.token}`)
+      .set("Authorization", `Bearer ${user.accessToken}`)
       .send({
         query: "pasta",
       });
@@ -486,7 +486,7 @@ describe("AI tests", () => {
 
     const response = await request(app)
       .post("/ai/ai-search")
-      .set("Authorization", `Bearer ${user.token}`)
+      .set("Authorization", `Bearer ${user.accessToken}`)
       .send({
         query: "book",
       });

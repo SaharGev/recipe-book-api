@@ -3,6 +3,22 @@ import Like from "../models/likeModel";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import mongoose from "mongoose";
 
+const getMyLikes = async (req: AuthRequest, res: Response) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const likes = await Like.find({ userId });
+    return res.status(200).json(likes);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const like = async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id;
   const { targetType, targetId } = req.body;
@@ -39,4 +55,4 @@ const like = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export default { like };
+export default { like, getMyLikes };

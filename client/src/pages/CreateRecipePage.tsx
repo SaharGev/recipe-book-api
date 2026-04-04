@@ -26,7 +26,7 @@ export default function CreateRecipe() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("User not logged in");

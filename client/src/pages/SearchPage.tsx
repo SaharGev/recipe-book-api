@@ -6,6 +6,8 @@ import RecipeCard from "../components/RecipeCard";
 import RecipeBookCard from "../components/RecipeBookCard";
 import type { AiSearchSection } from "../services/aiSearchService";
 import type { Recipe } from "../types/recipe";
+import type { RecipeBook } from "../types/recipeBook";
+import { getRecentlyViewed } from "../services/authService";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -13,6 +15,7 @@ export default function SearchPage() {
   const [searchError, setSearchError] = useState("");
   const [sections, setSections] = useState<AiSearchSection[]>([]);
   const [recentlyViewedRecipes, setRecentlyViewedRecipes] = useState<Recipe[]>([]);
+  const [recentlyViewedBooks, setRecentlyViewedBooks] = useState<RecipeBook[]>([]);
 
   const recipesSection = sections.find(
     (section): section is Extract<AiSearchSection, { type: "recipes" }> =>
@@ -31,8 +34,6 @@ export default function SearchPage() {
 
       const data = await aiSearch(query);
       setSections(data.sections);
-      console.log("AI search result:", data);
-      console.log("AI search sections:", data.sections);
 
     } catch {
       setSearchError("Failed to search recipes");
@@ -55,11 +56,18 @@ export default function SearchPage() {
   }, [query]);
 
   useEffect(() => {
-    const storedRecipes = localStorage.getItem("recentlyViewedRecipes");
+    const fetchRecentlyViewed = async () => {
+      try {
+        const data = await getRecentlyViewed();
+        setRecentlyViewedRecipes(data.recentlyViewedRecipes || []);
+        setRecentlyViewedBooks(data.recentlyViewedBooks || []);
+      } catch {
+        setRecentlyViewedRecipes([]);
+        setRecentlyViewedBooks([]);
+      }
+    };
 
-    if (storedRecipes) {
-      setRecentlyViewedRecipes(JSON.parse(storedRecipes));
-    }
+    fetchRecentlyViewed();
   }, []);
 
   const categories = [
@@ -90,7 +98,7 @@ export default function SearchPage() {
         ))}
       </div>
 
-      {recentlyViewedRecipes.length > 0 && (
+      {query.trim().length < 2 && recentlyViewedRecipes.length > 0 && (
         <div className="search-section">
           <div className="search-section-header">
             <h3 className="search-section-title">Recently viewed recipes</h3>
@@ -99,6 +107,25 @@ export default function SearchPage() {
           <div className="search-results-section">
             {recentlyViewedRecipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {query.trim().length < 2 && recentlyViewedBooks.length > 0 && (
+        <div className="search-section">
+          <div className="search-section-header">
+            <h3 className="search-section-title">Recently viewed books</h3>
+          </div>
+
+          <div className="search-results-section">
+            {recentlyViewedBooks.map((book) => (
+              <RecipeBookCard
+                key={book._id}
+                _id={book._id}
+                title={book.name}
+                recipesCount={book.recipes?.length || 0}
+              />
             ))}
           </div>
         </div>
@@ -118,8 +145,8 @@ export default function SearchPage() {
               recipesSection.items.length === 1 ? "single-result" : ""
             }`}
           >
-            {recipesSection.items.map((recipe, index) => (
-              <RecipeCard key={index} recipe={recipe} />
+            {recipesSection.items.map((recipe) => (
+              <RecipeCard key={recipe._id} recipe={recipe} />
             ))}
           </div>
         </>
@@ -132,9 +159,10 @@ export default function SearchPage() {
           </p>
 
           <div className="search-results-section">
-            {recipeBooksSection.items.map((book, index) => (
+            {recipeBooksSection.items.map((book) => (
               <RecipeBookCard
-                key={book._id || index}
+                key={book._id}
+                _id={book._id}
                 title={book.name}
                 recipesCount={book.recipes?.length || 0}
               />

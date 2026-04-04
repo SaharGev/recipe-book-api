@@ -32,7 +32,7 @@ describe("Comments", () => {
 
     const res = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "recipe",
         targetId,
@@ -49,7 +49,7 @@ describe("Comments", () => {
 
     const res = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "invalid",
         targetId,
@@ -64,7 +64,7 @@ describe("Comments", () => {
 
     const res = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "recipe",
         targetId: "not-an-object-id",
@@ -80,7 +80,7 @@ describe("Comments", () => {
 
     const res = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "recipe",
         targetId
@@ -97,7 +97,7 @@ describe("Comments", () => {
     // create comment first
     const createRes = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "recipe",
         targetId,
@@ -110,7 +110,7 @@ describe("Comments", () => {
     // update comment
     const updateRes = await request(app)
         .put("/comments/" + commentId)
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         content: "Updated comment",
         });
@@ -127,7 +127,7 @@ describe("Comments", () => {
     // create comment
     const createRes = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({
         targetType: "recipe",
         targetId,
@@ -140,7 +140,7 @@ describe("Comments", () => {
     // delete comment
     const delRes = await request(app)
         .delete("/comments/" + commentId)
-        .set("Authorization", "Bearer " + user.token);
+        .set("Authorization", "Bearer " + user.accessToken);
 
     expect(delRes.status).toBe(200);
     expect(delRes.body.message).toBe("Deleted");
@@ -153,13 +153,13 @@ describe("Comments", () => {
     // create 2 comments on same target
     const c1 = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({ targetType: "recipe", targetId, content: "first" });
     expect(c1.status).toBe(201);
 
     const c2 = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user.token)
+        .set("Authorization", "Bearer " + user.accessToken)
         .send({ targetType: "recipe", targetId, content: "second" });
     expect(c2.status).toBe(201);
 
@@ -177,7 +177,7 @@ describe("Comments", () => {
     const user1 = await getlogedInUser(app);
     const user2 = await getLoggedInCustomUser(app, {
         email: "other@test.com",
-        username: "otheruser",
+        username: "otherUser",
         password: "testpassword",
     });
 
@@ -186,7 +186,7 @@ describe("Comments", () => {
     // user1 creates comment
     const createRes = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user1.token)
+        .set("Authorization", "Bearer " + user1.accessToken)
         .send({
         targetType: "recipe",
         targetId,
@@ -198,7 +198,7 @@ describe("Comments", () => {
     // user2 tries to update
     const updateRes = await request(app)
         .put("/comments/" + commentId)
-        .set("Authorization", "Bearer " + user2.token)
+        .set("Authorization", "Bearer " + user2.accessToken)
         .send({
         content: "hacked comment",
         });
@@ -215,7 +215,7 @@ describe("Comments", () => {
 
     const user2 = await getLoggedInCustomUser(app, {
         email: "delete-other@test.com",
-        username: "deleteOtherUser",
+        username: "deleteotherUser",
         password: "testpassword",
     });
 
@@ -223,7 +223,7 @@ describe("Comments", () => {
 
     const createRes = await request(app)
         .post("/comments")
-        .set("Authorization", "Bearer " + user1.token)
+        .set("Authorization", "Bearer " + user1.accessToken)
         .send({
         targetType: "recipe",
         targetId,
@@ -237,7 +237,7 @@ describe("Comments", () => {
 
     const delRes = await request(app)
         .delete("/comments/" + commentId)
-        .set("Authorization", "Bearer " + user2.token);
+        .set("Authorization", "Bearer " + user2.accessToken);
 
     expect(delRes.status).toBe(404);
   });

@@ -22,3 +22,41 @@ export async function getMyRecipes(token: string) {
 
   return data;
 }
+
+export async function toggleLike(recipeId: string, token: string) {
+  const response = await fetch("http://localhost:3000/likes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      targetType: "recipe",
+      targetId: recipeId,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to toggle like");
+  }
+
+  return data;
+}
+
+export async function getMyLikes(token: string) {
+  const response = await fetch("http://localhost:3000/likes", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch likes");
+  }
+
+  return data;
+}

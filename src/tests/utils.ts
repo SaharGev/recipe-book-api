@@ -10,7 +10,7 @@ export type UserData = {
   password: string;
   phone?: string;
   _id: string;
-  token: string;
+  accessToken: string;
   refreshToken: string;
 };
 
@@ -19,7 +19,7 @@ export const UserData = {
   username: "testuser",
   password: "testpassword",
   _id: "",
-  token: "",
+  accessToken: "",
   refreshToken: "",
 };
 
@@ -27,18 +27,18 @@ export const UserData = {
 export const otherUsers: UserData[] = [
   {
     email: "other1@example.com",
-    username: "otheruser1",
+    username: "otherUser1",
     password: "testpassword",
     _id: "",
-    token: "",
+    accessToken: "",
     refreshToken: "",
   },
   {
     email: "other2@example.com",
-    username: "otheruser2",
+    username: "otherUser2",
     password: "testpassword",
     _id: "",
-    token: "",
+    accessToken: "",
     refreshToken: "",
   },
 ];
@@ -67,7 +67,7 @@ export const getlogedInUser = async (app: Express): Promise<UserData> => {
     password: password,
     username: UserData.username,
     phone: undefined,
-    token: response.body.token,
+    accessToken: response.body.accessToken,
     refreshToken: response.body.refreshToken,
   };
 
@@ -98,7 +98,7 @@ export const getLoggedInCustomUser = async (
     password: user.password,
     username: user.username,
     phone: user.phone,
-    token: response.body.token,
+    accessToken: response.body.accessToken,
     refreshToken: response.body.refreshToken,
   };
 
@@ -166,12 +166,12 @@ export type RecipeBookData = {
 
 export const createRecipeBook = async (
   app: Express,
-  token: string,
+  accessToken: string,
   bookData: RecipeBookData
 ) => {
   const response = await request(app)
     .post("/recipe-books")
-    .set("Authorization", "Bearer " + token)
+    .set("Authorization", "Bearer " + accessToken)
     .send(bookData);
 
   return response;
