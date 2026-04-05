@@ -60,7 +60,7 @@ export default function RecipeDetailsPage() {
 
           <button
             className="icon-btn edit-btn"
-            onClick={() => navigate(`/edit/${recipe._id}`)}
+            onClick={() => navigate(`/edit-recipe/${recipe._id}`)}
           >
             ✎
           </button>

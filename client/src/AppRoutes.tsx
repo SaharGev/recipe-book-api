@@ -12,6 +12,7 @@ import CreateRecipe from "./pages/CreateRecipePage";
 import MyRecipeBooksPage from "./pages/MyRecipeBooksPage";
 import RecipeDetailsPage from "./pages/RecipeDetailsPage";
 import RecipeBookDetailsPage from "./pages/RecipeBookDetailsPage";
+import EditRecipePage from "./pages/EditRecipePage";
 import FavoriteRecipesPage from "./pages/FavoriteRecipesPage";
 import FavoriteBooksPage from "./pages/FavoriteBooksPage";
 
@@ -32,6 +33,7 @@ export default function AppRoutes() {
         <Route path="/my-recipeBooks" element={token ? <MyRecipeBooksPage /> : <Navigate to="/" />} />
         <Route path="/recipes/:id" element={token ? <RecipeDetailsPage /> : <Navigate to="/" />} />
         <Route path="/recipe-books/:id" element={token ? <RecipeBookDetailsPage /> : <Navigate to="/" />} />
+        <Route path="/edit-recipe/:id" element={token ? <EditRecipePage /> : <Navigate to="/" />} />
         <Route path="/favorite-recipes" element={token ? <FavoriteRecipesPage /> : <Navigate to="/" />} />
         <Route path="/favorite-books" element={token ? <FavoriteBooksPage /> : <Navigate to="/" />} />
       </Routes>
