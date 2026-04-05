@@ -36,71 +36,82 @@ export default function RecipeDetailsPage() {
   if (!recipe) return <p>Loading...</p>;
 
   return (
-    <div className="recipe-details-page">
-      
-      {/* IMAGE */}
-      <div className="image-wrapper">
-        {recipe.imageUrl && (
-          <img
-            src={recipe.imageUrl}
-            alt={recipe.title}
-            className="recipe-main-image"
-          />
-        )}
+    <div className="recipe-page-wrapper">
+      <div className="recipe-details-page">
 
-        {/* TOP BUTTONS */}
-        <button className="close-btn" onClick={() => navigate("/my-recipes")}>
-          ✕
-        </button>
-
-        <button
-          className="edit-btn"
-          onClick={() => navigate(`/edit/${recipe._id}`)}
-        >
-          ✎
-        </button>
-      </div>
-
-      {/* CONTENT CARD */}
-      <div className="recipe-content">
-        <h1 className="recipe-title">{recipe.title}</h1>
-
-        {recipe.description && (
-          <p className="recipe-description">{recipe.description}</p>
-        )}
-
-        {/* META */}
-        <div className="recipe-meta">
-          <div className="meta-box">
-            <span>{recipe.cookTime}</span>
-            <small>min</small>
+        {/* IMAGE */}
+        <div className="image-wrapper">
+          <div className="recipe-image-placeholder">
+            {recipe.imageUrl ? (
+              <img
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className="recipe-main-image"
+              />
+            ) : (
+              <div className="recipe-no-image" />
+            )}
           </div>
 
-          <div className="meta-box">
-            <span>{recipe.difficulty}</span>
-            <small>difficulty</small>
-          </div>
+          {/* TOP BUTTONS */}
+          <button className="icon-btn close-btn" onClick={() => navigate("/my-recipes")}>
+            ✕
+          </button>
+
+          <button
+            className="icon-btn edit-btn"
+            onClick={() => navigate(`/edit/${recipe._id}`)}
+          >
+            ✎
+          </button>
         </div>
 
-        {/* INGREDIENTS */}
-        <h3>Ingredients</h3>
-        <ul className="ingredients-list">
-          {(Array.isArray(recipe.ingredients) ? recipe.ingredients : []).map((ing, i) => (
-            <li key={i}>
-              {typeof ing === "string"
-                ? ing
-                : `${ing.quantity ?? ""} ${ing.unit ?? ""} ${ing.name ?? ""}`.trim()}
-            </li>
-          ))}
-        </ul>
+        {/* CONTENT */}
+        <div className="recipe-content">
+          <h1 className="recipe-title">{recipe.title}</h1>
 
-        {/* INSTRUCTIONS */}
-        {recipe.instructions && (
-          <>
-            <h3>Instructions</h3>
-            <p className="instructions">{recipe.instructions}</p>
-          </>
-        )}
+          {recipe.description && (
+            <p className="recipe-description">{recipe.description}</p>
+          )}
+
+          {/* META */}
+          <div className="recipe-meta">
+            <div className="meta-box">
+              <span>{recipe.cookTime}</span>
+              <small>min</small>
+            </div>
+
+            <div className="meta-box">
+              <span>{recipe.difficulty}</span>
+              <small>difficulty</small>
+            </div>
+
+            <div className="meta-box">
+              <span>{recipe.isPublic ? "Public" : "Private"}</span>
+              <small>privacy</small>
+            </div>
+          </div>
+
+          {/* INGREDIENTS */}
+          <h3>Ingredients</h3>
+          <ul className="ingredients-list">
+            {(Array.isArray(recipe.ingredients) ? recipe.ingredients : []).map((ing, i) => (
+              <li key={i}>
+                {typeof ing === "string"
+                  ? ing
+                  : `${ing.quantity ?? ""} ${ing.unit ?? ""} ${ing.name ?? ""}`.trim()}
+              </li>
+            ))}
+          </ul>
+
+          {/* INSTRUCTIONS */}
+          {recipe.instructions && (
+            <>
+              <h3>Instructions</h3>
+              <p className="instructions">{recipe.instructions}</p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
