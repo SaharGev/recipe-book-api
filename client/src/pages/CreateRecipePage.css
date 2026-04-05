@@ -8,6 +8,7 @@
 }
 
 .create-recipe-card {
+  margin-top: 10px;
   width: 100%;
   max-width: 390px;
   background-color: #ffffff;

@@ -1,12 +1,11 @@
 /* client/src/pages/AddPage.css */
-
 .add-options-page {
-  padding: 16px;
-  padding-bottom: 120px;
   background-color: #f4f4f8;
   min-height: 100vh;
-  text-align: center;
-  box-sizing: border-box;
+  padding-bottom: 120px;
+
+  display: flex;
+  justify-content: center;
 }
 
 .page-title {
@@ -15,6 +14,7 @@
   margin-bottom: 20px;
   color: #89abf6; 
   font-family: Arial, sans-serif;
+  text-align: center;
 }
 
 .options-container {
@@ -24,24 +24,10 @@
   align-items: center;
 }
 
-.option-card {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
-  font-family: Arial, sans-serif;
-}
-
 .option-card:hover {
-  transform: scale(1.02);
-  background: #f2f0fb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15),
+              0 4px 10px rgba(0,0,0,0.08);
 }
 
 .option-icon {
@@ -70,4 +56,32 @@
   color: #666;
   text-align: left;
   font-family: Arial, sans-serif;
+}
+
+.add-page-container {
+  width: 100%;
+  max-width: 390px;
+  background-color: #ffffff;
+  border-radius: 24px; 
+  padding: 24px 16px 90px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+}
+
+.option-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12),
+              0 2px 6px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.add-page-container {
+  margin-top: 10px;
 }
