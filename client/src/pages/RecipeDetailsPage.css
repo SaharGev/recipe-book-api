@@ -123,18 +123,20 @@ body {
 .ingredients-list {
   list-style: decimal inside;   
   padding: 16px;                
-  margin-bottom: 20px;
   background-color: #f9f9fd;    
   border-radius: 16px;          
   box-shadow: 0 2px 6px rgba(0,0,0,0.05); 
   font-size: 15px;
   line-height: 1.6;
   color: #2c2c2c;
+  display: flex;           
+  flex-direction: column;  
+  justify-content: center; 
+  gap: 10px;              
+  margin-bottom: 0;
 }
 
-.ingredients-list li {
-  margin-bottom: 10px;          
-}
+
 
 .instructions {
   background-color: #f9f9fd; 

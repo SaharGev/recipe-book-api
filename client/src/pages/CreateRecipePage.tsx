@@ -1,4 +1,3 @@
-// client/src/pages/CreateRecipe.tsx
 import { useState } from "react";
 import BottomNav from "../components/BottomNav";
 import "../pages/CreateRecipePage.css";
@@ -9,6 +8,7 @@ export default function CreateRecipe() {
   const [ingredients, setIngredients] = useState<string[]>([""]);
   const [cookTime, setCookTime] = useState<number | "">("");
   const [difficulty, setDifficulty] = useState("easy");
+  const [privacy, setPrivacy] = useState("private");
   const [imageUrl, setImageUrl] = useState<File | null>(null);
   const [instructions, setInstructions] = useState("");
 
@@ -18,44 +18,36 @@ export default function CreateRecipe() {
     setIngredients(newIngredients);
   };
 
-  const addIngredient = () => {
-    setIngredients([...ingredients, ""]);
+  const addIngredient = () => setIngredients([...ingredients, ""]);
+
+  const removeIngredient = (index: number) => {
+    if (ingredients.length === 1) return;
+    setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        throw new Error("User not logged in");
-      }
+      if (!token) throw new Error("User not logged in");
 
       let uploadedImageUrl = "";
-
-      // upload image if exists
       if (imageUrl) {
         const imageData = new FormData();
         imageData.append("image", imageUrl);
 
         const uploadRes = await fetch("http://localhost:3000/upload/image", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
           body: imageData,
         });
 
-        if (!uploadRes.ok) {
-          throw new Error("Image upload failed");
-        }
+        if (!uploadRes.ok) throw new Error("Image upload failed");
 
-        const uploadResult = await uploadRes.json();
-        uploadedImageUrl = uploadResult.url;
+        uploadedImageUrl = (await uploadRes.json()).url;
       }
 
-      // create recipe
       const res = await fetch("http://localhost:3000/recipes", {
         method: "POST",
         headers: {
@@ -70,6 +62,7 @@ export default function CreateRecipe() {
           difficulty,
           imageUrl: uploadedImageUrl,
           instructions,
+          isPublic: privacy === "public",
         }),
       });
 
@@ -78,136 +71,139 @@ export default function CreateRecipe() {
         throw new Error(errorText || "Failed to save recipe");
       }
 
-      const data = await res.json();
-      console.log("Recipe saved:", data);
-
       alert("Recipe saved successfully!");
-
-      setTitle("");
-      setDescription("");
-      setIngredients([""]);
-      setCookTime("");
-      setDifficulty("easy");
-      setImageUrl(null);
-      setInstructions("");
+      setTitle(""); setDescription(""); setIngredients([""]);
+      setCookTime(""); setDifficulty("easy"); setPrivacy("public");
+      setImageUrl(null); setInstructions("");
 
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error("Save recipe error:", err.message);
-        alert("Error saving recipe: " + err.message);
-      } else {
-        console.error("Save recipe error:", err);
-        alert("Error saving recipe");
-      }
+      alert(err instanceof Error ? "Error saving recipe: " + err.message : "Error saving recipe");
     }
   };
 
   return (
     <div className="create-recipe-page">
       <div className="create-recipe-card">
-        <h1>Create Recipe</h1>
 
-        <form onSubmit={handleSubmit}>
+        <h1 className="recipe-title">Create Recipe</h1>
 
-          <div>
-            <label htmlFor="image">Add Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              id="image"
-              onChange={(e) =>
-                e.target.files && setImageUrl(e.target.files[0])
-              }
-            />
+        <div className="recipe-image-wrapper">
+          {imageUrl ? (
+            <img src={URL.createObjectURL(imageUrl)} alt="Recipe" className="recipe-main-image"/>
+          ) : <div className="recipe-no-image"/>}
+        </div>
+
+        <form onSubmit={handleSubmit} className="create-recipe-content">
+
+          {/* Add Image */}
+          <div style={{ marginBottom: "14px" }}>
+            <label>Add Image</label>
+            <div className="image-upload-wrapper">
+              <label className="choose-file-btn">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageUrl(e.target.files[0]); 
+                      e.target.value = ""; 
+                    }
+                  }}
+                />
+                Choose File
+              </label>
+
+              {/*filename + X*/}
+              {imageUrl && (
+                <div className="ingredient-row" style={{ marginTop: "8px" }}>
+                  <input type="text" value={imageUrl.name} readOnly />
+                  <button
+                    type="button"
+                    className="remove-ingredient-btn"
+                    onClick={() => setImageUrl(null)}
+                  >
+                    X
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Recipe Name */}
           <div>
             <label>Recipe Name</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter recipe name"
-              required
-            />
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter recipe name" required />
           </div>
 
+          {/* Description */}
           <div>
             <label>Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional description"
-            />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
           </div>
 
+          {/* Ingredients */}
           <div>
             <label>Ingredients</label>
-
             {ingredients.map((ing, i) => (
-              <input
-                key={i}
-                type="text"
-                value={ing}
-                onChange={(e) =>
-                  handleIngredientChange(i, e.target.value)
-                }
-                placeholder={`Ingredient ${i + 1}`}
-                className="ingredient-input"
-                required
-              />
+              <div key={i} className="ingredient-row ingredient">
+                <input
+                  type="text"
+                  value={ing}
+                  onChange={(e) => handleIngredientChange(i, e.target.value)}
+                  placeholder={`Ingredient ${i + 1}`}
+                  required
+                  className="ingredient-input"
+                />
+                {i > 0 && (
+                  <button
+                    type="button"
+                    className="remove-ingredient-btn"
+                    onClick={() => removeIngredient(i)}
+                  >
+                    X
+                  </button>
+                )}
+              </div>
             ))}
-
-            <button
-              type="button"
-              className="add-ingredient-btn"
-              onClick={addIngredient}
-            >
+            <button type="button" className="add-ingredient-btn" onClick={addIngredient}>
               + Add Ingredient
             </button>
           </div>
-          
+
+          {/* Instructions */}
           <div>
             <label>Instructions</label>
-            <textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder="Enter cooking instructions"
-              required
-            />
+            <textarea value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Enter cooking instructions" required className="instructions"/>
           </div>
 
+          {/* Cook Time */}
           <div>
             <label>Cook Time (minutes)</label>
-            <input
-              type="number"
-              value={cookTime}
-              onChange={(e) =>
-                setCookTime(e.target.value ? Number(e.target.value) : "")
-              }
-              required
-            />
+            <input type="number" value={cookTime} onChange={(e) => setCookTime(e.target.value ? Number(e.target.value) : "")} required />
           </div>
 
+          {/* Difficulty */}
           <div>
             <label>Difficulty</label>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-            >
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
           </div>
 
-          <button type="submit" className="save-recipe-btn">
-            Save Recipe
-          </button>
+          {/* Privacy */}
+          <div>
+            <label>Privacy</label>
+            <select value={privacy} onChange={(e) => setPrivacy(e.target.value)}>
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
 
+          <button type="submit" className="save-recipe-btn">Save Recipe</button>
         </form>
       </div>
-
       <BottomNav />
     </div>
   );
