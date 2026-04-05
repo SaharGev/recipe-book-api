@@ -8,6 +8,7 @@ import type { AiSearchSection } from "../services/aiSearchService";
 import type { Recipe } from "../types/recipe";
 import type { RecipeBook } from "../types/recipeBook";
 import { getRecentlyViewed } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -16,6 +17,9 @@ export default function SearchPage() {
   const [sections, setSections] = useState<AiSearchSection[]>([]);
   const [recentlyViewedRecipes, setRecentlyViewedRecipes] = useState<Recipe[]>([]);
   const [recentlyViewedBooks, setRecentlyViewedBooks] = useState<RecipeBook[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const navigate = useNavigate();
 
   const recipesSection = sections.find(
     (section): section is Extract<AiSearchSection, { type: "recipes" }> =>
@@ -75,6 +79,8 @@ export default function SearchPage() {
     "Breakfasts 🍳",
   ];
 
+  const favoriteRecipes: Recipe[] = [];
+  const favoriteBooks: RecipeBook[] = [];
 
   return (
     <div className="search-page">
@@ -92,42 +98,132 @@ export default function SearchPage() {
 
       <div className="search-categories">
         {categories.map((category) => (
-          <div key={category} className="category-chip">
+          <button
+            key={category}
+            type="button"
+            className={`category-chip ${
+              selectedCategory === category ? "active" : ""
+            }`}
+            onClick={() => setSelectedCategory(category)}
+          >
             {category}
-          </div>
+          </button>
         ))}
       </div>
 
-      {query.trim().length < 2 && recentlyViewedRecipes.length > 0 && (
+      {query.trim().length < 2 && (
         <div className="search-section">
           <div className="search-section-header">
             <h3 className="search-section-title">Recently viewed recipes</h3>
+            <button
+              type="button"
+              className="search-section-link-btn"
+              onClick={() => navigate("/my-recipes")}
+            >
+              All
+            </button>
           </div>
 
-          <div className="search-results-section">
-            {recentlyViewedRecipes.map((recipe) => (
-              <RecipeCard key={recipe._id} recipe={recipe} />
-            ))}
-          </div>
+          {recentlyViewedRecipes.length > 0 ? (
+            <div className="search-results-section">
+              {recentlyViewedRecipes.map((recipe) => (
+                <div key={recipe._id} className="search-card-slot">
+                  <RecipeCard recipe={recipe} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="search-empty-message">No recently viewed recipes yet</p>
+          )}
         </div>
       )}
 
-      {query.trim().length < 2 && recentlyViewedBooks.length > 0 && (
+      {query.trim().length < 2 && (
         <div className="search-section">
           <div className="search-section-header">
             <h3 className="search-section-title">Recently viewed books</h3>
+            <button
+              type="button"
+              className="search-section-link-btn"
+              onClick={() => navigate("/my-recipeBooks")}
+            >
+              All
+            </button>
           </div>
 
-          <div className="search-results-section">
-            {recentlyViewedBooks.map((book) => (
-              <RecipeBookCard
-                key={book._id}
-                _id={book._id}
-                title={book.name}
-                recipesCount={book.recipes?.length || 0}
-              />
-            ))}
+          {recentlyViewedBooks.length > 0 ? (
+            <div className="search-results-section">
+              {recentlyViewedBooks.map((book) => (
+                <RecipeBookCard
+                  key={book._id}
+                  _id={book._id}
+                  title={book.name}
+                  recipesCount={book.recipes?.length || 0}
+                  recipes={book.recipes as { imageUrl?: string }[]}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="search-empty-message">No recently viewed books yet</p>
+          )}
+        </div>
+      )}
+
+      {query.trim().length < 2 && (
+        <div className="search-section">
+          <div className="search-section-header">
+            <h3 className="search-section-title">Favorite recipes</h3>
+            <button
+              type="button"
+              className="search-section-link-btn search-section-link-btn-disabled"
+              disabled
+            >
+              All
+            </button>
           </div>
+
+          {favoriteRecipes.length > 0 ? (
+            <div className="search-results-section">
+              {favoriteRecipes.map((recipe) => (
+                <div key={recipe._id} className="search-card-slot">
+                  <RecipeCard recipe={recipe} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="search-empty-message">No favorite recipes yet</p>
+          )}
+        </div>
+      )}
+
+      {query.trim().length < 2 && (
+        <div className="search-section">
+          <div className="search-section-header">
+            <h3 className="search-section-title">Favorite books</h3>
+            <button
+              type="button"
+              className="search-section-link-btn search-section-link-btn-disabled"
+              disabled
+            >
+              All
+            </button>
+          </div>
+
+          {favoriteBooks.length > 0 ? (
+            <div className="search-results-section">
+              {favoriteBooks.map((book) => (
+                <div key={book._id} className="search-card-slot">
+                  <RecipeBookCard
+                    _id={book._id}
+                    title={book.name}
+                    recipesCount={book.recipes?.length || 0}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="search-empty-message">No favorite books yet</p>
+          )}
         </div>
       )}
 
@@ -146,7 +242,9 @@ export default function SearchPage() {
             }`}
           >
             {recipesSection.items.map((recipe) => (
-              <RecipeCard key={recipe._id} recipe={recipe} />
+              <div key={recipe._id} className="search-card-slot">
+                <RecipeCard recipe={recipe} />
+              </div>
             ))}
           </div>
         </>

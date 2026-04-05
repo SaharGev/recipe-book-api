@@ -71,7 +71,12 @@ const getRecentlyViewed = async (req: AuthRequest, res: Response) => {
 
     const user = await User.findById(userId)
       .populate("recentlyViewedRecipes")
-      .populate("recentlyViewedBooks");
+      .populate({
+        path: "recentlyViewedBooks",
+        populate: {
+          path: "recipes",
+        },
+      });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

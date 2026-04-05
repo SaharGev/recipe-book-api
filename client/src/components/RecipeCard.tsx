@@ -5,6 +5,7 @@ import "./RecipeCard.css";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import { useState } from "react";
+import { getImageUrl } from "../utils/getImageUrl";
 
 
 type RecipeCardProps = {
@@ -16,6 +17,8 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
     const [liked, setLiked] = useState(initialLiked);
+
+    const imageSrc = getImageUrl(recipe.imageUrl);
 
     const handleLikeClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -38,26 +41,26 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
             onClick={() => navigate(`/recipes/${recipe._id}`)}
         >
             <div className="recipe-card-preview">
-              <span
-              className="recipe-like-btn"
-              onClick={(e) => handleLikeClick(e as unknown as React.MouseEvent<HTMLButtonElement>)}
-              >
-              {liked ? "❤️" : "♡"}
-              </span>
+                <button
+                    type="button"
+                    className="recipe-like-btn"
+                    onClick={handleLikeClick}
+                >
+                    {liked ? "❤️" : "♡"}
+                </button>
               {recipe.imageUrl ? (
                 <img
-                   src={recipe.imageUrl}
-                   alt={recipe.title}
-                   className="recipe-card-image"
+                    src={imageSrc}
+                    alt={recipe.title}
+                    className="recipe-card-image"
                 />
-              ) : (
+                ) : (
                 <div className="recipe-card-image-placeholder" />
-              )}
+                )}
             </div>
 
             <div className="recipe-card-content">
                 <h3>{recipe.title}</h3>
-                {recipe.description && <p>{recipe.description}</p>}
                 {recipe.cookTime && <span className="recipe-card-time">{recipe.cookTime} min</span>}
             </div>
         </button>
