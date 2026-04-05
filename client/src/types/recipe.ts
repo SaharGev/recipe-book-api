@@ -15,4 +15,5 @@ export type Recipe = {
   difficulty: string;
   instructions?: string;
   imageUrl?: string;
+  isPublic?: boolean;
 };
