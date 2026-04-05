@@ -101,19 +101,19 @@ export const aiSearchService = async (
 
   // recipe books query
   const recipeBooks = await RecipeBook.find({
-    $and: [
-      recipeBookAccessFilter,
-      {
-        $or: [
-          ...(filters.recipeBookName
-            ? [{ name: { $regex: filters.recipeBookName, $options: "i" } }]
-            : []),
-          { name: { $regex: query, $options: "i" } },
-          { description: { $regex: query, $options: "i" } },
-        ],
-      },
-    ],
-  }).limit(10);
+      $and: [
+        recipeBookAccessFilter,
+        {
+          $or: [
+            ...(filters.recipeBookName
+              ? [{ name: { $regex: filters.recipeBookName, $options: "i" } }]
+              : []),
+            { name: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+          ],
+        },
+      ],
+  }).populate("recipes").limit(10);
 
   return {
     originalQuery: query,

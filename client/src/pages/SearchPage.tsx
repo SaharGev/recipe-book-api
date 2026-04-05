@@ -9,6 +9,10 @@ import type { Recipe } from "../types/recipe";
 import type { RecipeBook } from "../types/recipeBook";
 import { getRecentlyViewed } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
+import { getMyLikes, getRecipe } from "../services/recipeService";
+import { getRecipeBookById } from "../services/recipeBookService";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -18,6 +22,12 @@ export default function SearchPage() {
   const [recentlyViewedRecipes, setRecentlyViewedRecipes] = useState<Recipe[]>([]);
   const [recentlyViewedBooks, setRecentlyViewedBooks] = useState<RecipeBook[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
+  const { token } = useContext(AuthContext);
+  const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
+  const [favoriteBooks, setFavoriteBooks] = useState<RecipeBook[]>([]);
+  const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
+
 
   const navigate = useNavigate();
 
@@ -37,6 +47,7 @@ export default function SearchPage() {
       setSearchError("");
 
       const data = await aiSearch(query);
+      console.log("ai search result:", JSON.stringify(data.sections, null, 2));
       setSections(data.sections);
 
     } catch {
@@ -74,13 +85,100 @@ export default function SearchPage() {
     fetchRecentlyViewed();
   }, []);
 
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        if (!token) {
+          setLikedRecipeIds([]);
+          return;
+        }
+
+        const likes = await getMyLikes(token);
+
+        const recipeIds = likes
+          .filter((like: { targetType: string; targetId: string; createdAt: string }) => like.targetType === "recipe")
+          .sort((a: { createdAt: string }, b: { createdAt: string }) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
+
+        setLikedRecipeIds(recipeIds);
+
+        const bookIds = likes
+          .filter((like: { targetType: string; targetId: string; createdAt: string }) => like.targetType === "book")
+          .sort((a: { createdAt: string }, b: { createdAt: string }) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
+
+        setLikedBookIds(bookIds);
+      } catch {
+        setLikedRecipeIds([]);
+        setLikedBookIds([]);
+      }
+    };
+
+    fetchLikes();
+  }, [token]);
+
+  useEffect(() => {
+    const fetchFavoriteRecipes = async () => {
+      try {
+        if (!token || likedRecipeIds.length === 0) {
+          setFavoriteRecipes([]);
+          return;
+        }
+
+        const results = await Promise.all(
+          likedRecipeIds.map(async (id) => {
+            try {
+              return await getRecipe(id, token);
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        setFavoriteRecipes(results.filter(Boolean));
+      } catch {
+        setFavoriteRecipes([]);
+      }
+    };
+
+    fetchFavoriteRecipes();
+  }, [likedRecipeIds, token]);
+
+  useEffect(() => {
+    const fetchFavoriteBooks = async () => {
+      try {
+        if (!token || likedBookIds.length === 0) {
+          setFavoriteBooks([]);
+          return;
+        }
+
+        const results = await Promise.all(
+          likedBookIds.map(async (id) => {
+            try {
+              return await getRecipeBookById(id, token);
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        setFavoriteBooks(results.filter(Boolean));
+      } catch {
+        setFavoriteBooks([]);
+      }
+    };
+
+    fetchFavoriteBooks();
+  }, [likedBookIds, token]);
+
   const categories = [
     "Main courses 🍲",
     "Breakfasts 🍳",
   ];
-
-  const favoriteRecipes: Recipe[] = [];
-  const favoriteBooks: RecipeBook[] = [];
 
   return (
     <div className="search-page">
@@ -117,8 +215,9 @@ export default function SearchPage() {
             <h3 className="search-section-title">Recently viewed recipes</h3>
             <button
               type="button"
-              className="search-section-link-btn"
-              onClick={() => navigate("/my-recipes")}
+              className={`search-section-link-btn ${recentlyViewedRecipes.length === 0 ? "search-section-link-btn-disabled" : ""}`}
+              disabled={recentlyViewedRecipes.length === 0}
+              onClick={() => recentlyViewedRecipes.length > 0 && navigate("/my-recipes")}
             >
               All
             </button>
@@ -128,7 +227,10 @@ export default function SearchPage() {
             <div className="search-results-section">
               {recentlyViewedRecipes.map((recipe) => (
                 <div key={recipe._id} className="search-card-slot">
-                  <RecipeCard recipe={recipe} />
+                  <RecipeCard
+                    recipe={recipe}
+                    initialLiked={likedRecipeIds.includes(recipe._id)}
+                  />
                 </div>
               ))}
             </div>
@@ -144,8 +246,9 @@ export default function SearchPage() {
             <h3 className="search-section-title">Recently viewed books</h3>
             <button
               type="button"
-              className="search-section-link-btn"
-              onClick={() => navigate("/my-recipeBooks")}
+              className={`search-section-link-btn ${recentlyViewedBooks.length === 0 ? "search-section-link-btn-disabled" : ""}`}
+              disabled={recentlyViewedBooks.length === 0}
+              onClick={() => recentlyViewedBooks.length > 0 && navigate("/my-recipeBooks")}
             >
               All
             </button>
@@ -160,6 +263,7 @@ export default function SearchPage() {
                   title={book.name}
                   recipesCount={book.recipes?.length || 0}
                   recipes={book.recipes as { imageUrl?: string }[]}
+                  initialLiked={likedBookIds.includes(book._id)}
                 />
               ))}
             </div>
@@ -175,8 +279,9 @@ export default function SearchPage() {
             <h3 className="search-section-title">Favorite recipes</h3>
             <button
               type="button"
-              className="search-section-link-btn search-section-link-btn-disabled"
-              disabled
+              className={`search-section-link-btn ${favoriteRecipes.length === 0 ? "search-section-link-btn-disabled" : ""}`}
+              disabled={favoriteRecipes.length === 0}
+              onClick={() => favoriteRecipes.length > 0 && navigate("/favorite-recipes")}
             >
               All
             </button>
@@ -186,7 +291,10 @@ export default function SearchPage() {
             <div className="search-results-section">
               {favoriteRecipes.map((recipe) => (
                 <div key={recipe._id} className="search-card-slot">
-                  <RecipeCard recipe={recipe} />
+                  <RecipeCard
+                    recipe={recipe}
+                    initialLiked={likedRecipeIds.includes(recipe._id)}
+                  />
                 </div>
               ))}
             </div>
@@ -202,8 +310,9 @@ export default function SearchPage() {
             <h3 className="search-section-title">Favorite books</h3>
             <button
               type="button"
-              className="search-section-link-btn search-section-link-btn-disabled"
-              disabled
+              className={`search-section-link-btn ${favoriteBooks.length === 0 ? "search-section-link-btn-disabled" : ""}`}
+              disabled={favoriteBooks.length === 0}
+              onClick={() => favoriteBooks.length > 0 && navigate("/favorite-books")}
             >
               All
             </button>
@@ -217,6 +326,8 @@ export default function SearchPage() {
                     _id={book._id}
                     title={book.name}
                     recipesCount={book.recipes?.length || 0}
+                    recipes={book.recipes as { imageUrl?: string }[]}
+                    initialLiked={likedBookIds.includes(book._id)}
                   />
                 </div>
               ))}
@@ -243,7 +354,10 @@ export default function SearchPage() {
           >
             {recipesSection.items.map((recipe) => (
               <div key={recipe._id} className="search-card-slot">
-                <RecipeCard recipe={recipe} />
+                <RecipeCard
+                  recipe={recipe}
+                  initialLiked={likedRecipeIds.includes(recipe._id)}
+                />
               </div>
             ))}
           </div>
@@ -263,6 +377,8 @@ export default function SearchPage() {
                 _id={book._id}
                 title={book.name}
                 recipesCount={book.recipes?.length || 0}
+                recipes={book.recipes as { imageUrl?: string }[]}
+                initialLiked={likedBookIds.includes(book._id)}
               />
             ))}
           </div>
