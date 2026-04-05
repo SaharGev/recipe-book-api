@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
-import { getMyLikes } from "../services/recipeService";
+import { getMyLikes, toggleLike } from "../services/recipeService";
 import { getImageUrl } from "../utils/getImageUrl";
 
 type Recipe = {
@@ -110,7 +110,27 @@ export default function MyRecipesPage() {
                 <div className="myrecipes-card-image-placeholder" />
               )}
 
-              <button type="button" className="myrecipes-like-btn">
+              <button
+                type="button"
+                className="myrecipes-like-btn"
+                onClick={async (e) => {
+                  e.stopPropagation();
+
+                  if (!token) return;
+
+                  try {
+                    const data = await toggleLike(recipe._id, token);
+
+                    setLikedIds((prev) =>
+                      data.action === "liked"
+                        ? [...prev, recipe._id]
+                        : prev.filter((id) => id !== recipe._id)
+                    );
+                  } catch (error) {
+                    console.error("failed to toggle like", error);
+                  }
+                }}
+              >
                 {isLiked ? "❤️" : "♡"}
               </button>
             </div>

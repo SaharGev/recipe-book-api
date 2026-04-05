@@ -27,5 +27,5 @@ export async function getRecipeBookById(id: string, token: string) {
     throw new Error(data.message || "Failed to fetch recipe book");
   }
 
-  return data;
+  return data.recipeBook;
 }
