@@ -1,5 +1,6 @@
 // src/app.ts
 import express, { Express } from "express";
+import path from "path";
 import cors from "cors";
 import authRoute from "./routes/authRoute";
 import recipeRoutes from "./routes/recipeRoute";
@@ -23,6 +24,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

@@ -51,6 +51,7 @@ export default function MyRecipeBooksPage() {
               _id={book._id}
               title={book.name}
               recipesCount={book.recipes?.length || 0}
+              recipes={book.recipes as { imageUrl?: string }[]}
             />
           ))
         )}

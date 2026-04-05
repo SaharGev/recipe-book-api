@@ -4,6 +4,7 @@ import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
 import { getMyLikes } from "../services/recipeService";
+import { getImageUrl } from "../utils/getImageUrl";
 
 type Recipe = {
   _id: string;
@@ -98,9 +99,10 @@ export default function MyRecipesPage() {
               className="myrecipes-card"
               onClick={() => navigate(`/recipes/${recipe._id}`)}
             >
+              <div className="myrecipes-card-preview">
               {recipe.imageUrl ? (
                 <img
-                  src={`http://localhost:3000${recipe.imageUrl}`}
+                  src={getImageUrl(recipe.imageUrl)}
                   alt={recipe.title}
                   className="myrecipes-card-image"
                 />
@@ -108,7 +110,10 @@ export default function MyRecipesPage() {
                 <div className="myrecipes-card-image-placeholder" />
               )}
 
-              <span>{isLiked ? "❤️" : "♡"}</span>
+              <button type="button" className="myrecipes-like-btn">
+                {isLiked ? "❤️" : "♡"}
+              </button>
+            </div>
 
               <h3 className="myrecipes-card-title">{recipe.title}</h3>
 
