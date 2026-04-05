@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import BottomNav from "../components/BottomNav";
 import RecipeBookCard from "../components/RecipeBookCard";
 import { getMyRecipeBooks } from "../services/recipeBookService";
+import { getMyLikes } from "../services/recipeService";
 import type { RecipeBook } from "../types/recipeBook";
 import "./MyRecipeBooksPage.css";
 import { useContext } from "react";
@@ -13,6 +14,7 @@ export default function MyRecipeBooksPage() {
   const [books, setBooks] = useState<RecipeBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -23,6 +25,13 @@ export default function MyRecipeBooksPage() {
 
         const data = await getMyRecipeBooks(token);
         setBooks(data.recipeBooks);
+
+        const likes = await getMyLikes(token);
+        const bookIds = likes
+          .filter((like: { targetType: string; targetId: string }) => like.targetType === "book")
+          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
+        setLikedBookIds(bookIds);
+        
       } catch {
         setError("Failed to load books");
       } finally {
@@ -52,6 +61,7 @@ export default function MyRecipeBooksPage() {
               title={book.name}
               recipesCount={book.recipes?.length || 0}
               recipes={book.recipes as { imageUrl?: string }[]}
+              initialLiked={likedBookIds.includes(book._id)}
             />
           ))
         )}

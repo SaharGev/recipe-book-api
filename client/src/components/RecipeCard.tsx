@@ -4,7 +4,7 @@ import { toggleLike } from "../services/recipeService";
 import "./RecipeCard.css";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getImageUrl } from "../utils/getImageUrl";
 
 
@@ -17,6 +17,10 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
     const [liked, setLiked] = useState(initialLiked);
+
+    useEffect(() => {
+      setLiked(initialLiked);
+    }, [initialLiked]);
 
     const imageSrc = getImageUrl(recipe.imageUrl);
 
@@ -35,10 +39,9 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
     };
 
     return (
-        <button
-            className="recipe-card"
-            type="button"
-            onClick={() => navigate(`/recipes/${recipe._id}`)}
+        <div
+          className="recipe-card"
+          onClick={() => navigate(`/recipes/${recipe._id}`)}
         >
             <div className="recipe-card-preview">
                 <button
@@ -63,6 +66,6 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
                 <h3>{recipe.title}</h3>
                 {recipe.cookTime && <span className="recipe-card-time">{recipe.cookTime} min</span>}
             </div>
-        </button>
+        </div>
     );
 }

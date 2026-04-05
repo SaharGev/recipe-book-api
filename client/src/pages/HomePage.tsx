@@ -7,7 +7,7 @@ import "./HomePage.css";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../services/userService";
 import type { User } from "../types/user";
-import { getMyRecipes } from "../services/recipeService";
+import { getMyRecipes, getMyLikes } from "../services/recipeService";
 import { getMyRecipeBooks } from "../services/recipeBookService";
 import type { RecipeBook } from "../types/recipeBook";
 import { useContext } from "react";
@@ -31,6 +31,7 @@ export default function HomePage() {
   const [books, setBooks] = useState<RecipeBook[]>([]);
   const [booksLoading, setBooksLoading] = useState(true);
   const [booksError, setBooksError] = useState("");
+  const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,6 +54,12 @@ export default function HomePage() {
         setBooks(booksData.recipeBooks);
         console.log("books data:", booksData);
 
+        const likes = await getMyLikes(token);
+        const bookIds = likes
+          .filter((like: { targetType: string; targetId: string }) => like.targetType === "book")
+          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
+        setLikedBookIds(bookIds);
+
       } catch {
         setBooksError("Failed to load books");
       } finally {
@@ -64,7 +71,7 @@ export default function HomePage() {
     };
 
     fetchUser();
-  }, []);
+  }, [token]);
 
   return (
     <div className="home-page">
@@ -92,6 +99,7 @@ export default function HomePage() {
               title={book.name}
               recipesCount={book.recipes?.length || 0}
               recipes={book.recipes as { imageUrl?: string }[]}
+              initialLiked={likedBookIds.includes(book._id)}
             />
           ))
         )}
