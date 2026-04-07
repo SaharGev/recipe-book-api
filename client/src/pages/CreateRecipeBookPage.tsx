@@ -32,7 +32,7 @@ export default function CreateRecipeBookPage() {
 
   const [loadingBooks, setLoadingBooks] = useState(true);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
-
+  
   useEffect(() => {
     if (!token) return;
 
@@ -134,8 +134,8 @@ export default function CreateRecipeBookPage() {
         return;
       }
       alert("Recipe added to book successfully!");
-      setSelectedBookId("");
       setSelectedRecipeId("");
+      setRecipes((prev) => prev.filter((r) => r._id !== selectedRecipeId));
     } catch (err) {
       console.error(err);
       alert("Server error adding recipe");
@@ -144,105 +144,106 @@ export default function CreateRecipeBookPage() {
 
   return (
     <div className="create-book-page">
-      <h1 className="page-title">Recipe Books</h1>
+      <div className="page-container">
+        <h1 className="page-title">Recipe Books</h1>
 
-      <div className="accordion-container">
-        {/* CREATE BOOK */}
-        <div className="accordion-card">
-          <div
-            className="accordion-header"
-            onClick={() => setCreateOpen(!createOpen)}
-          >
-            <span>Create new empty recipe book</span>
-            <span className="arrow">{createOpen ? "▲" : "▼"}</span>
+        <div className="accordion-container">
+          {/* CREATE BOOK */}
+          <div className="accordion-card">
+            <div
+              className="accordion-header"
+              onClick={() => setCreateOpen(!createOpen)}
+            >
+              <span>Create new empty recipe book</span>
+              <span className="arrow">{createOpen ? "▲" : "▼"}</span>
+            </div>
+
+            {createOpen && (
+              <div className="accordion-content">
+                <label>Recipe Book Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter recipe book name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+
+                <label>Description</label>
+                <textarea
+                  placeholder="Optional description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+
+                <label>Visibility</label>
+                <select
+                  value={isPublic ? "public" : "private"}
+                  onChange={(e) => setIsPublic(e.target.value === "public")}
+                >
+                  <option value="private">Private</option>
+                  <option value="public">Public</option>
+                </select>
+
+                <button className="primary-button" onClick={handleCreateBook}>
+                  Create Recipe Book
+                </button>
+              </div>
+            )}
           </div>
 
-          {createOpen && (
-            <div className="accordion-content">
-              <label>Recipe Book Name</label>
-              <input
-                type="text"
-                placeholder="Enter recipe book name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <label>Description</label>
-              <textarea
-                placeholder="Optional description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-
-              <label>Visibility</label>
-              <select
-                value={isPublic ? "public" : "private"}
-                onChange={(e) => setIsPublic(e.target.value === "public")}
-              >
-                <option value="private">Private</option>
-                <option value="public">Public</option>
-              </select>
-
-              <button className="primary-button" onClick={handleCreateBook}>
-                Create Recipe Book
-              </button>
+          {/* ADD RECIPE TO BOOK */}
+          <div className="accordion-card">
+            <div
+              className="accordion-header"
+              onClick={() => setAddOpen(!addOpen)}
+            >
+              <span>Add a recipe to existing recipe book</span>
+              <span className="arrow">{addOpen ? "▲" : "▼"}</span>
             </div>
-          )}
-        </div>
 
-        {/* ADD RECIPE TO BOOK */}
-        <div className="accordion-card">
-          <div
-            className="accordion-header"
-            onClick={() => setAddOpen(!addOpen)}
-          >
-            <span>Add a recipe to existing recipe book</span>
-            <span className="arrow">{addOpen ? "▲" : "▼"}</span>
+            {addOpen && (
+              <div className="accordion-content">
+                <label>Select Recipe Book</label>
+                <select
+                  value={selectedBookId}
+                  onChange={(e) => setSelectedBookId(e.target.value)}
+                  disabled={loadingBooks}
+                >
+                  <option value="">Choose a recipe book</option>
+                  {books.map((b) => (
+                    <option key={b._id} value={b._id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+
+                <label>Select Recipe</label>
+                <select
+                  value={selectedRecipeId}
+                  onChange={(e) => setSelectedRecipeId(e.target.value)}
+                  disabled={loadingRecipes}
+                >
+                  <option value="">Choose recipe</option>
+                  {recipes.map((r) => (
+                    <option key={r._id} value={r._id}>
+                      {r.title}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  className="primary-button"
+                  onClick={handleAddRecipe}
+                  disabled={loadingBooks || loadingRecipes}
+                >
+                  Add Recipe
+                </button>
+              </div>
+            )}
           </div>
-
-          {addOpen && (
-            <div className="accordion-content">
-              <label>Select Recipe Book</label>
-              <select
-                value={selectedBookId}
-                onChange={(e) => setSelectedBookId(e.target.value)}
-                disabled={loadingBooks}
-              >
-                <option value="">Choose a recipe book</option>
-                {books.map((b) => (
-                  <option key={b._id} value={b._id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-
-              <label>Select Recipe</label>
-              <select
-                value={selectedRecipeId}
-                onChange={(e) => setSelectedRecipeId(e.target.value)}
-                disabled={loadingRecipes}
-              >
-                <option value="">Choose recipe</option>
-                {recipes.map((r) => (
-                  <option key={r._id} value={r._id}>
-                    {r.title}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                className="primary-button"
-                onClick={handleAddRecipe}
-                disabled={loadingBooks || loadingRecipes}
-              >
-                Add Recipe
-              </button>
-            </div>
-          )}
         </div>
-      </div>
-
-      <BottomNav />
+       </div>
+     <BottomNav />
     </div>
   );
 }
