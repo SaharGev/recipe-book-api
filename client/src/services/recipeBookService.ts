@@ -1,9 +1,7 @@
+import { apiFetch } from "./apiClient";
+
 export async function getMyRecipeBooks(token: string) {
-  const response = await fetch("/recipe-books/my", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await apiFetch("http://localhost:3000/recipe-books/my", {}, token);
 
   const data = await response.json();
 
@@ -15,11 +13,7 @@ export async function getMyRecipeBooks(token: string) {
 }
 
 export async function getRecipeBookById(id: string, token: string) {
-  const response = await fetch(`/recipe-books/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await apiFetch(`http://localhost:3000/recipe-books/${id}`, {}, token);
 
   const data = await response.json();
 

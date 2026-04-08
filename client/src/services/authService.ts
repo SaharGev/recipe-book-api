@@ -59,3 +59,26 @@ export async function getRecentlyViewed() {
 
   return data;
 }
+
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = localStorage.getItem("refreshToken");
+
+  if (!refreshToken) return null;
+
+  const response = await fetch("http://localhost:3000/auth/refresh", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ refreshToken }),
+  });
+
+  if (!response.ok) return null;
+
+  const data = await response.json();
+
+  localStorage.setItem("accessToken", data.accessToken);
+  localStorage.setItem("refreshToken", data.refreshToken);
+
+  return data.accessToken;
+}

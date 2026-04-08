@@ -1,5 +1,6 @@
 import "./ProfileSummaryCard.css";
 import type { User } from "../types/user";
+import { useNavigate } from "react-router-dom";
 
 type ProfileSummaryCardProps = {
   user: User | null;
@@ -16,6 +17,8 @@ export default function ProfileSummaryCard({
   onRecipesClick,
   onBooksClick,
 }: ProfileSummaryCardProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="profile-summary-card">
       <div className="profile-summary-header">
@@ -36,7 +39,7 @@ export default function ProfileSummaryCard({
           </div>
         </div>
 
-        <button type="button" className="profile-settings-button">
+        <button type="button" className="profile-settings-button" onClick={() => navigate("/settings")}>
           ⚙
         </button>
       </div>

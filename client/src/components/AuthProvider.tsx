@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
+import { registerSetToken } from "../services/apiClient";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -20,6 +21,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem("accessToken");
     }
   };
+
+  useEffect(() => {
+    registerSetToken(setToken);
+  }, []);
 
   const setRefreshToken = (newToken: string | null) => {
     setRefreshTokenState(newToken);
