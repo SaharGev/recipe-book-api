@@ -1,6 +1,7 @@
 import "./ProfileSummaryCard.css";
 import type { User } from "../types/user";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/getImageUrl";
 
 type ProfileSummaryCardProps = {
   user: User | null;
@@ -25,7 +26,7 @@ export default function ProfileSummaryCard({
         <div className="profile-user-info">
           {user?.profileImageUrl ? (
             <img
-              src={user.profileImageUrl}
+              src={getImageUrl(user.profileImageUrl)}
               alt="profile"
               className="profile-avatar"
             />

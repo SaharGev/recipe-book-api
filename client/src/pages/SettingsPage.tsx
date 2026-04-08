@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import { getCurrentUser, uploadProfileImage, updateProfileImage, updateCurrentUser } from "../services/userService";
+import { getImageUrl } from "../utils/getImageUrl";
 import "./SettingsPage.css";
 import { logout } from "../services/authService";
 
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<{ username?: string; email?: string; phone?: string }>({});
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -26,6 +28,7 @@ export default function SettingsPage() {
         setUsername(user.username || "");
         setEmail(user.email || "");
         setPhone(user.phone || "");
+        setAvatarPreview(user.profileImageUrl ? getImageUrl(user.profileImageUrl) : null);
       } catch {
         console.error("Failed to fetch user");
       }
@@ -83,8 +86,9 @@ export default function SettingsPage() {
             type="text"
             placeholder="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => { setUsername(e.target.value); setErrors((prev) => ({ ...prev, username: undefined })); }}
           />
+          {errors.username && <p className="settings-message-error">{errors.username}</p>}
         </div>
 
         <div className="settings-field">
@@ -94,8 +98,9 @@ export default function SettingsPage() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); setErrors((prev) => ({ ...prev, email: undefined })); }}
           />
+          {errors.email && <p className="settings-message-error">{errors.email}</p>}
         </div>
 
         <div className="settings-field">
@@ -105,11 +110,12 @@ export default function SettingsPage() {
             type="text"
             placeholder="Phone (optional)"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => { setPhone(e.target.value); setErrors((prev) => ({ ...prev, phone: undefined })); }}
           />
+          {errors.phone && <p className="settings-message-error">{errors.phone}</p>}
         </div>
 
-        {message && <p className="settings-message">{message}</p>}
+        {message && <p className="settings-message-success">{message}</p>}
 
         <button
           type="button"
@@ -129,7 +135,16 @@ export default function SettingsPage() {
               await updateCurrentUser(token, { username, email, phone });
               setMessage("Saved successfully!");
             } catch (err) {
-              setMessage(err instanceof Error ? err.message : "Failed to save");
+              const errorMessage = err instanceof Error ? err.message : "Failed to save";
+              if (errorMessage.toLowerCase().includes("username")) {
+                setErrors((prev) => ({ ...prev, username: errorMessage }));
+              } else if (errorMessage.toLowerCase().includes("email")) {
+                setErrors((prev) => ({ ...prev, email: errorMessage }));
+              } else if (errorMessage.toLowerCase().includes("phone")) {
+                setErrors((prev) => ({ ...prev, phone: errorMessage }));
+              } else {
+                setMessage(errorMessage);
+              }
             } finally {
               setLoading(false);
             }
@@ -145,9 +160,8 @@ export default function SettingsPage() {
           className="settings-logout-btn"
           onClick={async () => {
             try {
-              if (!token) return;
-              const { refreshToken } = useContext(AuthContext);
-              await logout(refreshToken || "");
+              if (!refreshToken) return;
+              await logout(refreshToken);
               setToken(null);
               setRefreshToken(null);
               navigate("/");

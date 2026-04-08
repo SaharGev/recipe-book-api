@@ -156,3 +156,16 @@
 .settings-logout-btn:hover {
   opacity: 0.85;
 }
+
+.settings-message-success {
+  font-size: 14px;
+  color: #2e7d32;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.settings-message-error {
+  font-size: 12px;
+  color: #e53935;
+  margin-top: 4px;
+}
