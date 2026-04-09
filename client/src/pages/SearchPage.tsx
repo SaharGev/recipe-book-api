@@ -46,7 +46,7 @@ export default function SearchPage() {
       setSearchLoading(true);
       setSearchError("");
 
-      const data = await aiSearch(query);
+      const data = await aiSearch(query, token);
       console.log("ai search result:", JSON.stringify(data.sections, null, 2));
       setSections(data.sections);
 

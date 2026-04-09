@@ -1,10 +1,7 @@
-// client/src/services/recipeService.ts
+import { apiFetch } from "./apiClient";
+
 export async function getRecipe(id: string, token: string) {
-  const response = await fetch(`http://localhost:3000/recipes/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, token);
 
   if (!response.ok) {
     throw new Error("Failed to fetch recipe");
@@ -14,11 +11,7 @@ export async function getRecipe(id: string, token: string) {
 }
 
 export async function getMyRecipes(token: string) {
-  const response = await fetch("http://localhost:3000/recipes/my", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await apiFetch("http://localhost:3000/recipes/my", {}, token);
 
   const data = await response.json();
 
@@ -30,17 +23,16 @@ export async function getMyRecipes(token: string) {
 }
 
 export async function toggleLike(recipeId: string, token: string) {
-  const response = await fetch("http://localhost:3000/likes", {
+  const response = await apiFetch("http://localhost:3000/likes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       targetType: "recipe",
       targetId: recipeId,
     }),
-  });
+  }, token);
 
   const data = await response.json();
 
@@ -52,11 +44,7 @@ export async function toggleLike(recipeId: string, token: string) {
 }
 
 export async function getMyLikes(token: string) {
-  const response = await fetch("http://localhost:3000/likes", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await apiFetch("http://localhost:3000/likes", {}, token);
 
   const data = await response.json();
 
