@@ -64,3 +64,25 @@
 .mybooks-add-button:hover {
   background-color: #688fe4;
 }
+
+.mybooks-empty-text {
+  text-align: center;
+}
+
+.mybooks-empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 10px; 
+  width: 100%;
+}
+
+.mybooks-empty-text {
+  color: #555;
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+
+

@@ -73,7 +73,29 @@ export default function MyRecipesPage() {
 
   if (loading) return <p className="myrecipes-loading-text">Loading your recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
-  if (recipes.length === 0) return <p className="myrecipes-no-recipes-text">No recipes found.</p>;
+  if (recipes.length === 0)
+  return (
+    <div className="myrecipes-page">
+      <h1 className="myrecipes-page-title">My Recipes</h1>
+      <p className="myrecipes-recipes-count">0 Recipes</p>
+
+      <div className="myrecipes-add-button-wrapper">
+        <button
+          className="myrecipes-add-button"
+          onClick={() => navigate("/createRecipe")}
+        >
+          + Add Recipe
+        </button>
+      </div>
+
+      <p className="myrecipes-empty-text">
+        No recipes yet 🍳<br />
+        Start by adding your first recipe!
+      </p>
+
+      <BottomNav />
+    </div>
+  );
 
   return (
     <div className="myrecipes-page">

@@ -61,8 +61,6 @@ export default function MyRecipeBooksPage() {
           <p>Loading books...</p>
         ) : error ? (
           <p>{error}</p>
-        ) : books.length === 0 ? (
-          <p>No books yet</p>
         ) : (
           books.map((book) => (
             <RecipeBookCard
@@ -76,6 +74,15 @@ export default function MyRecipeBooksPage() {
           ))
         )}
       </div>
+
+      {!loading && !error && books.length === 0 && (
+        <div className="mybooks-empty-state">
+          <p className="mybooks-empty-text">
+            No books yet 📚<br />
+            Start by creating your first recipe book!
+          </p>
+        </div>
+      )}
 
       <BottomNav />
     </div>
