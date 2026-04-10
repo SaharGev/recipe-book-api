@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
-import { getRecipeBookById } from "../services/recipeBookService";
+import { getRecipeBookById, searchUsers } from "../services/recipeBookService";
 import type { RecipeBook } from "../types/recipeBook";
 import { getImageUrl } from "../utils/getImageUrl";
 import "./RecipeBookDetailsPage.css";
@@ -16,23 +16,44 @@ type Recipe = {
   difficulty?: string;
 };
 
+type User = {
+  _id: string;
+  username: string;
+};
+
+type Collaborator = {
+  user: {
+    _id: string;
+    username?: string;
+  } | string;
+};
+
+type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
+  collaborators: Collaborator[];
+};
+
+
 export default function RecipeBookDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [book, setBook] = useState<RecipeBook | null>(null);
+  const [book, setBook] = useState<RecipeBookWithPopulated | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [showShareModal, setShowShareModal] = useState(false);
 
+  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
   const previewImages =
-    (book?.recipes as Recipe[] || [])
+    ((book?.recipes as Recipe[]) || [])
       .slice(-4)
       .reverse()
       .map((r) => r.imageUrl)
       .filter(Boolean);
 
-  useEffect(() => {
     const fetchBook = async () => {
       try {
         setLoading(true);
@@ -44,7 +65,8 @@ export default function RecipeBookDetailsPage() {
         }
 
         const data = await getRecipeBookById(id, token);
-        setBook(data.recipeBook ?? data);
+        setBook(data);
+
       } catch {
         setError("Failed to load recipe book");
       } finally {
@@ -52,8 +74,78 @@ export default function RecipeBookDetailsPage() {
       }
     };
 
-    fetchBook();
-  }, [id]);
+useEffect(() => {
+  fetchBook();
+}, [id]);
+
+  const handleSearch = async (value: string) => {
+    setSearch(value);
+
+    if (!value.trim()) {
+      setUsers([]);
+      return;
+    }
+
+    try {
+      setLoadingUsers(true);
+
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const data = await searchUsers(value, token);
+
+      setUsers(data as User[]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  
+  const shareBook = async (userId: string) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    await fetch(
+      `http://localhost:3000/recipe-books/${book?._id}/share`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
+      }
+    );
+
+    await fetchBook(); 
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const unshareBook = async (userId: string) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    await fetch(
+      `http://localhost:3000/recipe-books/${book?._id}/unshare`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
+      }
+    );
+
+    await fetchBook(); 
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   if (loading) return <p>Loading book...</p>;
   if (error) return <p>{error}</p>;
@@ -98,7 +190,6 @@ export default function RecipeBookDetailsPage() {
         </div>
       </div>
 
-      {/* CONTENT */}
       <div className="book-content">
         <h1 className="book-title">{book.name}</h1>
 
@@ -135,11 +226,54 @@ export default function RecipeBookDetailsPage() {
         </div>
       </div>
 
+      {/* MODAL */}
       {showShareModal && (
         <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <p>hi</p>
-            <button onClick={() => setShowShareModal(false)}>Close</button>
+
+            <h3 className="modal-title">Share book</h3>
+
+            <input
+              value={search}
+              placeholder="Search user..."
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+
+            {loadingUsers && <p className="muted">Searching...</p>}
+
+            {users.map((u) => {
+              const isUserShared = book?.collaborators?.some((c) => {
+                const userId =
+                  typeof c.user === "string" ? c.user : c.user._id;
+
+                return userId === u._id;
+              });
+
+              return (
+                <div key={u._id} className="user-row">
+                  <span>{u.username}</span>
+
+                  <button
+                    className={`share-toggle-btn ${isUserShared ? "unshare" : "share"}`}
+                    onClick={() =>
+                      isUserShared
+                        ? unshareBook(u._id)
+                        : shareBook(u._id)
+                    }
+                  >
+                    {isUserShared ? "Unshare" : "Share"}
+                  </button>
+                </div>
+              );
+            })}
+
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowShareModal(false)}
+            >
+              Close
+            </button>
+
           </div>
         </div>
       )}

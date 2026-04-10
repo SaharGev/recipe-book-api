@@ -209,13 +209,13 @@ const shareRecipeBook = async (req: AuthRequest, res: Response) => {
     }
 
     const { bookId } = req.params;
-    const { email } = req.body;
+    const { username } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Target user email is required" });
+    if (!username) {
+      return res.status(400).json({ message: "Target user username is required" });
     }
 
-    const targetUser = await User.findOne({ email });
+    const targetUser = await User.findOne({ username });
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -265,13 +265,13 @@ const unshareRecipeBook = async (req: AuthRequest, res: Response) => {
     }
 
     const { bookId } = req.params;
-    const { email } = req.body;
+    const { username } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Target user email is required" });
+    if (!username) {
+      return res.status(400).json({ message: "Target user username is required" });
     }
 
-    const targetUser = await User.findOne({ email });
+    const targetUser = await User.findOne({ username });
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -419,6 +419,32 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const searchUsers = async (req: AuthRequest, res: Response) => {
+  try {
+    const query = req.query.query as string;
+
+    if (!query) {
+      return res.status(400).json({ message: "Query is required" });
+    }
+
+    // prevent regex injection
+    const escapeRegex = (text: string) =>
+      text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const safeQuery = escapeRegex(query);
+
+    const users = await User.find({
+      username: { $regex: safeQuery, $options: "i" }
+    })
+      .select("username _id")
+      .limit(10); 
+
+    res.status(200).json(users);
+  } catch (err: any) {
+    res.status(500).json({ message: "Error searching users" });
+  }
+};
+
 export default {
   createRecipeBook,
   addRecipeToBook,
@@ -431,4 +457,5 @@ export default {
   unshareRecipeBook,
   updateRecipeBook,
   duplicateRecipeBook,
+  searchUsers
 };

@@ -1,3 +1,4 @@
+// src/services/recipeBookService.ts
 import { apiFetch } from "./apiClient";
 
 export async function getMyRecipeBooks(token: string) {
@@ -23,3 +24,23 @@ export async function getRecipeBookById(id: string, token: string) {
 
   return data.recipeBook;
 }
+
+export async function searchUsers(query: string, token: string) {
+  const res = await fetch(
+    `http://localhost:3000/recipe-books/search-users?query=${query}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to search users");
+  }
+
+  return data;
+}
+
