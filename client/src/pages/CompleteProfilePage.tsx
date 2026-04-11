@@ -31,7 +31,7 @@ export default function CompleteProfilePage() {
 
     fetchUser();
   }, [token]);
-  
+
   return (
     <div className="settings-page">
       <h2 className="settings-title" style={{ textAlign: "center", marginBottom: "24px" }}>
@@ -113,7 +113,7 @@ export default function CompleteProfilePage() {
                 await updateCurrentUser(token, { username, phone });
               }
 
-              navigate("/home");
+              navigate("/add-friends");
             } catch (err) {
               const errorMessage = err instanceof Error ? err.message : "Failed to save";
               if (errorMessage.toLowerCase().includes("username")) {

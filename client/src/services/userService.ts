@@ -66,3 +66,61 @@ export async function uploadProfileImage(token: string, file: File): Promise<str
 
   return data.url;
 }
+
+export async function getFriends(token: string) {
+  const response = await apiFetch("http://localhost:3000/users/friends", {}, token);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch friends");
+  }
+
+  return data.friends;
+}
+
+export async function addFriend(token: string, identifier: string) {
+  const response = await apiFetch("http://localhost:3000/users/friends", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier }),
+  }, token);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to add friend");
+  }
+
+  return data;
+}
+
+export async function removeFriend(token: string, friendId: string) {
+  const response = await apiFetch(`http://localhost:3000/users/friends/${friendId}`, {
+    method: "DELETE",
+  }, token);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to remove friend");
+  }
+
+  return data;
+}
+
+export async function searchUsers(token: string, query: string) {
+  const response = await apiFetch(
+    `http://localhost:3000/users/search?query=${encodeURIComponent(query)}`,
+    {},
+    token
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to search users");
+  }
+
+  return data.users;
+}
