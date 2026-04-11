@@ -1,6 +1,7 @@
 // client/src/pages/LoginPage.tsx
 import { useState } from "react";
 import { login } from "../services/authService";
+import { signInWithGoogle } from "../services/firebaseService";
 import "./LoginPage.css";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
@@ -23,8 +24,11 @@ export default function LoginPage() {
 
       setToken(data.accessToken);
       setRefreshToken(data.refreshToken);
-
-      navigate("/home");
+      if (data.isNewUser) {
+        navigate("/complete-profile");
+      } else {
+        navigate("/home");
+      }
 
       console.log("login response:", data);
     } catch (error) {
@@ -84,7 +88,32 @@ export default function LoginPage() {
           <span>or</span>
         </div>
 
-        <button className="google-button" type="button">
+        <button
+          className="google-button"
+          type="button"
+          onClick={async () => {
+            try {
+              const idToken = await signInWithGoogle();
+              const response = await fetch("http://localhost:3000/auth/google", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken }),
+              });
+              const data = await response.json();
+              if (!response.ok) throw new Error(data.message || "Google login failed");
+              console.log("google login data:", data);
+              setToken(data.accessToken);
+              setRefreshToken(data.refreshToken);
+              if (data.isNewUser) {
+                navigate("/complete-profile");
+              } else {
+                navigate("/home");
+              }
+            } catch (error) {
+              setError(error instanceof Error ? error.message : "Google login failed");
+            }
+          }}
+        >
           Continue with Google
         </button>
 
