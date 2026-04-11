@@ -1,10 +1,10 @@
 import { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
-import { addFriend, searchUsers } from "../services/userService";
+import { addFriend, getFriends, removeFriend, searchUsers } from "../services/userService";
 import { getImageUrl } from "../utils/getImageUrl";
 import BottomNav from "../components/BottomNav";
 import "./AddFriendsPage.css";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type UserResult = {
   _id: string;
@@ -16,16 +16,32 @@ type UserResult = {
 export default function AddFriendsPage() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromFriends = location.state?.from === "friends";
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<UserResult[]>([]);
+  const [friendIds, setFriendIds] = useState<string[]>([]);
   const [addedIds, setAddedIds] = useState<string[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        if (!token) return;
+        const friends = await getFriends(token);
+        setFriendIds(friends.map((f: { _id: string }) => f._id));
+      } catch {
+        setFriendIds([]);
+      }
+    };
+    fetchFriends();
+  }, [token]);
+  
+  useEffect(() => {
     if (query.trim().length < 2) {
-      setResults([]);
-      return;
+      const timer = setTimeout(() => setResults([]), 0);
+      return () => clearTimeout(timer);
     }
 
     const timeout = setTimeout(async () => {
@@ -41,13 +57,21 @@ export default function AddFriendsPage() {
     return () => clearTimeout(timeout);
   }, [query, token]);
 
-  const handleAdd = async (user: UserResult) => {
+  const isAdded = (userId: string) => addedIds.includes(userId) || friendIds.includes(userId);
+
+  const handleToggleFriend = async (user: UserResult) => {
     try {
       if (!token) return;
-      await addFriend(token, user.email);
-      setAddedIds((prev) => [...prev, user._id]);
+      if (isAdded(user._id)) {
+        await removeFriend(token, user._id);
+        setAddedIds((prev) => prev.filter((id) => id !== user._id));
+        setFriendIds((prev) => prev.filter((id) => id !== user._id));
+      } else {
+        await addFriend(token, user.email);
+        setAddedIds((prev) => [...prev, user._id]);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add friend");
+      setError(err instanceof Error ? err.message : "Failed to update friend");
     }
   };
 
@@ -83,29 +107,41 @@ export default function AddFriendsPage() {
                 ) : (
                   <div className="add-friends-result-avatar-placeholder" />
                 )}
+              </div>
               <div className="add-friends-result-info">
                 <p className="add-friends-result-username">{user.username}</p>
               </div>
               <button
                 type="button"
-                className={`add-friends-result-btn ${addedIds.includes(user._id) ? "added" : ""}`}
-                disabled={addedIds.includes(user._id)}
-                onClick={() => handleAdd(user)}
+                className={`add-friends-result-btn ${isAdded(user._id) ? "added" : ""}`}
+                disabled={false}
+                onClick={() => handleToggleFriend(user)}
               >
-                {addedIds.includes(user._id) ? "Added ✓" : "Add"}
+                {isAdded(user._id) ? "Added ✓" : "Add"}
               </button>
             </div>
           ))}
         </div>
       )}
 
-      <button
-        type="button"
-        className="add-friends-skip-btn"
-        onClick={() => navigate("/home")}
-      >
-        Skip
-      </button>
+      <div className="add-friends-actions">
+        <button
+          type="button"
+          className="add-friends-done-btn"
+          onClick={() => fromFriends ? navigate("/friends") : navigate("/home")}
+        >
+          Done
+        </button>
+        {!fromFriends && (
+          <button
+            type="button"
+            className="add-friends-skip-btn"
+            onClick={() => navigate("/home")}
+          >
+            Skip
+          </button>
+        )}
+      </div>
 
       <BottomNav />
     </div>
