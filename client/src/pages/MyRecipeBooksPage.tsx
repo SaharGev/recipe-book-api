@@ -8,6 +8,7 @@ import type { RecipeBook } from "../types/recipeBook";
 import "./MyRecipeBooksPage.css";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function MyRecipeBooksPage() {
   const { token } = useContext(AuthContext);
@@ -15,6 +16,7 @@ export default function MyRecipeBooksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -40,19 +42,25 @@ export default function MyRecipeBooksPage() {
     };
 
     fetchBooks();
-  }, []);
+  }, [token]);
 
   return (
     <div className="home-page">
       <h3 className="section-title mybooks-title">My Recipe Books</h3>
-
+      <p className="mybooks-count">{books.length} Books</p>
+      <div className="mybooks-add-button-wrapper">
+        <button
+          className="mybooks-add-button"
+          onClick={() => navigate("/createRecipeBook")}
+        >
+          + Add Book
+        </button>
+      </div>
       <div className="books-feed">
         {loading ? (
           <p>Loading books...</p>
         ) : error ? (
           <p>{error}</p>
-        ) : books.length === 0 ? (
-          <p>No books yet</p>
         ) : (
           books.map((book) => (
             <RecipeBookCard
@@ -66,6 +74,15 @@ export default function MyRecipeBooksPage() {
           ))
         )}
       </div>
+
+      {!loading && !error && books.length === 0 && (
+        <div className="mybooks-empty-state">
+          <p className="mybooks-empty-text">
+            No books yet 📚<br />
+            Start by creating your first recipe book!
+          </p>
+        </div>
+      )}
 
       <BottomNav />
     </div>

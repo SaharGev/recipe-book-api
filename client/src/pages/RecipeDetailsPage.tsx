@@ -54,7 +54,15 @@ export default function RecipeDetailsPage() {
           </div>
 
           {/* TOP BUTTONS */}
-          <button className="icon-btn close-btn" onClick={() => navigate("/my-recipes")}>
+          <button className="icon-btn close-btn" 
+            onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/my-recipes");
+            }
+          }}
+          >
             ✕
           </button>
 

@@ -463,11 +463,11 @@ describe("RecipeBook API", () => {
       };
       const targetUser = await getLoggedInCustomUser(app, targetUserData);
 
-      // Owner shares the book using email
+      // Owner shares the book using username
       const shareResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
         .set("Authorization", "Bearer " + loginUser.accessToken)
-        .send({ email: targetUser.email });
+        .send({ username: targetUser.username });
 
       expect(shareResp.status).toBe(200);
       expect(shareResp.body.message).toBe("Recipe book shared successfully");
@@ -496,7 +496,7 @@ describe("RecipeBook API", () => {
       const forbiddenShareResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
         .set("Authorization", "Bearer " + otherUser.accessToken)
-        .send({ email: otherUser.email });
+        .send({ username: otherUser.username });
 
       expect(forbiddenShareResp.status).toBe(403);
       expect(forbiddenShareResp.body.message).toBe(
@@ -507,7 +507,7 @@ describe("RecipeBook API", () => {
       const shareAgainResp = await request(app)
         .post(`/recipe-books/${bookId}/share`)
         .set("Authorization", "Bearer " + loginUser.accessToken)
-        .send({ email: targetUser.email });
+        .send({ username: targetUser.username });
 
       expect(shareAgainResp.status).toBe(400);
       expect(shareAgainResp.body.message).toBe("User is already a collaborator");
@@ -535,7 +535,7 @@ describe("RecipeBook API", () => {
       await request(app)
         .post(`/recipe-books/${bookId}/share`)
         .set("Authorization", "Bearer " + loginUser.accessToken)
-        .send({ email: collabUser.email });
+        .send({ username: collabUser.username });
 
       // Verify collaborator exists
       let book = await RecipeBook.findById(bookId);
@@ -547,7 +547,7 @@ describe("RecipeBook API", () => {
       const unshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
         .set("Authorization", "Bearer " + loginUser.accessToken)
-        .send({ email: collabUser.email });
+        .send({ username: collabUser.username });
 
       expect(unshareResp.status).toBe(200);
       expect(unshareResp.body.message).toBe("Collaborator removed successfully");
@@ -576,7 +576,7 @@ describe("RecipeBook API", () => {
       const forbiddenUnshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
         .set("Authorization", "Bearer " + otherUser.accessToken)
-        .send({ email: collabUser.email });
+        .send({ username: collabUser.username });
 
       expect(forbiddenUnshareResp.status).toBe(403);
       expect(forbiddenUnshareResp.body.message).toBe(
@@ -594,7 +594,7 @@ describe("RecipeBook API", () => {
       const notFoundUnshareResp = await request(app)
         .post(`/recipe-books/${bookId}/unshare`)
         .set("Authorization", "Bearer " + loginUser.accessToken)
-        .send({ email: notcollabUser.email });
+        .send({ username: notcollabUser.username });
 
       expect(notFoundUnshareResp.status).toBe(404);
       expect(notFoundUnshareResp.body.message).toBe("User is not a collaborator");
@@ -720,6 +720,55 @@ describe("RecipeBook API", () => {
           expect(recipe._id.toString()).not.toBe(recipeId2);
         }
 
+    });
+
+    test("Search users - full flow (success, validation, security)", async () => { 
+      await getLoggedInCustomUser(app, {
+        email: "dan1@example.com",
+        username: "daniel",
+        password: "123456",
+      });
+
+      await getLoggedInCustomUser(app, {
+        email: "dan2@example.com",
+        username: "idan",
+        password: "123456",
+      });
+
+      await getLoggedInCustomUser(app, {
+        email: "other@example.com",
+        username: "moshe",
+        password: "123456",
+      });
+
+      // right search
+      const resp = await request(app)
+        .get("/recipe-books/search-users?query=dan")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(resp.status).toBe(200);
+
+      const usernames = resp.body.map((u: any) => u.username);
+
+      expect(usernames).toContain("daniel");
+      expect(usernames).toContain("idan");
+      expect(usernames).not.toContain("moshe");
+
+      // without query
+      const respNoQuery = await request(app)
+        .get("/recipe-books/search-users")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(respNoQuery.status).toBe(400);
+      expect(respNoQuery.body.message).toBe("Query is required");
+
+      // regex injection attempt - should not return all users
+      const respInjection = await request(app)
+        .get("/recipe-books/search-users?query=.*")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(respInjection.status).toBe(200);
+      expect(respInjection.body.length).toBeLessThanOrEqual(10);
     });
 
   });

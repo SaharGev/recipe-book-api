@@ -1,22 +1,62 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
-import { getRecipeBookById } from "../services/recipeBookService";
+import { getRecipeBookById, searchUsers } from "../services/recipeBookService";
 import type { RecipeBook } from "../types/recipeBook";
+import { getImageUrl } from "../utils/getImageUrl";
+import "./RecipeBookDetailsPage.css";
+import { BsShare } from "react-icons/bs";
+
+type Recipe = {
+  _id: string;
+  title: string;
+  instructions?: string;
+  imageUrl?: string;
+  cookTime?: number;
+  difficulty?: string;
+};
+
+type User = {
+  _id: string;
+  username: string;
+};
+
+type Collaborator = {
+  user: {
+    _id: string;
+    username?: string;
+  } | string;
+};
+
+type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
+  collaborators: Collaborator[];
+};
+
 
 export default function RecipeBookDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [book, setBook] = useState<RecipeBook | null>(null);
+  const [book, setBook] = useState<RecipeBookWithPopulated | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const previewImages =
+    ((book?.recipes as Recipe[]) || [])
+      .slice(-4)
+      .reverse()
+      .map((r) => r.imageUrl)
+      .filter(Boolean);
+
     const fetchBook = async () => {
       try {
         setLoading(true);
-        setError("");
 
         const token = localStorage.getItem("accessToken");
         if (!token || !id) {
@@ -25,8 +65,8 @@ export default function RecipeBookDetailsPage() {
         }
 
         const data = await getRecipeBookById(id, token);
-        const bookData = data.recipeBook ?? data;
-        setBook(bookData);
+        setBook(data);
+
       } catch {
         setError("Failed to load recipe book");
       } finally {
@@ -34,24 +74,208 @@ export default function RecipeBookDetailsPage() {
       }
     };
 
-    fetchBook();
-  }, [id]);
+useEffect(() => {
+  fetchBook();
+}, [id]);
+
+  const handleSearch = async (value: string) => {
+    setSearch(value);
+
+    if (!value.trim()) {
+      setUsers([]);
+      return;
+    }
+
+    try {
+      setLoadingUsers(true);
+
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      const data = await searchUsers(value, token);
+
+      setUsers(data as User[]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  
+  const shareBook = async (userId: string) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    await fetch(
+      `http://localhost:3000/recipe-books/${book?._id}/share`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
+      }
+    );
+
+    await fetchBook(); 
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const unshareBook = async (userId: string) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    await fetch(
+      `http://localhost:3000/recipe-books/${book?._id}/unshare`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
+      }
+    );
+
+    await fetchBook(); 
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+  if (loading) return <p>Loading book...</p>;
+  if (error) return <p>{error}</p>;
+  if (!book) return <p>Book not found</p>;
 
   return (
-    <div className="home-page">
-      <button onClick={() => navigate(-1)}>Back</button>
+    <div className="book-details-page">
 
-      {loading ? (
-        <p>Loading book...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : !book ? (
-        <p>Book not found</p>
-      ) : (
-        <>
-          <h2>{book.name}</h2>
-          <p>{book.recipes?.length || 0} recipes</p>
-        </>
+      <div className="book-hero">
+        <div className="image-wrapper">
+          <div className="book-cover">
+            {[0, 1, 2, 3].map((index) =>
+              previewImages[index] ? (
+                <img
+                  key={index}
+                  src={getImageUrl(previewImages[index] as string)}
+                  className="book-cover-img"
+                />
+              ) : (
+                <div key={index} className="book-cover-placeholder" />
+              )
+            )}
+          </div>
+
+          <button className="icon-btn close-btn" onClick={() => navigate(-1)}>
+            ✕
+          </button>
+
+          <button
+            className="icon-btn edit-btn"
+            onClick={() => navigate(`/edit-book/${book._id}`)}
+          >
+            ✎
+          </button>
+
+          <button
+            className="icon-btn share-btn"
+            onClick={() => setShowShareModal(true)}
+          >
+            <BsShare />
+          </button>
+        </div>
+      </div>
+
+      <div className="book-content">
+        <h1 className="book-title">{book.name}</h1>
+
+        <p className="book-count">
+          {(book.recipes as Recipe[])?.length || 0} Recipes
+        </p>
+
+        <div className="book-recipes-grid">
+          {(book.recipes as Recipe[])?.map((recipe) => (
+            <div
+              key={recipe._id}
+              className="myrecipes-card"
+              onClick={() => navigate(`/recipes/${recipe._id}`)}
+            >
+              <div className="myrecipes-card-preview">
+                {recipe.imageUrl ? (
+                  <img
+                    src={getImageUrl(recipe.imageUrl)}
+                    className="myrecipes-card-image"
+                  />
+                ) : (
+                  <div className="myrecipes-card-image-placeholder" />
+                )}
+              </div>
+
+              <h3 className="myrecipes-card-title">{recipe.title}</h3>
+
+              <div className="myrecipes-card-meta">
+                {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
+                {recipe.difficulty && <span>• {recipe.difficulty}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* MODAL */}
+      {showShareModal && (
+        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+            <h3 className="modal-title">Share book</h3>
+
+            <input
+              value={search}
+              placeholder="Search user..."
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+
+            {loadingUsers && <p className="muted">Searching...</p>}
+
+            {users.map((u) => {
+              const isUserShared = book?.collaborators?.some((c) => {
+                const userId =
+                  typeof c.user === "string" ? c.user : c.user._id;
+
+                return userId === u._id;
+              });
+
+              return (
+                <div key={u._id} className="user-row">
+                  <span>{u.username}</span>
+
+                  <button
+                    className={`share-toggle-btn ${isUserShared ? "unshare" : "share"}`}
+                    onClick={() =>
+                      isUserShared
+                        ? unshareBook(u._id)
+                        : shareBook(u._id)
+                    }
+                  >
+                    {isUserShared ? "Unshare" : "Share"}
+                  </button>
+                </div>
+              );
+            })}
+
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowShareModal(false)}
+            >
+              Close
+            </button>
+
+          </div>
+        </div>
       )}
 
       <BottomNav />
