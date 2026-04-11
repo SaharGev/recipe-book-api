@@ -14,21 +14,18 @@ const originalGoogleClientId = process.env.GOOGLE_CLIENT_ID;
 process.env.JWT_EXPIRES_IN = "1";
 process.env.GOOGLE_CLIENT_ID = "test-google-client-id";
 
-jest.mock("google-auth-library", () => {
-  const verifyIdTokenMock = jest.fn();
+const mockVerifyIdToken = jest.fn();
 
-  return {
-    OAuth2Client: jest.fn().mockImplementation(() => ({
-      verifyIdToken: verifyIdTokenMock,
-    })),
-    __verifyIdTokenMock: verifyIdTokenMock,
-  };
-});
-
-
-const { __verifyIdTokenMock } = jest.requireMock("google-auth-library") as {
-  __verifyIdTokenMock: jest.Mock;
-};
+jest.mock("firebase-admin", () => ({
+  apps: [],
+  initializeApp: jest.fn(),
+  credential: {
+    cert: jest.fn(),
+  },
+  auth: jest.fn(() => ({
+    verifyIdToken: mockVerifyIdToken,
+  })),
+}));
 
 beforeAll(async () => {
   const { default: initApp } = await import("../app");
@@ -338,8 +335,8 @@ describe("Google Auth", () => {
     expect(res.body).toHaveProperty("message");
   });
 
-  test("POST /auth/google invalid token should return 401", async () => {
-    __verifyIdTokenMock.mockRejectedValueOnce(new Error("invalid token"));
+test("POST /auth/google invalid token should return 401", async () => {
+    mockVerifyIdToken.mockRejectedValueOnce(new Error("invalid token"));
 
     const res = await request(app).post("/auth/google").send({
       idToken: "fake_token",
@@ -350,13 +347,11 @@ describe("Google Auth", () => {
   });
 
   test("POST /auth/google should create user and return tokens", async () => {
-    __verifyIdTokenMock.mockResolvedValueOnce({
-      getPayload: () => ({
-        sub: "google-user-123",
-        email: "google@test.com",
-        name: "Google User",
-        picture: "http://image.test/profile.png",
-      }),
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "google-user-123",
+      email: "google@test.com",
+      name: "Google User",
+      picture: "http://image.test/profile.png",
     });
 
     const res = await request(app).post("/auth/google").send({
@@ -370,13 +365,11 @@ describe("Google Auth", () => {
   });
 
   test("POST /auth/google existing user should login", async () => {
-    __verifyIdTokenMock.mockResolvedValueOnce({
-      getPayload: () => ({
-        sub: "google-user-123",
-        email: "google@test.com",
-        name: "Google User",
-        picture: "http://image.test/profile.png",
-      }),
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "google-user-123",
+      email: "google@test.com",
+      name: "Google User",
+      picture: "http://image.test/profile.png",
     });
 
     const firstLogin = await request(app).post("/auth/google").send({
@@ -385,14 +378,11 @@ describe("Google Auth", () => {
 
     expect(firstLogin.status).toBe(200);
 
-    // login again with same google user
-    __verifyIdTokenMock.mockResolvedValueOnce({
-      getPayload: () => ({
-        sub: "google-user-123",
-        email: "google@test.com",
-        name: "Google User",
-        picture: "http://image.test/profile.png",
-      }),
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "google-user-123",
+      email: "google@test.com",
+      name: "Google User",
+      picture: "http://image.test/profile.png",
     });
 
     const secondLogin = await request(app).post("/auth/google").send({
@@ -405,12 +395,10 @@ describe("Google Auth", () => {
   });
 
   test("POST /auth/google should fail if payload missing email", async () => {
-    __verifyIdTokenMock.mockResolvedValueOnce({
-      getPayload: () => ({
-        sub: "google-user-123",
-        email: undefined,
-        name: "Google User",
-      }),
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "google-user-123",
+      email: undefined,
+      name: "Google User",
     });
 
     const res = await request(app).post("/auth/google").send({
@@ -436,13 +424,11 @@ describe("Google Auth", () => {
     const existingUserId = regRes.body._id;
 
     // google login with SAME email but new googleId
-    __verifyIdTokenMock.mockResolvedValueOnce({
-      getPayload: () => ({
-        sub: "google-attached-999",
-        email,
-        name: "Attached User",
-        picture: "http://image.test/p.png",
-      }),
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "google-attached-999",
+      email,
+      name: "Attached User",
+      picture: "http://image.test/p.png",
     });
 
     const googleRes = await request(app).post("/auth/google").send({
@@ -454,5 +440,50 @@ describe("Google Auth", () => {
     expect(googleRes.body._id).toBe(existingUserId);
     expect(googleRes.body).toHaveProperty("accessToken");
     expect(googleRes.body).toHaveProperty("refreshToken");
+  });
+
+  test("POST /auth/google should return isNewUser true for new user", async () => {
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "new-google-user-999",
+      email: "newgoogle@test.com",
+      name: "New Google User",
+      picture: "http://image.test/new.png",
+    });
+
+    const res = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("isNewUser");
+    expect(res.body.isNewUser).toBe(true);
+  });
+
+  test("POST /auth/google should return isNewUser false for existing user", async () => {
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "existing-google-user-888",
+      email: "existinggoogle@test.com",
+      name: "Existing Google User",
+      picture: "http://image.test/existing.png",
+    });
+
+    await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "existing-google-user-888",
+      email: "existinggoogle@test.com",
+      name: "Existing Google User",
+      picture: "http://image.test/existing.png",
+    });
+
+    const res = await request(app).post("/auth/google").send({
+      idToken: "valid_google_token",
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("isNewUser");
+    expect(res.body.isNewUser).toBe(false);
   });
 });

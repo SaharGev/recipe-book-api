@@ -2,9 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import User from "../models/userModel";
-import { OAuth2Client } from "google-auth-library";
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import admin from "../config/firebaseAdmin";
 
 const sendError = (code: number, message: string, res: Response) => {
   return res.status(code).send({ message });
@@ -124,25 +122,13 @@ const googleLogin = async (req: Request, res: Response) => {
     return sendError(400, "idToken is required", res);
   }
 
-  if (!process.env.GOOGLE_CLIENT_ID) {
-    return sendError(500, "GOOGLE_CLIENT_ID is not configured", res);
-  }
-
   try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-    const payload = ticket.getPayload();
-    if (!payload) {
-      return sendError(401, "Invalid Google token", res);
-    }
-
-    const googleId = payload.sub;
-    const email = payload.email?.toLowerCase();
-    const name = payload.name;
-    const picture = payload.picture;
+    const googleId = decodedToken.uid;
+    const email = decodedToken.email?.toLowerCase();
+    const name = decodedToken.name;
+    const picture = decodedToken.picture;
 
     if (!googleId || !email) {
       return sendError(401, "Invalid Google token", res);
@@ -153,7 +139,10 @@ const googleLogin = async (req: Request, res: Response) => {
       user = await User.findOne({ email });
     }
 
+    let isNewUser = false;
+
     if (!user) {
+      isNewUser = true;
       const username = (name || email.split("@")[0]).trim();
 
       user = await User.create({
@@ -175,7 +164,7 @@ const googleLogin = async (req: Request, res: Response) => {
     user.refreshTokens.push(tokens.refreshToken);
     await user.save();
 
-    return res.status(200).json({ _id: user._id, ...tokens });
+    return res.status(200).json({ _id: user._id, ...tokens, isNewUser });
   } catch (err) {
     console.error(err);
     return sendError(401, "Invalid Google token", res);

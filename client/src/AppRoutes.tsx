@@ -16,6 +16,7 @@ import EditRecipePage from "./pages/EditRecipePage";
 import FavoriteRecipesPage from "./pages/FavoriteRecipesPage";
 import FavoriteBooksPage from "./pages/FavoriteBooksPage";
 import SettingsPage from "./pages/SettingsPage";
+import CompleteProfilePage from "./pages/CompleteProfilePage";
 
 export default function AppRoutes() {
   const { token } = useContext(AuthContext);
@@ -38,6 +39,7 @@ export default function AppRoutes() {
         <Route path="/favorite-recipes" element={token ? <FavoriteRecipesPage /> : <Navigate to="/" />} />
         <Route path="/favorite-books" element={token ? <FavoriteBooksPage /> : <Navigate to="/" />} />
         <Route path="/settings" element={token ? <SettingsPage /> : <Navigate to="/" />} />
+        <Route path="/complete-profile" element={token ? <CompleteProfilePage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
