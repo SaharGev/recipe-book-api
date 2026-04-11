@@ -609,4 +609,77 @@ describe("Recipe API", () => {
     const unique = new Set(viewed);
     expect(unique.size).toBe(viewed.length);
   });
+
+  test("POST /recipes/:id/share - owner can share recipe", async () => {
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send(recipesList[0]);
+    expect(createResponse.status).toBe(201);
+    const recipeId = createResponse.body._id;
+
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "sharetest@test.com",
+      username: "shareTestUser",
+      password: "testpassword",
+    });
+
+    const response = await request(app)
+      .post(`/recipes/${recipeId}/share`)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ email: otherUser.email });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Recipe shared successfully");
+  });
+
+  test("POST /recipes/:id/share - non-owner cannot share recipe", async () => {
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ ...recipesList[0], title: "Share Test Recipe 2" });
+    expect(createResponse.status).toBe(201);
+    const recipeId = createResponse.body._id;
+
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "sharetest2@test.com",
+      username: "shareTestUser2",
+      password: "testpassword",
+    });
+
+    const response = await request(app)
+      .post(`/recipes/${recipeId}/share`)
+      .set("Authorization", "Bearer " + otherUser.accessToken)
+      .send({ email: otherUser.email });
+
+    expect(response.status).toBe(403);
+  });
+
+  test("POST /recipes/:id/unshare - owner can unshare recipe", async () => {
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ ...recipesList[0], title: "Unshare Test Recipe" });
+    expect(createResponse.status).toBe(201);
+    const recipeId = createResponse.body._id;
+
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "unsharetest@test.com",
+      username: "unshareTestUser",
+      password: "testpassword",
+    });
+
+    await request(app)
+      .post(`/recipes/${recipeId}/share`)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ email: otherUser.email });
+
+    const response = await request(app)
+      .post(`/recipes/${recipeId}/unshare`)
+      .set("Authorization", "Bearer " + loginUser.accessToken)
+      .send({ email: otherUser.email });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Recipe unshared successfully");
+  });
 });

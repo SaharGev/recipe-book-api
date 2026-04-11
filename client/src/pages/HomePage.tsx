@@ -32,7 +32,6 @@ export default function HomePage() {
   const [booksLoading, setBooksLoading] = useState(true);
   const [booksError, setBooksError] = useState("");
   const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
-  const [friends, setFriends] = useState<{ _id: string; username: string; profileImageUrl?: string }[]>([]);
   const [friendsCount, setFriendsCount] = useState(0);
 
   useEffect(() => {
@@ -56,8 +55,7 @@ export default function HomePage() {
         setBooks(booksData.recipeBooks);
         console.log("books data:", booksData);
 
-        const friendsData = await getFriends(token);
-        setFriends(friendsData);
+       const friendsData = await getFriends(token);
         setFriendsCount(friendsData.length);
         
         const likes = await getMyLikes(token);

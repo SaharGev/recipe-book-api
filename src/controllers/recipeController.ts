@@ -205,5 +205,79 @@ const updateRecipeImage = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export default { createNewRecipe, getAllRecipes, getMyRecipes, getRecipeById, updateRecipe, deleteRecipe, updateRecipeImage};
+const shareRecipe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    const { id } = req.params;
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "email is required" });
+
+    const recipe = await Recipe.findById(id);
+    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+
+    const isOwner = recipe.owner.toString() === userId.toString();
+    if (!isOwner) return res.status(403).json({ message: "Only the owner can share the recipe" });
+
+    const targetUser = await User.findOne({ email });
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+    const alreadyCollaborator = recipe.collaborators.some(
+      (c: any) => c.user.toString() === targetUser._id.toString()
+    );
+    if (alreadyCollaborator) return res.status(400).json({ message: "User already has access" });
+
+    recipe.collaborators.push({ user: targetUser._id });
+    await recipe.save();
+
+    return res.status(200).json({ message: "Recipe shared successfully", recipe });
+  } catch (err: any) {
+    res.status(500).json({ message: "Error sharing recipe" });
+  }
+};
+
+const unshareRecipe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { id } = req.params;
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "email is required" });
+
+    const recipe = await Recipe.findById(id);
+    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+
+    const isOwner = recipe.owner.toString() === userId.toString();
+    if (!isOwner) return res.status(403).json({ message: "Only the owner can unshare the recipe" });
+
+    const targetUser = await User.findOne({ email });
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+    const index = recipe.collaborators.findIndex(
+      (c: any) => c.user.toString() === targetUser._id.toString()
+    );
+    if (index !== -1) {
+      recipe.collaborators.splice(index, 1);
+    }
+    await recipe.save();
+
+    return res.status(200).json({ message: "Recipe unshared successfully" });
+  } catch (err: any) {
+    res.status(500).json({ message: "Error unsharing recipe" });
+  }
+};
+
+export default { createNewRecipe,
+  getAllRecipes,
+  getMyRecipes,
+  getRecipeById,
+  updateRecipe,
+  deleteRecipe,
+  updateRecipeImage,
+  shareRecipe,
+  unshareRecipe
+};

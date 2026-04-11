@@ -13,6 +13,8 @@ router.get('/:id', authenticate, recipeController.getRecipeById);
 router.put('/:id', authenticate, recipeController.updateRecipe);
 router.delete('/:id', authenticate, recipeController.deleteRecipe);
 router.patch("/:id/image", authenticate, recipeController.updateRecipeImage);
+router.post("/:id/share", authenticate, recipeController.shareRecipe);
+router.post("/:id/unshare", authenticate, recipeController.unshareRecipe);
 
 export default router;
 
