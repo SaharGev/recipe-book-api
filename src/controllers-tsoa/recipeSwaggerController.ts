@@ -58,6 +58,15 @@ interface RecipeSwaggerMessageResponse {
   message: string;
 }
 
+interface ShareRecipeRequest {
+  email: string;
+}
+
+interface ShareRecipeResponse {
+  message: string;
+  recipe: RecipeSwaggerResponse;
+}
+
 @Route("recipes")
 @Tags("Recipes")
 export class RecipeSwaggerController extends Controller {
@@ -200,6 +209,55 @@ export class RecipeSwaggerController extends Controller {
       isPublic: true,
       imageUrl: "string",
       owner: "string",
+    };
+  }
+
+  /**
+   * Share recipe with a user by email
+   */
+  @SuccessResponse("200", "OK")
+  @Response<RecipeSwaggerMessageResponse>("400", "Bad Request")
+  @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
+  @Response<RecipeSwaggerMessageResponse>("403", "Forbidden")
+  @Response<RecipeSwaggerMessageResponse>("404", "Recipe or user not found")
+  @Security("bearerAuth")
+  @Post("{id}/share")
+  public async shareRecipe(
+    @Path() id: string,
+    @Body() _body: ShareRecipeRequest
+  ): Promise<ShareRecipeResponse> {
+    return {
+      message: "Recipe shared successfully",
+      recipe: {
+        _id: id,
+        title: "string",
+        description: "string",
+        ingredients: ["string"],
+        cookTime: 30,
+        difficulty: "easy",
+        isPublic: true,
+        imageUrl: "string",
+        owner: "string",
+      },
+    };
+  }
+
+  /**
+   * Unshare recipe from a user by email
+   */
+  @SuccessResponse("200", "OK")
+  @Response<RecipeSwaggerMessageResponse>("400", "Bad Request")
+  @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
+  @Response<RecipeSwaggerMessageResponse>("403", "Forbidden")
+  @Response<RecipeSwaggerMessageResponse>("404", "Recipe or user not found")
+  @Security("bearerAuth")
+  @Post("{id}/unshare")
+  public async unshareRecipe(
+    @Path() id: string,
+    @Body() _body: ShareRecipeRequest
+  ): Promise<RecipeSwaggerMessageResponse> {
+    return {
+      message: "Recipe unshared successfully",
     };
   }
 }

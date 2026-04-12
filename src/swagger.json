@@ -104,6 +104,71 @@
 				"type": "object",
 				"additionalProperties": true
 			},
+			"FriendSwaggerResponse": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"profileImageUrl": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"username",
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"FriendsListResponse": {
+				"properties": {
+					"friends": {
+						"items": {
+							"$ref": "#/components/schemas/FriendSwaggerResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"friends"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"AddFriendRequest": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"identifier"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"SearchUsersResponse": {
+				"properties": {
+					"users": {
+						"items": {
+							"$ref": "#/components/schemas/FriendSwaggerResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"users"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
 			"UploadSwaggerResponse": {
 				"properties": {
 					"url": {
@@ -302,6 +367,34 @@
 				"type": "object",
 				"additionalProperties": true
 			},
+			"ShareRecipeResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"recipe": {
+						"$ref": "#/components/schemas/RecipeSwaggerResponse"
+					}
+				},
+				"required": [
+					"message",
+					"recipe"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"ShareRecipeRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
 			"RecipeBookSwaggerResponse": {
 				"properties": {
 					"_id": {
@@ -390,6 +483,22 @@
 						"type": "boolean"
 					}
 				},
+				"type": "object",
+				"additionalProperties": true
+			},
+			"SearchUserResult": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"username"
+				],
 				"type": "object",
 				"additionalProperties": true
 			},
@@ -993,6 +1102,232 @@
 				}
 			}
 		},
+		"/users/friends": {
+			"get": {
+				"operationId": "GetFriends",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FriendsListResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get friends list of current user",
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "AddFriend",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"friend": {
+											"$ref": "#/components/schemas/FriendSwaggerResponse"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"friend",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "User not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Add a friend by email, username or phone",
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AddFriendRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/friends/{friendId}": {
+			"delete": {
+				"operationId": "RemoveFriend",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Remove a friend",
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "friendId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/users/search": {
+			"get": {
+				"operationId": "SearchUsers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SearchUsersResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Search users by username, email or phone",
+				"tags": [
+					"Users"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "query",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/upload/image": {
 			"post": {
 				"operationId": "UploadImage",
@@ -1494,6 +1829,178 @@
 				}
 			}
 		},
+		"/recipes/{id}/share": {
+			"post": {
+				"operationId": "ShareRecipe",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShareRecipeResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Recipe or user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Share recipe with a user by email",
+				"tags": [
+					"Recipes"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ShareRecipeRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/recipes/{id}/unshare": {
+			"post": {
+				"operationId": "UnshareRecipe",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Recipe or user not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Unshare recipe from a user by email",
+				"tags": [
+					"Recipes"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ShareRecipeRequest"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/recipe-books": {
 			"post": {
 				"operationId": "CreateRecipeBook",
@@ -1917,6 +2424,65 @@
 					{
 						"in": "path",
 						"name": "bookId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/recipe-books/search-users": {
+			"get": {
+				"operationId": "SearchUsers",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SearchUserResult"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeBookSwaggerMessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeBookSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Search users by username",
+				"tags": [
+					"Recipe Books"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "query",
 						"required": true,
 						"schema": {
 							"type": "string"

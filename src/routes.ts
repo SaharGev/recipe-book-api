@@ -61,10 +61,63 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RecentlyViewedRecipeSwaggerItem": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": {"dataType":"string","required":true},
+            "title": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RecentlyViewedBookSwaggerItem": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateProfileImageRequest": {
         "dataType": "refObject",
         "properties": {
             "profileImageUrl": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "FriendSwaggerResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": {"dataType":"string","required":true},
+            "username": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true},
+            "profileImageUrl": {"dataType":"string"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "FriendsListResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "friends": {"dataType":"array","array":{"dataType":"refObject","ref":"FriendSwaggerResponse"},"required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AddFriendRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "identifier": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SearchUsersResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "users": {"dataType":"array","array":{"dataType":"refObject","ref":"FriendSwaggerResponse"},"required":true},
         },
         "additionalProperties": true,
     },
@@ -146,6 +199,23 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ShareRecipeResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "recipe": {"ref":"RecipeSwaggerResponse","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ShareRecipeRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "email": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "RecipeBookSwaggerResponse": {
         "dataType": "refObject",
         "properties": {
@@ -191,6 +261,15 @@ const models: TsoaRoute.Models = {
             "name": {"dataType":"string"},
             "description": {"dataType":"string"},
             "isPublic": {"dataType":"boolean"},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SearchUserResult": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": {"dataType":"string","required":true},
+            "username": {"dataType":"string","required":true},
         },
         "additionalProperties": true,
     },
@@ -440,6 +519,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserSwaggerController_getRecentlyViewed: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/users/me/recently-viewed',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController.prototype.getRecentlyViewed)),
+
+            async function UserSwaggerController_getRecentlyViewed(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserSwaggerController_getRecentlyViewed, request, response });
+
+                const controller = new UserSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getRecentlyViewed',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserSwaggerController_updateProfileImage: Record<string, TsoaRoute.ParameterSchema> = {
                 _body: {"in":"body","name":"_body","required":true,"ref":"UpdateProfileImageRequest"},
         };
@@ -460,6 +569,129 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'updateProfileImage',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserSwaggerController_getFriends: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/users/friends',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController.prototype.getFriends)),
+
+            async function UserSwaggerController_getFriends(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserSwaggerController_getFriends, request, response });
+
+                const controller = new UserSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getFriends',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserSwaggerController_addFriend: Record<string, TsoaRoute.ParameterSchema> = {
+                _body: {"in":"body","name":"_body","required":true,"ref":"AddFriendRequest"},
+        };
+        app.post('/users/friends',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController.prototype.addFriend)),
+
+            async function UserSwaggerController_addFriend(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserSwaggerController_addFriend, request, response });
+
+                const controller = new UserSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'addFriend',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserSwaggerController_removeFriend: Record<string, TsoaRoute.ParameterSchema> = {
+                friendId: {"in":"path","name":"friendId","required":true,"dataType":"string"},
+        };
+        app.delete('/users/friends/:friendId',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController.prototype.removeFriend)),
+
+            async function UserSwaggerController_removeFriend(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserSwaggerController_removeFriend, request, response });
+
+                const controller = new UserSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'removeFriend',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserSwaggerController_searchUsers: Record<string, TsoaRoute.ParameterSchema> = {
+                query: {"in":"query","name":"query","required":true,"dataType":"string"},
+        };
+        app.get('/users/search',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(UserSwaggerController.prototype.searchUsers)),
+
+            async function UserSwaggerController_searchUsers(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserSwaggerController_searchUsers, request, response });
+
+                const controller = new UserSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'searchUsers',
                 controller,
                 response,
                 next,
@@ -714,6 +946,70 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'updateRecipeImage',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeSwaggerController_shareRecipe: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+                _body: {"in":"body","name":"_body","required":true,"ref":"ShareRecipeRequest"},
+        };
+        app.post('/recipes/:id/share',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController.prototype.shareRecipe)),
+
+            async function RecipeSwaggerController_shareRecipe(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeSwaggerController_shareRecipe, request, response });
+
+                const controller = new RecipeSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'shareRecipe',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeSwaggerController_unshareRecipe: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"string"},
+                _body: {"in":"body","name":"_body","required":true,"ref":"ShareRecipeRequest"},
+        };
+        app.post('/recipes/:id/unshare',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController.prototype.unshareRecipe)),
+
+            async function RecipeSwaggerController_unshareRecipe(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeSwaggerController_unshareRecipe, request, response });
+
+                const controller = new RecipeSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'unshareRecipe',
                 controller,
                 response,
                 next,
@@ -1058,6 +1354,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'duplicateRecipeBook',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeBookSwaggerController_searchUsers: Record<string, TsoaRoute.ParameterSchema> = {
+                query: {"in":"query","name":"query","required":true,"dataType":"string"},
+        };
+        app.get('/recipe-books/search-users',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController.prototype.searchUsers)),
+
+            async function RecipeBookSwaggerController_searchUsers(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeBookSwaggerController_searchUsers, request, response });
+
+                const controller = new RecipeBookSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'searchUsers',
                 controller,
                 response,
                 next,
