@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema(
       ref: "RecipeBook",
       default: [],
     },
+
+    friends: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
   { timestamps: true }
 );

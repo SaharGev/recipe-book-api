@@ -7,16 +7,20 @@ type ProfileSummaryCardProps = {
   user: User | null;
   recipesCount: number;
   booksCount: number;
+  friendsCount?: number;
   onRecipesClick?: () => void;
   onBooksClick?: () => void;
+  onFriendsClick?: () => void;
 };
 
 export default function ProfileSummaryCard({
   user,
   recipesCount,
   booksCount,
+  friendsCount = 0,
   onRecipesClick,
   onBooksClick,
+  onFriendsClick,
 }: ProfileSummaryCardProps) {
   const navigate = useNavigate();
 
@@ -46,8 +50,8 @@ export default function ProfileSummaryCard({
       </div>
 
       <div className="profile-stats">
-        <div className="profile-stat">
-          <strong>0</strong>
+        <div className="profile-stat" onClick={onFriendsClick} style={{ cursor: "pointer" }}>
+          <strong>{friendsCount}</strong>
           <p>Friends</p>
         </div>
 

@@ -156,9 +156,109 @@ const updateCurrentUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const addFriend = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { identifier } = req.body;
+    if (!identifier) return res.status(400).json({ message: "identifier is required" });
+
+    const friend = await User.findOne({
+      $or: [
+        { email: identifier.toLowerCase() },
+        { username: identifier },
+        { phone: identifier },
+      ],
+    });
+
+    if (!friend) return res.status(404).json({ message: "User not found" });
+    if (friend._id.toString() === userId) return res.status(400).json({ message: "Cannot add yourself" });
+
+    const currentUser = await User.findById(userId);
+    if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+    if (currentUser.friends.includes(friend._id)) {
+      return res.status(400).json({ message: "Already friends" });
+    }
+
+    await User.findByIdAndUpdate(userId, { $push: { friends: friend._id } });
+
+    return res.status(200).json({ message: "Friend added successfully", friend: buildSafeUserResponse(friend) });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to add friend" });
+  }
+};
+
+const removeFriend = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { friendId } = req.params;
+
+    const currentUser = await User.findById(userId);
+    if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+    if (!currentUser.friends.includes(friendId as any)) {
+      return res.status(400).json({ message: "Not friends" });
+    }
+
+    await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+
+    return res.status(200).json({ message: "Friend removed successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to remove friend" });
+  }
+};
+
+const getFriends = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await User.findById(userId).populate("friends", "username email profileImageUrl");
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.status(200).json({ friends: user.friends });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to get friends" });
+  }
+};
+
+const searchUsers = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { query } = req.query;
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ message: "query is required" });
+    }
+
+    const users = await User.find({
+      _id: { $ne: userId },
+      $or: [
+        { username: { $regex: query, $options: "i" } },
+        { email: query.toLowerCase() },
+        { phone: query },
+      ],
+    }).select("username email profileImageUrl").limit(10);
+
+    return res.status(200).json({ users });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to search users" });
+  }
+};
+
 export default {
   updateProfileImage,
   getCurrentUser,
   updateCurrentUser,
   getRecentlyViewed,
+  addFriend,
+  removeFriend,
+  getFriends,
+  searchUsers,
 };

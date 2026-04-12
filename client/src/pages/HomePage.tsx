@@ -5,7 +5,7 @@ import ProfileSummaryCard from "../components/ProfileSummaryCard";
 import RecipeBookCard from "../components/RecipeBookCard";
 import "./HomePage.css";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "../services/userService";
+import { getCurrentUser, getFriends } from "../services/userService";
 import type { User } from "../types/user";
 import { getMyRecipes, getMyLikes } from "../services/recipeService";
 import { getMyRecipeBooks } from "../services/recipeBookService";
@@ -32,6 +32,7 @@ export default function HomePage() {
   const [booksLoading, setBooksLoading] = useState(true);
   const [booksError, setBooksError] = useState("");
   const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
+  const [friendsCount, setFriendsCount] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -54,6 +55,9 @@ export default function HomePage() {
         setBooks(booksData.recipeBooks);
         console.log("books data:", booksData);
 
+       const friendsData = await getFriends(token);
+        setFriendsCount(friendsData.length);
+        
         const likes = await getMyLikes(token);
         const bookIds = likes
           .filter((like: { targetType: string; targetId: string }) => like.targetType === "book")
@@ -79,8 +83,10 @@ export default function HomePage() {
           user={user}
           recipesCount={recipesCount}
           booksCount={booksCount}
+          friendsCount={friendsCount}
           onRecipesClick={goToMyRecipes}
           onBooksClick={goToMyRecipeBooks}
+          onFriendsClick={() => navigate("/friends")}
         />
       <div className="section-divider" />
       <h3 className="section-title">My Books</h3>
