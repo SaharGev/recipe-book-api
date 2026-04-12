@@ -1,8 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Path,
   Patch,
+  Post,
+  Query,
   Route,
   Security,
   Tags,
@@ -30,6 +34,25 @@ interface UserSwaggerResponse {
 
 interface UserSwaggerMessageResponse {
   message: string;
+}
+
+interface FriendSwaggerResponse {
+  _id: string;
+  username: string;
+  email: string;
+  profileImageUrl?: string;
+}
+
+interface AddFriendRequest {
+  identifier: string;
+}
+
+interface SearchUsersResponse {
+  users: FriendSwaggerResponse[];
+}
+
+interface FriendsListResponse {
+  friends: FriendSwaggerResponse[];
 }
 
 interface RecentlyViewedRecipeSwaggerItem {
@@ -121,5 +144,59 @@ export class UserSwaggerController extends Controller {
       phone: "string",
       profileImageUrl: "string",
     };
+  }
+
+  /**
+   * Get friends list of current user
+   */
+  @SuccessResponse("200", "OK")
+  @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("friends")
+  public async getFriends(): Promise<FriendsListResponse> {
+    return { friends: [] };
+  }
+
+  /**
+   * Add a friend by email, username or phone
+   */
+  @SuccessResponse("200", "OK")
+  @Response<UserSwaggerMessageResponse>("400", "Bad Request")
+  @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
+  @Response<UserSwaggerMessageResponse>("404", "User not found")
+  @Security("bearerAuth")
+  @Post("friends")
+  public async addFriend(
+    @Body() _body: AddFriendRequest
+  ): Promise<{ message: string; friend: FriendSwaggerResponse }> {
+    return { message: "string", friend: { _id: "string", username: "string", email: "string" } };
+  }
+
+  /**
+   * Remove a friend
+   */
+  @SuccessResponse("200", "OK")
+  @Response<UserSwaggerMessageResponse>("400", "Bad Request")
+  @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Delete("friends/{friendId}")
+  public async removeFriend(
+    @Path() friendId: string
+  ): Promise<UserSwaggerMessageResponse> {
+    return { message: "string" };
+  }
+
+  /**
+   * Search users by username, email or phone
+   */
+  @SuccessResponse("200", "OK")
+  @Response<UserSwaggerMessageResponse>("400", "Bad Request")
+  @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("search")
+  public async searchUsers(
+    @Query() query: string
+  ): Promise<SearchUsersResponse> {
+    return { users: [] };
   }
 }

@@ -6,6 +6,7 @@ import {
   Path,
   Post,
   Put,
+  Query,
   Route,
   Security,
   Tags,
@@ -40,6 +41,11 @@ interface RecipeBookSwaggerResponse {
 
 interface RecipeBookSwaggerMessageResponse {
   message: string;
+}
+
+interface SearchUserResult {
+  _id: string;
+  username: string;
 }
 
 @Route("recipe-books")
@@ -200,5 +206,19 @@ export class RecipeBookSwaggerController extends Controller {
       isPublic: true,
       owner: "string",
     };
+  }
+
+  /**
+   * Search users by username
+   */
+  @SuccessResponse("200", "OK")
+  @Response<RecipeBookSwaggerMessageResponse>("400", "Bad Request")
+  @Response<RecipeBookSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("search-users")
+  public async searchUsers(
+    @Query() query: string
+  ): Promise<SearchUserResult[]> {
+    return [];
   }
 }
