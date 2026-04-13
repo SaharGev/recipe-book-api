@@ -138,3 +138,38 @@
   padding: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
+
+.icon-btn-crb {
+  position: absolute;
+  top: 28px;
+  left: 12px;
+
+  width: 38px;
+  height: 38px;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: white;
+  font-size: 18px;
+
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+  transition: 0.2s;
+
+}
+
+.icon-btn-crb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background-color: #f0f0f5;
+}
+
+.icon-btn-crb:active {
+  transform: scale(0.95);
+}
+
+.page-container {
+  position: relative;  
+}

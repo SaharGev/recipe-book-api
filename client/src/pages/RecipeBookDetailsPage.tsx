@@ -1,3 +1,4 @@
+// client/src/pages/RecipeBookDetailsPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
