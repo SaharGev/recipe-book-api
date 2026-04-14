@@ -771,4 +771,40 @@ describe("RecipeBook API", () => {
       expect(respInjection.body.length).toBeLessThanOrEqual(10);
     });
 
+    test("GET /recipe-books/shared-with-me - returns books shared with user", async () => {
+    // create another user
+    const otherUserData = {
+      email: "sharedbook@example.com",
+      username: "sharedbookuser",
+      password: "password123",
+    };
+    const otherUser = await getLoggedInCustomUser(app, otherUserData);
+
+    // other user creates a book
+    const bookResp = await createRecipeBook(app, otherUser.accessToken, {
+      name: "Shared Book With Me",
+      description: "This book is shared with me",
+      isPublic: false,
+    });
+    expect(bookResp.status).toBe(201);
+    const bookId = bookResp.body._id;
+
+    // other user shares book with loginUser
+    const shareResp = await request(app)
+      .post(`/recipe-books/${bookId}/share`)
+      .set("Authorization", "Bearer " + otherUser.accessToken)
+      .send({ username: loginUser.username });
+
+    expect(shareResp.status).toBe(200);
+
+    // loginUser gets shared books
+    const response = await request(app)
+      .get("/recipe-books/shared-with-me")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(response.status).toBe(200);
+    const bookIds = response.body.recipeBooks.map((b: any) => b._id);
+    expect(bookIds).toContain(bookId);
+  });
+
   });

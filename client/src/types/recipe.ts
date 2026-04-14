@@ -16,4 +16,12 @@ export type Recipe = {
   instructions?: string;
   imageUrl?: string;
   isPublic?: boolean;
+  collaborators?: {
+    user: {
+      _id: string;
+      username: string;
+      profileImageUrl?: string;
+    } | string;
+    role?: string;
+  }[];
 };

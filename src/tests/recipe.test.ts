@@ -197,14 +197,13 @@ describe("Recipe API", () => {
     expect(getOther.status).toBe(403);
 
 
-    // add loginUser as collaborator
+    // add loginUser as collaborator via share
     const addCollaborator = await request(app)
-      .put(`/recipes/${otherRecipeId}`)
+      .post(`/recipes/${otherRecipeId}/share`)
       .set("Authorization", "Bearer " + otherToken)
-      .send({
-        collaborators: [{ user: loginUser._id }]
-      });
+      .send({ email: loginUser.email });
 
+    console.log("addCollaborator:", addCollaborator.status, addCollaborator.body);
     expect(addCollaborator.status).toBe(200);
 
 
@@ -681,5 +680,36 @@ describe("Recipe API", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Recipe unshared successfully");
+  });
+
+  test("GET /recipes/shared-with-me - returns recipes shared with user", async () => {
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "sharedwithme@test.com",
+      username: "sharedWithMeUser",
+      password: "testpassword",
+    });
+
+    // other user creates a recipe
+    const createResponse = await request(app)
+      .post("/recipes")
+      .set("Authorization", "Bearer " + otherUser.accessToken)
+      .send({ ...recipesList[0], title: "Shared With Me Recipe", isPublic: false });
+    expect(createResponse.status).toBe(201);
+    const recipeId = createResponse.body._id;
+
+    // other user shares it with loginUser
+    await request(app)
+      .post(`/recipes/${recipeId}/share`)
+      .set("Authorization", "Bearer " + otherUser.accessToken)
+      .send({ email: loginUser.email });
+
+    // loginUser gets shared recipes
+    const response = await request(app)
+      .get("/recipes/shared-with-me")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(response.status).toBe(200);
+    const titles = response.body.map((r: any) => r.title);
+    expect(titles).toContain("Shared With Me Recipe");
   });
 });

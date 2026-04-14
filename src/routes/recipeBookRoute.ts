@@ -11,6 +11,7 @@ router.post('/:bookId/recipes/:recipeId', authenticate, recipeBookController.add
 router.delete('/:bookId/recipes/:recipeId', authenticate, recipeBookController.removeRecipeFromBook);
 router.get('/', authenticate, recipeBookController.getAllRecipeBooks);
 router.get('/my', authenticate, recipeBookController.getMyRecipeBooks);
+router.get('/shared-with-me', authenticate, recipeBookController.getSharedWithMe);
 router.get('/:bookId', authenticate, recipeBookController.getRecipeBookById);
 router.delete('/:bookId', authenticate, recipeBookController.deleteRecipeBook);
 router.post('/:bookId/share', authenticate, recipeBookController.shareRecipeBook);

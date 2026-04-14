@@ -50,8 +50,10 @@ export default function RecipeDetailsPage() {
 
       setRecipe(data);
       if (data.collaborators) {
-        setSharedUserIds(data.collaborators.map((c: any) => c.user));
-      }
+        setSharedUserIds(data.collaborators.map((c: { user: string | { _id: string } }) => 
+          typeof c.user === "string" ? c.user : c.user._id
+        ));
+            }
     };
 
   fetchRecipe();
@@ -60,9 +62,10 @@ export default function RecipeDetailsPage() {
   const handleShare = async () => {
     try {
       setShareError("");
-      if (!token || selectedFriendIds.length === 0) return;
+      if (!token) return;
 
       const toShare = selectedFriendIds.filter(fid => !sharedUserIds.includes(fid));
+      const toUnshare = sharedUserIds.filter(fid => !selectedFriendIds.includes(fid));
 
       for (const friendId of toShare) {
         const friend = friends.find(f => f._id === friendId);
@@ -79,8 +82,22 @@ export default function RecipeDetailsPage() {
         if (!response.ok) throw new Error(data.message || "Failed to share");
       }
 
-      setSharedUserIds(prev => [...new Set([...prev, ...toShare])]);
-      setSelectedFriendIds([]);
+      for (const friendId of toUnshare) {
+        const friend = friends.find(f => f._id === friendId);
+        if (!friend) continue;
+        const response = await fetch(`http://localhost:3000/recipes/${id}/unshare`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ email: friend.email }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Failed to unshare");
+      }
+
+      setSharedUserIds([...selectedFriendIds]);
       setShowShareModal(false);
     } catch (err) {
       setShareError(err instanceof Error ? err.message : "Failed to share");
@@ -129,7 +146,10 @@ export default function RecipeDetailsPage() {
 
           <button
             className="icon-btn share-btn"
-            onClick={() => setShowShareModal(true)}
+              onClick={() => {
+                setSelectedFriendIds([...sharedUserIds]);
+                setShowShareModal(true);
+              }}
           >
             ↗
           </button>
@@ -181,6 +201,27 @@ export default function RecipeDetailsPage() {
               <p className="instructions">{recipe.instructions}</p>
             </>
           )}
+
+          {/* SHARED WITH */}
+          {recipe.collaborators && recipe.collaborators.length > 0 && (
+            <>
+              <h3>Shared with</h3>
+              <div className="shared-with-list">
+                {recipe.collaborators.map((c: any) => (
+                  <div key={c.user._id || c.user} className="shared-with-item">
+                    <div className="share-friend-avatar">
+                      {c.user.profileImageUrl ? (
+                        <img src={getImageUrl(c.user.profileImageUrl)} alt={c.user.username} />
+                      ) : (
+                        <div className="share-friend-avatar-placeholder" />
+                      )}
+                    </div>
+                    <p className="shared-with-username">{c.user.username || "Unknown"}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
       {showShareModal && (
@@ -203,14 +244,12 @@ export default function RecipeDetailsPage() {
                 {friends.filter(f =>
                   f.username.toLowerCase().includes(friendSearch.toLowerCase())
                 ).map((friend) => {
-                  const isShared = sharedUserIds.includes(friend._id);
                   const isSelected = selectedFriendIds.includes(friend._id);
                   return (
                     <div
                       key={friend._id}
                       className={`share-friend-item ${isSelected ? "selected" : ""}`}
                       onClick={() => {
-                        if (isShared) return;
                         setSelectedFriendIds(prev =>
                           isSelected
                             ? prev.filter(id => id !== friend._id)
@@ -219,6 +258,12 @@ export default function RecipeDetailsPage() {
                         setShareError("");
                       }}
                     >
+                      <input
+                        type="checkbox"
+                        className="share-friend-checkbox"
+                        checked={isSelected}
+                        onChange={() => {}}
+                      />
                       <div className="share-friend-avatar">
                         {friend.profileImageUrl ? (
                           <img src={getImageUrl(friend.profileImageUrl)} alt={friend.username} />
@@ -227,16 +272,6 @@ export default function RecipeDetailsPage() {
                         )}
                       </div>
                       <p className="share-friend-username">{friend.username}</p>
-                      {isShared ? (
-                        <span className="share-friend-shared">Shared ✓</span>
-                      ) : (
-                        <input
-                          type="checkbox"
-                          className="share-friend-checkbox"
-                          checked={isSelected}
-                          onChange={() => {}}
-                        />
-                      )}
                     </div>
                   );
                 })}

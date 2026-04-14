@@ -45,6 +45,22 @@ const getAllRecipes = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const getSharedWithMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const recipes = await Recipe.find({
+      "collaborators.user": userId,
+      owner: { $ne: userId },
+    });
+    return res.json(recipes);
+  } catch (err: any) {
+    res.status(500).send("Error fetching shared recipes");
+  }
+};
+
 const getMyRecipes = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
@@ -65,7 +81,7 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const recipeId = req.params.id;
-    const recipe = await Recipe.findById(recipeId);
+    const recipe = await Recipe.findById(recipeId).populate("collaborators.user", "username profileImageUrl");
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
@@ -274,6 +290,7 @@ const unshareRecipe = async (req: AuthRequest, res: Response) => {
 export default { createNewRecipe,
   getAllRecipes,
   getMyRecipes,
+  getSharedWithMe,
   getRecipeById,
   updateRecipe,
   deleteRecipe,

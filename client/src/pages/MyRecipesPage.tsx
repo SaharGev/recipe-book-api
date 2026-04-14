@@ -22,6 +22,7 @@ type LikeItem = {
 
 export default function MyRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [sharedRecipes, setSharedRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState<string[]>([]);
@@ -49,6 +50,12 @@ export default function MyRecipesPage() {
         const data: Recipe[] = await res.json();
         setRecipes(data);
 
+        const sharedRes = await fetch("http://localhost:3000/recipes/shared-with-me", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        const sharedData: Recipe[] = await sharedRes.json();
+        setSharedRecipes(sharedData);
+
         const likes = await getMyLikes(token);
 
         const likedRecipeIds = (likes as LikeItem[])
@@ -73,7 +80,7 @@ export default function MyRecipesPage() {
 
   if (loading) return <p className="myrecipes-loading-text">Loading your recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
-  if (recipes.length === 0)
+  if (recipes.length === 0 && sharedRecipes.length === 0)
   return (
     <div className="myrecipes-page">
       <h1 className="myrecipes-page-title">My Recipes</h1>
@@ -111,8 +118,12 @@ export default function MyRecipesPage() {
         </button>
       </div>
 
+      {sharedRecipes.length > 0 && (
+        <p className="myrecipes-recipes-count">Shared with me ({sharedRecipes.length})</p>
+      )}
+
       <div className="myrecipes-grid">
-        {recipes.map((recipe) => {
+        {[...recipes, ...sharedRecipes].map((recipe) => {
           const isLiked = likedIds.includes(recipe._id);
 
           return (
