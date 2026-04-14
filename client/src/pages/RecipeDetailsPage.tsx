@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import "./RecipeDetailsPage.css";
 import type { Recipe } from "../types/recipe";
-
+import BottomNav from "../components/BottomNav";
 
 export default function RecipeDetailsPage() {
   const { id } = useParams();
@@ -54,12 +54,12 @@ export default function RecipeDetailsPage() {
           </div>
 
           {/* TOP BUTTONS */}
-          <button className="icon-btn close-btn" onClick={() => navigate("/my-recipes")}>
-            ✕
+          <button className="icon-btn-rd close-btn-rd" onClick={() => navigate("/my-recipes")}>
+            ‹
           </button>
 
           <button
-            className="icon-btn edit-btn"
+            className="icon-btn-rd edit-btn-rd"
             onClick={() => navigate(`/edit-recipe/${recipe._id}`)}
           >
             ✎
@@ -113,6 +113,7 @@ export default function RecipeDetailsPage() {
           )}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 }

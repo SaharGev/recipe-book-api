@@ -37,7 +37,7 @@
   font-size: 24px;
   color: #89abf6;
   text-align: center;
-  margin: 28px 0 8px;
+  margin: 0;
 }
 
 .buttons-row-under-title {
@@ -69,14 +69,14 @@
 }
 
 .edr-close-btn,
-.delete-btn {
+.edr-delete-btn {
   position: static;
 }
 
 .recipe-image-wrapper {
   width: 100%;
   height: 220px;
-  margin: 12px 0;
+  margin: 4px 0 12px;
   overflow: hidden;
 }
 
@@ -175,4 +175,11 @@ textarea {
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.edit-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
 }

@@ -125,34 +125,39 @@ export default function EditRecipePage() {
   return (
     <div className="create-recipe-page">
       <div className="create-recipe-card">
+        {/* under title */}
+        <div className="edit-header-row">
+        <button 
+          className="edr-icon-btn edr-close-btn"
+          onClick={() => navigate(`/recipes/${id}`)}
+        >
+          ‹
+        </button>
+
         <h1 className="edr-recipe-title">Edit Recipe</h1>
 
-        {/* under title */}
-        <div className="buttons-row-under-title">
-          <button className="edr-icon-btn edr-close-btn" onClick={() => navigate(`/recipes/${id}`)}>✕</button>
-
-          <button
-            className="edr-icon-btn delete-btn"
-            onClick={async () => {
-              if (!window.confirm("Are you sure you want to delete this recipe?")) return;
-              try {
-                const token = localStorage.getItem("accessToken");
-                const res = await fetch(`http://localhost:3000/recipes/${id}`, {
-                  method: "DELETE",
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error("Failed to delete");
-                alert("Recipe deleted!");
-                navigate("/my-recipes");
-              } catch (err: unknown) {
-                console.error(err);
-                alert(err instanceof Error ? err.message : "Error deleting recipe");
-              }
-            }}
-          >
-            🗑
-          </button>
-        </div>
+        <button
+          className="edr-icon-btn edr-delete-btn"
+          onClick={async () => {
+            if (!window.confirm("Are you sure you want to delete this recipe?")) return;
+            try {
+              const token = localStorage.getItem("accessToken");
+              const res = await fetch(`http://localhost:3000/recipes/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (!res.ok) throw new Error("Failed to delete");
+              alert("Recipe deleted!");
+              navigate("/my-recipes");
+            } catch (err: unknown) {
+              console.error(err);
+              alert(err instanceof Error ? err.message : "Error deleting recipe");
+            }
+          }}
+        >
+          🗑
+        </button>
+      </div>
 
         {/* Image */}
         <div className="recipe-image-wrapper">

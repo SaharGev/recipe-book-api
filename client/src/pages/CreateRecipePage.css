@@ -220,3 +220,25 @@
 .ingredient-row.ingredient input {
   margin-bottom: 2px; 
 }
+
+.icon-btn-cr {
+  position: absolute;
+  top: 16px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background-color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: 0.2s;
+  margin: 14px;
+  
+}
+
+.icon-btn-cr:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background-color: #f0f0f5;
+}

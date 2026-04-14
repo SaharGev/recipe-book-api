@@ -46,6 +46,12 @@ export default function MyRecipeBooksPage() {
 
   return (
     <div className="home-page">
+      <button
+          className="icon-btn-mrb"
+          onClick={() => navigate(-1)}
+        >
+          ‹
+        </button>
       <h3 className="section-title mybooks-title">My Recipe Books</h3>
       <p className="mybooks-count">{books.length} Books</p>
       <div className="mybooks-add-button-wrapper">

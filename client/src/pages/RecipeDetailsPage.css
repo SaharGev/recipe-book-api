@@ -26,7 +26,7 @@ body {
   object-fit: cover;
 }
 
-.icon-btn {
+.icon-btn-rd {
   position: absolute;
   top: 16px;
   width: 38px;
@@ -40,22 +40,22 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-.icon-btn:hover {
+.icon-btn-rd:hover {
   transform: scale(1.1); 
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   background-color: #f0f0f5; 
 }
 
-.icon-btn:active {
+.icon-btn-rd:active {
   transform: scale(0.95); 
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.close-btn {
+.close-btn-rd {
   left: 16px;
 }
 
-.edit-btn {
+.edit-btn-rd {
   right: 16px;
 }
 
