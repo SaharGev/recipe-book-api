@@ -1,7 +1,9 @@
+// client/src/pages/RecipeBookDetailsPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import { getRecipeBookById, searchUsers } from "../services/recipeBookService";
+import { getFriends } from "../services/userService";
 import type { RecipeBook } from "../types/recipeBook";
 import { getImageUrl } from "../utils/getImageUrl";
 import "./RecipeBookDetailsPage.css";
@@ -47,6 +49,8 @@ export default function RecipeBookDetailsPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
+  const [friends, setFriends] = useState<User[]>([]);
+
   const previewImages =
     ((book?.recipes as Recipe[]) || [])
       .slice(-4)
@@ -78,48 +82,99 @@ useEffect(() => {
   fetchBook();
 }, [id]);
 
-  const handleSearch = async (value: string) => {
-    setSearch(value);
 
-    if (!value.trim()) {
-      setUsers([]);
-      return;
-    }
-
+useEffect(() => {
+  const fetchFriends = async () => {
     try {
-      setLoadingUsers(true);
-
       const token = localStorage.getItem("accessToken");
       if (!token) return;
 
-      const data = await searchUsers(value, token);
-
-      setUsers(data as User[]);
+      const data = await getFriends(token);
+      setFriends(data);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoadingUsers(false);
     }
   };
 
-  
+  fetchFriends();
+}, []);
+
+  const handleSearch = async (value: string) => {
+  setSearch(value);
+
+  if (!value.trim()) {
+    setUsers([]);
+    return;
+  }
+
+  try {
+    setLoadingUsers(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    const data = await searchUsers(value, token);
+
+    const filtered = (data as User[]).filter((u) =>
+      friends.some((f) => f._id === u._id)
+    );
+
+    setUsers(filtered);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingUsers(false);
+  }
+};
+
+  const updateCollaborators = (userId: string, add: boolean) => {
+  setBook((prev) => {
+    if (!prev) return prev;
+
+    const current = prev.collaborators || [];
+
+    const updated = add
+      ? [...current, { user: userId }]
+      : current.filter((c) => {
+          const id = typeof c.user === "string" ? c.user : c.user._id;
+          return id !== userId;
+        });
+
+    return {
+      ...prev,
+      collaborators: updated,
+    };
+  });
+};
+
+const openShareModal = () => {
+  setSearch("");
+  setUsers([]);
+  setShowShareModal(true);
+};
+
+const closeShareModal = () => {
+  setSearch("");
+  setUsers([]);
+  setShowShareModal(false);
+};
+
   const shareBook = async (userId: string) => {
   try {
     const token = localStorage.getItem("accessToken");
 
-    await fetch(
-      `http://localhost:3000/recipe-books/${book?._id}/share`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
-      }
-    );
+    await fetch(`http://localhost:3000/recipe-books/${book?._id}/share`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username: users.find(u => u._id === userId)?.username,
+      }),
+    });
 
-    await fetchBook(); 
+    updateCollaborators(userId, true);
   } catch (err) {
     console.error(err);
   }
@@ -129,19 +184,18 @@ const unshareBook = async (userId: string) => {
   try {
     const token = localStorage.getItem("accessToken");
 
-    await fetch(
-      `http://localhost:3000/recipe-books/${book?._id}/unshare`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username: users.find(u => u._id === userId)?.username }),
-      }
-    );
+    await fetch(`http://localhost:3000/recipe-books/${book?._id}/unshare`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username: users.find(u => u._id === userId)?.username,
+      }),
+    });
 
-    await fetchBook(); 
+    updateCollaborators(userId, false);
   } catch (err) {
     console.error(err);
   }
@@ -183,7 +237,7 @@ const unshareBook = async (userId: string) => {
 
           <button
             className="icon-btn share-btn"
-            onClick={() => setShowShareModal(true)}
+            onClick={openShareModal}
           >
             <BsShare />
           </button>
@@ -228,7 +282,7 @@ const unshareBook = async (userId: string) => {
 
       {/* MODAL */}
       {showShareModal && (
-        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+        <div className="modal-overlay" onClick={closeShareModal}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
 
             <h3 className="modal-title">Share book</h3>
@@ -269,7 +323,7 @@ const unshareBook = async (userId: string) => {
 
             <button
               className="modal-close-btn"
-              onClick={() => setShowShareModal(false)}
+              onClick={closeShareModal}
             >
               Close
             </button>
