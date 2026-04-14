@@ -161,7 +161,7 @@ export default function CreateRecipeBookPage() {
             className="icon-btn-crb close-btn-crb"
             onClick={() => navigate(-1)}
           >
-            ✕
+            ‹
           </button>
         <h1 className="page-title">Create Recipe Book</h1>
 

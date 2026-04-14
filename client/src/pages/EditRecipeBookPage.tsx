@@ -89,6 +89,8 @@ export default function EditRecipeBookPage() {
     }
 
     alert("Book updated!");
+    navigate(`/recipe-books/${id}`);
+
   } catch (err) {
     console.error(err);
     alert("Error updating book");
@@ -99,92 +101,92 @@ export default function EditRecipeBookPage() {
 
   return (
     <div className="edit-page">
+      <div className="edit-card">
+        <div className="edit-header">
+          <button className="icon-btn-rbe close-btn-rbe" onClick={() => navigate(-1)}>
+            ‹
+          </button>
 
-      <div className="edit-header">
-        <button className="icon-btn-rbe close-btn-rbe" onClick={() => navigate(-1)}>
-          ✕
-        </button>
-
-        <h1>Edit Recipe</h1>
-      </div>
-
-      <div className="edit-book-form">
-        <label>Book Name</label>
-        <input
-            type="text"
-            value={bookName}
-            onChange={(e) => setBookName(e.target.value)}
-        />
-
-        <label>Description</label>
-        <textarea
-            value={bookDescription}
-            onChange={(e) => setBookDescription(e.target.value)}
-        />
-
-        <label>Privacy</label>
-        <select
-            value={privacy}
-            onChange={(e) => setPrivacy(e.target.value)}
-        >
-            <option value="private">Private</option>
-            <option value="public">Public</option>
-        </select>
-
+          <h1>Edit Recipe Book</h1>
         </div>
 
-      <div className="add-recipe-wrapper">
-        <button
-            className="add-recipe-btn"
-            onClick={() => navigate(`/createRecipeBook?bookId=${id}`)}
-        >
-            + Add Recipe
-        </button>
-        </div>
+        <div className="edit-book-form">
+          <label>Book Name</label>
+          <input
+              type="text"
+              value={bookName}
+              onChange={(e) => setBookName(e.target.value)}
+          />
 
-      <div className="recipes-grid">
-        {recipes.map((recipe) => (
-          <div key={recipe._id} className="recipe-card">
+          <label>Description</label>
+          <textarea
+              value={bookDescription}
+              onChange={(e) => setBookDescription(e.target.value)}
+          />
 
-            <button
-              className="delete-btn"
-              onClick={() => removeRecipe(recipe._id)}
-            >
-              🗑
-            </button>
-
-            <div
-              onClick={() => navigate(`/recipes/${recipe._id}`)}
-            >
-              <div className="recipe-img-wrapper">
-                {recipe.imageUrl ? (
-                  <img
-                    src={getImageUrl(recipe.imageUrl)}
-                    className="recipe-img"
-                  />
-                ) : (
-                  <div className="recipe-placeholder" />
-                )}
-              </div>
-
-              <h3>{recipe.title}</h3>
-
-              <div className="meta">
-                {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
-                {recipe.difficulty && <span>• {recipe.difficulty}</span>}
-              </div>
-            </div>
+          <label>Privacy</label>
+          <select
+              value={privacy}
+              onChange={(e) => setPrivacy(e.target.value)}
+          >
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+          </select>
 
           </div>
-        ))}
-      </div>
 
-      <div className="update-book-wrapper">
-        <button className="update-book-btn" onClick={handleUpdateBook}>
-            Update Book
-        </button>
-      </div>
+        <div className="add-recipe-wrapper">
+          <button
+              className="add-recipe-btn"
+              onClick={() => navigate(`/createRecipeBook?bookId=${id}`)}
+          >
+              + Add Recipe
+          </button>
+          </div>
 
+        <div className="recipes-grid">
+          {recipes.map((recipe) => (
+            <div key={recipe._id} className="recipe-card">
+
+              <button
+                className="delete-btn"
+                onClick={() => removeRecipe(recipe._id)}
+              >
+                🗑
+              </button>
+
+              <div
+                onClick={() => navigate(`/recipes/${recipe._id}`)}
+              >
+                <div className="recipe-img-wrapper">
+                  {recipe.imageUrl ? (
+                    <img
+                      src={getImageUrl(recipe.imageUrl)}
+                      className="recipe-img"
+                    />
+                  ) : (
+                    <div className="recipe-placeholder" />
+                  )}
+                </div>
+
+                <h3>{recipe.title}</h3>
+
+                <div className="meta">
+                  {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
+                  {recipe.difficulty && <span>• {recipe.difficulty}</span>}
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+
+        <div className="update-book-wrapper">
+          <button className="update-book-btn" onClick={handleUpdateBook}>
+              Update Book
+          </button>
+        </div>
+       </div>
       <BottomNav />
     </div>
   );

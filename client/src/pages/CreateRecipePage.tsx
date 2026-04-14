@@ -2,6 +2,7 @@
 import { useState } from "react";
 import BottomNav from "../components/BottomNav";
 import "../pages/CreateRecipePage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateRecipe() {
   const [title, setTitle] = useState("");
@@ -12,6 +13,7 @@ export default function CreateRecipe() {
   const [privacy, setPrivacy] = useState("private");
   const [imageUrl, setImageUrl] = useState<File | null>(null);
   const [instructions, setInstructions] = useState("");
+  const navigate = useNavigate();
 
   const handleIngredientChange = (index: number, value: string) => {
     const newIngredients = [...ingredients];
@@ -86,6 +88,12 @@ export default function CreateRecipe() {
     <div className="create-recipe-page">
       <div className="create-recipe-card">
 
+        <button
+            className="icon-btn-cr"
+            onClick={() => navigate(-1)}
+          >
+            ‹
+          </button>
         <h1 className="recipe-title">Create Recipe</h1>
 
         <div className="recipe-image-wrapper">

@@ -224,19 +224,19 @@ const unshareBook = async (userId: string) => {
             )}
           </div>
 
-          <button className="icon-btn close-btn" onClick={() => navigate(-1)}>
-            ✕
+          <button className="icon-btn-rbd close-btn-rbd" onClick={() => navigate(-1)}>
+            ‹
           </button>
 
           <button
-            className="icon-btn edit-btn"
+            className="icon-btn-rbd edit-btn-rbd"
             onClick={() => navigate(`/edit-book/${book._id}`)}
           >
             ✎
           </button>
 
           <button
-            className="icon-btn share-btn"
+            className="icon-btn-rbd share-btn-rbd"
             onClick={openShareModal}
           >
             <BsShare />
