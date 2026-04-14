@@ -5,6 +5,7 @@ import { AuthContext } from "../components/AuthContext";
 import "./RecipeDetailsPage.css";
 import type { Recipe } from "../types/recipe";
 import { getFriends } from "../services/userService";
+import { apiFetch } from "../services/apiClient";
 import { getImageUrl } from "../utils/getImageUrl";
 
 
@@ -16,7 +17,7 @@ export default function RecipeDetailsPage() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [shareEmail, setShareEmail] = useState("");
+  const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareMessage, setShareMessage] = useState("");
   const [shareError, setShareError] = useState("");
   const [friends, setFriends] = useState<{ _id: string; username: string; email: string; profileImageUrl?: string }[]>([]);
@@ -38,9 +39,8 @@ export default function RecipeDetailsPage() {
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      const res = await fetch(`http://localhost:3000/recipes/${id}`, {
-        headers: { Authorization: "Bearer " + accessToken },
-      });
+      if (!accessToken) return;
+      const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, accessToken);
 
       const data = await res.json();
 
@@ -54,30 +54,34 @@ export default function RecipeDetailsPage() {
       }
     };
 
-    fetchRecipe();
+  fetchRecipe();
   }, [id, accessToken]);
 
   const handleShare = async () => {
     try {
       setShareError("");
-      if (!token || !shareEmail.trim()) return;
+      if (!token || selectedFriendIds.length === 0) return;
 
-      const response = await fetch(`http://localhost:3000/recipes/${id}/share`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ email: shareEmail.trim() }),
-      });
+      const toShare = selectedFriendIds.filter(fid => !sharedUserIds.includes(fid));
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Failed to share");
-
-      const sharedFriend = friends.find(f => f.email === shareEmail.trim());
-      if (sharedFriend) {
-        setSharedUserIds(prev => [...prev, sharedFriend._id]);
+      for (const friendId of toShare) {
+        const friend = friends.find(f => f._id === friendId);
+        if (!friend) continue;
+        const response = await fetch(`http://localhost:3000/recipes/${id}/share`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ email: friend.email }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Failed to share");
       }
+
+      setSharedUserIds(prev => [...new Set([...prev, ...toShare])]);
+      setSelectedFriendIds([]);
+      setShowShareModal(false);
     } catch (err) {
       setShareError(err instanceof Error ? err.message : "Failed to share");
     }
@@ -196,33 +200,46 @@ export default function RecipeDetailsPage() {
                 onChange={(e) => setFriendSearch(e.target.value)}
               />
               <div className="share-friends-list">
-                 {friends.filter(f => 
+                {friends.filter(f =>
                   f.username.toLowerCase().includes(friendSearch.toLowerCase())
-                ).map((friend) => (
-                  <div
-                    key={friend._id}
-                    className={`share-friend-item ${shareEmail === friend.email ? "selected" : ""}`}
-                    onClick={() => {
-                      setShareEmail(friend.email);
-                      setShareError("");
-                      setShareMessage("");
-                    }}
-                  >
-                    <div className="share-friend-avatar">
-                      {friend.profileImageUrl ? (
-                        <img src={getImageUrl(friend.profileImageUrl)} alt={friend.username} />
+                ).map((friend) => {
+                  const isShared = sharedUserIds.includes(friend._id);
+                  const isSelected = selectedFriendIds.includes(friend._id);
+                  return (
+                    <div
+                      key={friend._id}
+                      className={`share-friend-item ${isSelected ? "selected" : ""}`}
+                      onClick={() => {
+                        if (isShared) return;
+                        setSelectedFriendIds(prev =>
+                          isSelected
+                            ? prev.filter(id => id !== friend._id)
+                            : [...prev, friend._id]
+                        );
+                        setShareError("");
+                      }}
+                    >
+                      <div className="share-friend-avatar">
+                        {friend.profileImageUrl ? (
+                          <img src={getImageUrl(friend.profileImageUrl)} alt={friend.username} />
+                        ) : (
+                          <div className="share-friend-avatar-placeholder" />
+                        )}
+                      </div>
+                      <p className="share-friend-username">{friend.username}</p>
+                      {isShared ? (
+                        <span className="share-friend-shared">Shared ✓</span>
                       ) : (
-                        <div className="share-friend-avatar-placeholder" />
+                        <input
+                          type="checkbox"
+                          className="share-friend-checkbox"
+                          checked={isSelected}
+                          onChange={() => {}}
+                        />
                       )}
                     </div>
-                    <p className="share-friend-username">{friend.username}</p>
-                    {sharedUserIds.includes(friend._id) ? (
-                      <span className="share-friend-shared">Shared ✓</span>
-                    ) : shareEmail === friend.email ? (
-                      <span className="share-friend-selected">Selected</span>
-                    ) : null}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               </>
             )}
@@ -233,15 +250,16 @@ export default function RecipeDetailsPage() {
                 type="button"
                 className="share-modal-btn"
                 onClick={handleShare}
+                disabled={selectedFriendIds.length === 0}
               >
-                Share
+                Done
               </button>
               <button
                 type="button"
                 className="share-modal-cancel"
                 onClick={() => {
                   setShowShareModal(false);
-                  setShareEmail("");
+                  setSelectedFriendIds([]);
                   setShareError("");
                   setShareMessage("");
                 }}
