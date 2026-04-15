@@ -1,4 +1,3 @@
-//client/src/components/AuthProvider.tsx
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { AuthContext } from "./AuthContext";

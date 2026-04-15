@@ -94,8 +94,8 @@ body {
   font-size: 14px;
   color: #8a8a8a;
   text-align: center;
-  white-space: nowrap;        /* 👈 שורה אחת בלבד */
-  overflow: hidden;           /* 👈 מסתיר מה שלא נכנס */
+  white-space: nowrap;       
+  overflow: hidden;          
   text-overflow: ellipsis;   
 }
 
