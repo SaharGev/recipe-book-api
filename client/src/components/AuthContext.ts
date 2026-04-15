@@ -1,3 +1,4 @@
+//client/src/components/AuthContext.ts
 import { createContext } from "react";
 
 type AuthContextType = {
