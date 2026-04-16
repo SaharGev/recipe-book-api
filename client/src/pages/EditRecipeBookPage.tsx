@@ -9,9 +9,10 @@ import "./EditRecipeBookPage.css";
 type Recipe = {
   _id: string;
   title: string;
+  description: string;
   imageUrl?: string;
-  cookTime?: number;
-  difficulty?: string;
+  cookTime: number;
+  difficulty: string;
 };
 
 export default function EditRecipeBookPage() {
@@ -169,10 +170,14 @@ export default function EditRecipeBookPage() {
                   )}
                 </div>
 
-                <h3>{recipe.title}</h3>
+                <h3 className="recipe-title">{recipe.title}</h3>
 
-                <div className="meta">
-                  {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
+                <p className="recipe-description">
+                  {recipe.description}
+                </p>
+
+                <div className="recipe-meta">
+                  {recipe.cookTime && <span>⏱ {recipe.cookTime} min </span>}
                   {recipe.difficulty && <span>• {recipe.difficulty}</span>}
                 </div>
               </div>
