@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 export default function MyRecipeBooksPage() {
   const { token } = useContext(AuthContext);
   const [books, setBooks] = useState<RecipeBook[]>([]);
+  const [sharedBooks, setSharedBooks] = useState<RecipeBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likedBookIds, setLikedBookIds] = useState<string[]>([]);
@@ -27,6 +28,12 @@ export default function MyRecipeBooksPage() {
 
         const data = await getMyRecipeBooks(token);
         setBooks(data.recipeBooks);
+
+        const sharedRes = await fetch("http://localhost:3000/recipe-books/shared-with-me", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        const sharedData = await sharedRes.json();
+        setSharedBooks(sharedData.recipeBooks || []);
 
         const likes = await getMyLikes(token);
         const bookIds = likes
@@ -68,7 +75,7 @@ export default function MyRecipeBooksPage() {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          books.map((book) => (
+          [...books, ...sharedBooks].map((book) => (
             <RecipeBookCard
               key={book._id}
               _id={book._id}

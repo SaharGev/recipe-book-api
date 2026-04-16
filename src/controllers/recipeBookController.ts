@@ -149,8 +149,7 @@ const getRecipeBookById = async (req: AuthRequest, res: Response) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
     const { bookId } = req.params;
-    const recipeBook = await RecipeBook.findById(bookId).populate("recipes").populate("owner", "username").populate("collaborators.user", "username");
-    if (!recipeBook) {
+    const recipeBook = await RecipeBook.findById(bookId).populate("recipes").populate("owner", "username").populate("collaborators.user", "username profileImageUrl");    if (!recipeBook) {
         return res.status(404).json({ message: "Recipe book not found" });
     }
     const isOwner = recipeBook.owner._id.toString() === userId.toString();
@@ -418,6 +417,21 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+const getSharedWithMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const recipeBooks = await RecipeBook.find({
+      "collaborators.user": userId,
+      owner: { $ne: userId },
+    }).populate("recipes").populate("owner", "username").populate("collaborators.user", "username");
+    res.status(200).json({ recipeBooks });
+  } catch (err: any) {
+    res.status(500).json({ message: "Error fetching shared recipe books" });
+  }
+};
 
 const searchUsers = async (req: AuthRequest, res: Response) => {
   try {
@@ -451,6 +465,7 @@ export default {
   removeRecipeFromBook,
   getAllRecipeBooks,
   getMyRecipeBooks,
+  getSharedWithMe,
   getRecipeBookById,
   deleteRecipeBook,
   shareRecipeBook,

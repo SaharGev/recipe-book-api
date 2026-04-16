@@ -117,6 +117,17 @@ export class RecipeSwaggerController extends Controller {
   }
 
   /**
+   * Get recipes shared with current user
+   */
+  @SuccessResponse("200", "OK")
+  @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("shared-with-me")
+  public async getSharedWithMe(): Promise<RecipeSwaggerResponse[]> {
+    return [];
+  }
+
+  /**
    * Get recipe by id
    */
   @SuccessResponse("200", "OK")
