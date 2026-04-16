@@ -9,8 +9,9 @@ import { getImageUrl } from "../utils/getImageUrl";
 type Recipe = {
   _id: string;
   title: string;
-  cookTime?: number;
-  difficulty?: string;
+  description: string;
+  cookTime: number;
+  difficulty: string;
   instructions?: string;
   imageUrl?: string;
 };
@@ -182,11 +183,9 @@ export default function MyRecipesPage() {
 
               <h3 className="myrecipes-card-title">{recipe.title}</h3>
 
-              {recipe.instructions && (
+              {recipe.description && (
                 <p className="myrecipes-card-description">
-                  {recipe.instructions.length > 80
-                    ? recipe.instructions.slice(0, 80) + "..."
-                    : recipe.instructions}
+                  {recipe.description}
                 </p>
               )}
 
