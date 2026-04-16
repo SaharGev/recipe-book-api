@@ -4,14 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import "./RecipeDetailsPage.css";
 import type { Recipe } from "../types/recipe";
-<<<<<<< HEAD
-import BottomNav from "../components/BottomNav";
-=======
 import { getFriends } from "../services/userService";
 import { apiFetch } from "../services/apiClient";
 import { getImageUrl } from "../utils/getImageUrl";
 
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
 
 export default function RecipeDetailsPage() {
   const { id } = useParams();
@@ -20,9 +16,6 @@ export default function RecipeDetailsPage() {
   const accessToken = token || localStorage.getItem("accessToken");
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-<<<<<<< HEAD
-
-=======
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareMessage, setShareMessage] = useState("");
@@ -53,7 +46,6 @@ export default function RecipeDetailsPage() {
     };
     fetchCurrentUser();
   }, [token]);
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -68,21 +60,16 @@ export default function RecipeDetailsPage() {
       }
 
       setRecipe(data);
-<<<<<<< HEAD
-=======
       if (data.collaborators) {
         setSharedUserIds(data.collaborators.map((c: { user: string | { _id: string } }) => 
           typeof c.user === "string" ? c.user : c.user._id
         ));
             }
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
     };
 
     fetchRecipe();
   }, [id, accessToken]);
 
-<<<<<<< HEAD
-=======
   const handleShare = async () => {
     try {
       setShareError("");
@@ -128,7 +115,6 @@ export default function RecipeDetailsPage() {
     }
   };
 
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
   if (!recipe) return <p>Loading...</p>;
 
   return (
@@ -160,8 +146,6 @@ export default function RecipeDetailsPage() {
           >
             ✎
           </button>
-<<<<<<< HEAD
-=======
 
           <button
             className="icon-btn share-btn"
@@ -173,7 +157,6 @@ export default function RecipeDetailsPage() {
             ↗
           </button>
 
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
         </div>
 
         {/* CONTENT */}
@@ -223,9 +206,7 @@ export default function RecipeDetailsPage() {
           )}
         </div>
       </div>
-<<<<<<< HEAD
       <BottomNav />
-=======
       {showShareModal && (
         <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
           <div className="share-modal" onClick={(e) => e.stopPropagation()}>
@@ -314,7 +295,6 @@ export default function RecipeDetailsPage() {
         </div>
       )}
 
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
     </div>
   );
 }

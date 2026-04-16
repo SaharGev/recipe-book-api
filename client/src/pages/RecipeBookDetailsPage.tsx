@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
-<<<<<<< HEAD
-import { getRecipeBookById, searchUsers } from "../services/recipeBookService";
-=======
 import { getRecipeBookById } from "../services/recipeBookService";
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
 import { getFriends } from "../services/userService";
 import type { RecipeBook } from "../types/recipeBook";
 import { getImageUrl } from "../utils/getImageUrl";
@@ -30,20 +26,12 @@ type User = {
 };
 
 type Collaborator = {
-<<<<<<< HEAD
   user:
     | {
         _id: string;
         username?: string;
       }
     | string;
-=======
-  user: {
-    _id: string;
-    username?: string;
-    profileImageUrl?: string;
-  } | string;
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
 };
 
 type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
@@ -131,13 +119,6 @@ export default function RecipeBookDetailsPage() {
 
       const data = await searchUsers(value, token);
 
-<<<<<<< HEAD
-      const filtered = (data as User[]).filter((u) =>
-        friends.some((f) => f._id === u._id)
-      );
-
-      setUsers(filtered);
-=======
       const toShare = selectedFriendIds.filter(fid => !sharedUserIds.includes(fid));
       const toUnshare = sharedUserIds.filter(fid => !selectedFriendIds.includes(fid));
 
@@ -164,7 +145,6 @@ export default function RecipeBookDetailsPage() {
       await fetchBook();
       setShowShareModal(false);
       setSelectedFriendIds([]);
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
     } catch (err) {
       console.error(err);
     } finally {
@@ -172,91 +152,6 @@ export default function RecipeBookDetailsPage() {
     }
   };
 
-<<<<<<< HEAD
-  const updateCollaborators = (userId: string, add: boolean) => {
-    setBook((prev) => {
-      if (!prev) return prev;
-
-      const current = prev.collaborators || [];
-
-      const updated = add
-        ? [...current, { user: userId }]
-        : current.filter((c) => {
-            const id =
-              typeof c.user === "string" ? c.user : c.user._id;
-
-            return id !== userId;
-          });
-
-      return {
-        ...prev,
-        collaborators: updated,
-      };
-    });
-  };
-
-  const openShareModal = () => {
-    setSearch("");
-    setUsers([]);
-    setShowShareModal(true);
-  };
-
-  const closeShareModal = () => {
-    setSearch("");
-    setUsers([]);
-    setShowShareModal(false);
-  };
-
-  const shareBook = async (userId: string) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-
-      await fetch(
-        `http://localhost:3000/recipe-books/${book?._id}/share`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            username: users.find((u) => u._id === userId)?.username,
-          }),
-        }
-      );
-
-      updateCollaborators(userId, true);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const unshareBook = async (userId: string) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-
-      await fetch(
-        `http://localhost:3000/recipe-books/${book?._id}/unshare`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            username: users.find((u) => u._id === userId)?.username,
-          }),
-        }
-      );
-
-      updateCollaborators(userId, false);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-=======
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
   if (loading) return <p>Loading book...</p>;
   if (error) return <p>{error}</p>;
   if (!book) return <p>Book not found</p>;
@@ -301,10 +196,6 @@ export default function RecipeBookDetailsPage() {
           </button>
 
           <button
-<<<<<<< HEAD
-            className="icon-btn-rbd share-btn-rbd"
-            onClick={openShareModal}
-=======
             className="icon-btn share-btn"
             onClick={() => {
               const sharedIds = book?.collaborators?.map((c) =>
@@ -313,7 +204,6 @@ export default function RecipeBookDetailsPage() {
               setSelectedFriendIds(sharedIds);
               setShowShareModal(true);
             }}
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
           >
             <BsShare />
           </button>
@@ -372,66 +262,6 @@ export default function RecipeBookDetailsPage() {
 
       {/* MODAL */}
       {showShareModal && (
-<<<<<<< HEAD
-        <div
-          className="modal-overlay"
-          onClick={closeShareModal}
-        >
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="modal-title">Share book</h3>
-
-            <input
-              value={search}
-              placeholder="Search user..."
-              onChange={(e) =>
-                handleSearch(e.target.value)
-              }
-            />
-
-            {loadingUsers && (
-              <p className="muted">Searching...</p>
-            )}
-
-            {users.map((u) => {
-              const isUserShared = book.collaborators?.some(
-                (c) =>
-                  typeof c.user === "string"
-                    ? c.user === u._id
-                    : c.user._id === u._id
-              );
-
-              return (
-                <div key={u._id} className="user-row">
-                  <span>{u.username}</span>
-
-                  <button
-                    className={`share-toggle-btn ${
-                      isUserShared ? "unshare" : "share"
-                    }`}
-                    onClick={() =>
-                      isUserShared
-                        ? unshareBook(u._id)
-                        : shareBook(u._id)
-                    }
-                  >
-                    {isUserShared
-                      ? "Unshare"
-                      : "Share"}
-                  </button>
-                </div>
-              );
-            })}
-
-            <button
-              className="modal-close-btn"
-              onClick={closeShareModal}
-            >
-              Close
-            </button>
-=======
         <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
           <div className="share-modal" onClick={(e) => e.stopPropagation()}>
             <h3 className="share-modal-title">Share Book</h3>
@@ -489,7 +319,6 @@ export default function RecipeBookDetailsPage() {
                 setShareError("");
               }}>Cancel</button>
             </div>
->>>>>>> 147cbee595acd38aaa7a7d50fd85dd2d12e4b5f8
           </div>
         </div>
       )}
