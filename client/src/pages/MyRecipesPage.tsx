@@ -83,6 +83,12 @@ export default function MyRecipesPage() {
   if (recipes.length === 0 && sharedRecipes.length === 0)
   return (
     <div className="myrecipes-page">
+      <button
+          className="icon-btn-mr"
+          onClick={() => navigate(-1)}
+        >
+          ‹
+        </button>
       <h1 className="myrecipes-page-title">My Recipes</h1>
       <p className="myrecipes-recipes-count">0 Recipes</p>
 
@@ -106,6 +112,12 @@ export default function MyRecipesPage() {
 
   return (
     <div className="myrecipes-page">
+      <button
+          className="icon-btn-mr"
+          onClick={() => navigate(-1)}
+        >
+          ‹
+        </button>
       <h1 className="myrecipes-page-title">My Recipes</h1>
       <p className="myrecipes-recipes-count">{recipes.length} Recipes</p>
 
