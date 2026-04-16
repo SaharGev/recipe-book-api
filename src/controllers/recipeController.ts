@@ -81,13 +81,18 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const recipeId = req.params.id;
-    const recipe = await Recipe.findById(recipeId).populate("collaborators.user", "username profileImageUrl");
+    const recipe = await Recipe.findById(recipeId)
+      .populate("collaborators.user", "username profileImageUrl")
+      .populate("owner", "username profileImageUrl");
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
     const isOwner = recipe.owner.toString() === userId.toString();
     const isCollaborator = recipe.collaborators.some(
-      (c: any) => c.user.toString() === userId.toString()
+      (c: any) => {
+        const collabId = typeof c.user === "object" ? c.user._id.toString() : c.user.toString();
+        return collabId === userId.toString();
+      }
     );
     if (!recipe.isPublic && !isOwner && !isCollaborator) {
       return res.status(403).json({ message: "Forbidden" });

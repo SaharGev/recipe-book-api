@@ -13,6 +13,7 @@ export default function RecipeDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const accessToken = token || localStorage.getItem("accessToken");
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -35,6 +36,16 @@ export default function RecipeDetailsPage() {
       }
     };
     fetchFriends();
+
+    const fetchCurrentUser = async () => {
+      try {
+        if (!token) return;
+        const res = await apiFetch("http://localhost:3000/users/me", {}, token);
+        const data = await res.json();
+        if (res.ok) setCurrentUserId(data._id);
+      } catch {}
+    };
+    fetchCurrentUser();
   }, [token]);
 
   useEffect(() => {
@@ -203,11 +214,27 @@ export default function RecipeDetailsPage() {
           )}
 
           {/* SHARED WITH */}
-          {recipe.collaborators && recipe.collaborators.length > 0 && (
+          {(recipe.owner || (recipe.collaborators && recipe.collaborators.length > 0)) && (
             <>
               <h3>Shared with</h3>
               <div className="shared-with-list">
-                {recipe.collaborators.map((c: any) => (
+                {recipe.owner && typeof recipe.owner === "object" && recipe.owner._id !== currentUserId && (
+                  <div className="shared-with-item">
+                    <div className="share-friend-avatar">
+                      {recipe.owner.profileImageUrl ? (
+                        <img src={getImageUrl(recipe.owner.profileImageUrl)} alt={recipe.owner.username} />
+                      ) : (
+                        <div className="share-friend-avatar-placeholder" />
+                      )}
+                    </div>
+                    <p className="shared-with-username">{recipe.owner.username}</p>
+                    <span className="shared-with-badge">Owner</span>
+                  </div>
+                )}
+                {recipe.collaborators && recipe.collaborators.filter((c: any) => {
+                  const uid = typeof c.user === "object" ? c.user._id : c.user;
+                  return uid !== currentUserId;
+                }).map((c: any) => (
                   <div key={c.user._id || c.user} className="shared-with-item">
                     <div className="share-friend-avatar">
                       {c.user.profileImageUrl ? (
@@ -272,6 +299,12 @@ export default function RecipeDetailsPage() {
                         )}
                       </div>
                       <p className="share-friend-username">{friend.username}</p>
+                      <input
+                        type="checkbox"
+                        className="share-friend-checkbox"
+                        checked={isSelected}
+                        onChange={() => {}}
+                      />
                     </div>
                   );
                 })}
