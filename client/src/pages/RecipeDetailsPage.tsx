@@ -7,6 +7,8 @@ import type { Recipe } from "../types/recipe";
 import { getFriends } from "../services/userService";
 import { apiFetch } from "../services/apiClient";
 import { getImageUrl } from "../utils/getImageUrl";
+import { BsShare } from "react-icons/bs";
+import ShareModal from "../components/ShareModal";
 
 
 export default function RecipeDetailsPage() {
@@ -148,13 +150,13 @@ export default function RecipeDetailsPage() {
           </button>
 
           <button
-            className="icon-btn share-btn"
+            className="icon-btn-rd share-btn-rd"
               onClick={() => {
                 setSelectedFriendIds([...sharedUserIds]);
                 setShowShareModal(true);
               }}
           >
-            ↗
+            <BsShare />
           </button>
 
         </div>
@@ -244,91 +246,29 @@ export default function RecipeDetailsPage() {
         </div>
       </div>
       {showShareModal && (
-        <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
-          <div className="share-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="share-modal-title">Share Recipe</h3>
-            <p className="share-modal-subtitle">Search by name, email or phone</p>
-            {friends.length === 0 ? (
-              <p className="share-modal-subtitle">No friends yet. Add friends first!</p>
-            ) : (
-              <>
-              <input
-                className="share-modal-input"
-                type="text"
-                placeholder="Search friends..."
-                value={friendSearch}
-                onChange={(e) => setFriendSearch(e.target.value)}
-              />
-              <div className="share-friends-list">
-                {friends.filter(f =>
-                  f.username.toLowerCase().includes(friendSearch.toLowerCase())
-                ).map((friend) => {
-                  const isSelected = selectedFriendIds.includes(friend._id);
-                  return (
-                    <div
-                      key={friend._id}
-                      className={`share-friend-item ${isSelected ? "selected" : ""}`}
-                      onClick={() => {
-                        setSelectedFriendIds(prev =>
-                          isSelected
-                            ? prev.filter(id => id !== friend._id)
-                            : [...prev, friend._id]
-                        );
-                        setShareError("");
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        className="share-friend-checkbox"
-                        checked={isSelected}
-                        onChange={() => {}}
-                      />
-                      <div className="share-friend-avatar">
-                        {friend.profileImageUrl ? (
-                          <img src={getImageUrl(friend.profileImageUrl)} alt={friend.username} />
-                        ) : (
-                          <div className="share-friend-avatar-placeholder" />
-                        )}
-                      </div>
-                      <p className="share-friend-username">{friend.username}</p>
-                      <input
-                        type="checkbox"
-                        className="share-friend-checkbox"
-                        checked={isSelected}
-                        onChange={() => {}}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-              </>
-            )}
-            {shareError && <p className="share-modal-error">{shareError}</p>}
-            {shareMessage && <p className="share-modal-success">{shareMessage}</p>}
-            <div className="share-modal-actions">
-              <button
-                type="button"
-                className="share-modal-btn"
-                onClick={handleShare}
-                disabled={selectedFriendIds.length === 0}
-              >
-                Done
-              </button>
-              <button
-                type="button"
-                className="share-modal-cancel"
-                onClick={() => {
-                  setShowShareModal(false);
-                  setSelectedFriendIds([]);
-                  setShareError("");
-                  setShareMessage("");
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <ShareModal
+          title="Share Recipe"
+          friends={friends}
+          selectedFriendIds={selectedFriendIds}
+          friendSearch={friendSearch}
+          onSearchChange={setFriendSearch}
+          onToggleFriend={(friendId) => {
+            setSelectedFriendIds(prev =>
+              prev.includes(friendId)
+                ? prev.filter(id => id !== friendId)
+                : [...prev, friendId]
+            );
+            setShareError("");
+          }}
+          onDone={handleShare}
+          onCancel={() => {
+            setShowShareModal(false);
+            setSelectedFriendIds([]);
+            setShareError("");
+            setShareMessage("");
+          }}
+          error={shareError}
+        />
       )}
 
     </div>

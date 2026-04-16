@@ -82,8 +82,7 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
     }
     const recipeId = req.params.id;
     const recipe = await Recipe.findById(recipeId)
-      .populate("collaborators.user", "username profileImageUrl")
-      .populate("owner", "username profileImageUrl");
+      .populate("collaborators.user", "username profileImageUrl");
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
