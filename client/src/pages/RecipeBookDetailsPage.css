@@ -29,7 +29,7 @@
   background: linear-gradient(135deg, #f1f0f7, #e6e4f2);
 }
 
-.icon-btn {
+.icon-btn-rbd {
   position: absolute;
   top: 16px;
   width: 38px;
@@ -42,9 +42,15 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.close-btn { left: 16px; }
-.edit-btn { right: 16px; }
-.share-btn { right: 64px; }
+.icon-btn-rbd:hover {
+  transform: scale(1.1); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background-color: #f0f0f5; 
+}
+
+.close-btn-rbd { left: 16px; }
+.edit-btn-rbd { right: 16px; }
+.share-btn-rbd { right: 64px; }
 
 .book-content {
   padding: 20px 16px 120px; 
@@ -72,7 +78,7 @@
   gap: 12px 8px;
 }
 
-.share-btn svg { 
+.share-btn-rbd svg { 
     transform: translate(-2px, 2px); 
 }
 

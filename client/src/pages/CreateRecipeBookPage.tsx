@@ -3,6 +3,8 @@ import { useState, useContext, useEffect } from "react";
 import BottomNav from "../components/BottomNav";
 import "./CreateRecipeBookPage.css";
 import { AuthContext } from "../components/AuthContext";
+import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface RecipeBook {
   _id: string;
@@ -33,8 +35,18 @@ export default function CreateRecipeBookPage() {
   const [loadingBooks, setLoadingBooks] = useState(true);
   const [loadingRecipes, setLoadingRecipes] = useState(true);
   
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!token) return;
+      if (!token) return;
+
+      const bookIdFromUrl = searchParams.get("bookId");
+
+      if (bookIdFromUrl) {
+        setAddOpen(true);              
+        setSelectedBookId(bookIdFromUrl); 
+      }
 
     const fetchBooks = async () => {
       try {
@@ -145,7 +157,13 @@ export default function CreateRecipeBookPage() {
   return (
     <div className="create-book-page">
       <div className="page-container">
-        <h1 className="page-title">Recipe Books</h1>
+          <button
+            className="icon-btn-crb close-btn-crb"
+            onClick={() => navigate(-1)}
+          >
+            ‹
+          </button>
+        <h1 className="page-title">Create Recipe Book</h1>
 
         <div className="accordion-container">
           {/* CREATE BOOK */}

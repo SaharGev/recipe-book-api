@@ -9,8 +9,9 @@ import { getImageUrl } from "../utils/getImageUrl";
 type Recipe = {
   _id: string;
   title: string;
-  cookTime?: number;
-  difficulty?: string;
+  description: string;
+  cookTime: number;
+  difficulty: string;
   instructions?: string;
   imageUrl?: string;
 };
@@ -83,6 +84,12 @@ export default function MyRecipesPage() {
   if (recipes.length === 0 && sharedRecipes.length === 0)
   return (
     <div className="myrecipes-page">
+      <button
+          className="icon-btn-mr"
+          onClick={() => navigate(-1)}
+        >
+          ‹
+        </button>
       <h1 className="myrecipes-page-title">My Recipes</h1>
       <p className="myrecipes-recipes-count">0 Recipes</p>
 
@@ -106,6 +113,12 @@ export default function MyRecipesPage() {
 
   return (
     <div className="myrecipes-page">
+      <button
+          className="icon-btn-mr"
+          onClick={() => navigate(-1)}
+        >
+          ‹
+        </button>
       <h1 className="myrecipes-page-title">My Recipes</h1>
       <p className="myrecipes-recipes-count">{recipes.length} Recipes</p>
 
@@ -170,11 +183,9 @@ export default function MyRecipesPage() {
 
               <h3 className="myrecipes-card-title">{recipe.title}</h3>
 
-              {recipe.instructions && (
+              {recipe.description && (
                 <p className="myrecipes-card-description">
-                  {recipe.instructions.length > 80
-                    ? recipe.instructions.slice(0, 80) + "..."
-                    : recipe.instructions}
+                  {recipe.description}
                 </p>
               )}
 

@@ -9,8 +9,15 @@ export default function AddPage() {
   return (
     <div className="add-options-page">
        <div className="add-page-container">
-        <h1 className="page-title">Add Recipe</h1>
-
+         <div className="add-header">
+          <button
+                className="icon-btn-add"
+                onClick={() => navigate(-1)}
+              >
+                ‹
+            </button>
+          <h1 className="page-title">Add Recipe or Book</h1>
+         </div>
         <div className="options-container">
 
           <div

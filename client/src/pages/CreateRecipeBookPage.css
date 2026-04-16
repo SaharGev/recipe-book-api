@@ -4,13 +4,16 @@
   background-color: #f4f4f8;
   min-height: 100vh;
   padding: 16px;
-  padding-bottom: 120px;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-bottom: 90px;
   text-align: center;
 }
 
 .page-title {
   color: #89abf6;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 700;
   margin-bottom: 24px;
   font-family: Arial, sans-serif;
@@ -21,6 +24,7 @@
   flex-direction: column;
   gap: 16px;
   align-items: center;
+  flex-grow: 0;
 }
 
 .accordion-card {
@@ -60,6 +64,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding-bottom: 10px;
 }
 
 .accordion-content input,
@@ -114,13 +119,6 @@
   font-family: Arial, sans-serif;
 }
 
-.create-book-page {
-  background-color: #f4f4f8; 
-  min-height: 100vh;
-  padding-bottom: 120px;
-  display: flex;
-  justify-content: center; 
-}
 
 .create-book-page {
   background-color: #f4f4f8; 
@@ -132,9 +130,45 @@
 
 .page-container {
   width: 100%;
-  max-width: 390px; 
+  min-height: 85vh;
+  max-width: 370px; 
   background-color: white;
   border-radius: 24px;
   padding: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.icon-btn-crb {
+  position: absolute;
+  top: 24px;
+  left: 12px;
+
+  width: 38px;
+  height: 38px;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: white;
+  font-size: 18px;
+
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+  transition: 0.2s;
+
+}
+
+.icon-btn-crb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background-color: #f0f0f5;
+}
+
+.icon-btn-crb:active {
+  transform: scale(0.95);
+}
+
+.page-container {
+  position: relative;  
 }

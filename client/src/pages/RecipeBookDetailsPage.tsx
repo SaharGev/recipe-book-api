@@ -1,3 +1,5 @@
+// client/src/pages/RecipeBookDetailsPage.tsx
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
@@ -11,10 +13,11 @@ import { BsShare } from "react-icons/bs";
 type Recipe = {
   _id: string;
   title: string;
+  description: string;
   instructions?: string;
   imageUrl?: string;
-  cookTime?: number;
-  difficulty?: string;
+  cookTime: number;
+  difficulty: string;
 };
 
 type Collaborator = {
@@ -29,12 +32,13 @@ type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
   collaborators: Collaborator[];
 };
 
-
 export default function RecipeBookDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [book, setBook] = useState<RecipeBookWithPopulated | null>(null);
+  const [book, setBook] =
+    useState<RecipeBookWithPopulated | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -44,6 +48,8 @@ export default function RecipeBookDetailsPage() {
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareError, setShareError] = useState("");
 
+  const [friends, setFriends] = useState<User[]>([]);
+
   const previewImages =
     ((book?.recipes as Recipe[]) || [])
       .slice(-4)
@@ -51,29 +57,45 @@ export default function RecipeBookDetailsPage() {
       .map((r) => r.imageUrl)
       .filter(Boolean);
 
-    const fetchBook = async () => {
+  const fetchBook = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("accessToken");
+
+      if (!token || !id) {
+        setError("Missing token or book id");
+        return;
+      }
+
+      const data = await getRecipeBookById(id, token);
+      setBook(data);
+    } catch {
+      setError("Failed to load recipe book");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBook();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
       try {
-        setLoading(true);
-
         const token = localStorage.getItem("accessToken");
-        if (!token || !id) {
-          setError("Missing token or book id");
-          return;
-        }
+        if (!token) return;
 
-        const data = await getRecipeBookById(id, token);
-        setBook(data);
-
-      } catch {
-        setError("Failed to load recipe book");
-      } finally {
-        setLoading(false);
+        const data = await getFriends(token);
+        setFriends(data);
+      } catch (err) {
+        console.error(err);
       }
     };
 
-useEffect(() => {
-  fetchBook();
-}, [id]);
+    fetchFriends();
+  }, []);
 
 useEffect(() => {
   const fetchFriends = async () => {
@@ -136,7 +158,6 @@ useEffect(() => {
 
   return (
     <div className="book-details-page">
-
       <div className="book-hero">
         <div className="image-wrapper">
           <div className="book-cover">
@@ -144,22 +165,32 @@ useEffect(() => {
               previewImages[index] ? (
                 <img
                   key={index}
-                  src={getImageUrl(previewImages[index] as string)}
+                  src={getImageUrl(
+                    previewImages[index] as string
+                  )}
                   className="book-cover-img"
                 />
               ) : (
-                <div key={index} className="book-cover-placeholder" />
+                <div
+                  key={index}
+                  className="book-cover-placeholder"
+                />
               )
             )}
           </div>
 
-          <button className="icon-btn close-btn" onClick={() => navigate(-1)}>
-            ✕
+          <button
+            className="icon-btn-rbd close-btn-rbd"
+            onClick={() => navigate(-1)}
+          >
+            ‹
           </button>
 
           <button
-            className="icon-btn edit-btn"
-            onClick={() => navigate(`/edit-book/${book._id}`)}
+            className="icon-btn-rbd edit-btn-rbd"
+            onClick={() =>
+              navigate(`/edit-book/${book._id}`)
+            }
           >
             ✎
           </button>
@@ -215,7 +246,9 @@ useEffect(() => {
             <div
               key={recipe._id}
               className="myrecipes-card"
-              onClick={() => navigate(`/recipes/${recipe._id}`)}
+              onClick={() =>
+                navigate(`/recipes/${recipe._id}`)
+              }
             >
               <div className="myrecipes-card-preview">
                 {recipe.imageUrl ? (
@@ -228,11 +261,23 @@ useEffect(() => {
                 )}
               </div>
 
-              <h3 className="myrecipes-card-title">{recipe.title}</h3>
+              <h3 className="myrecipes-card-title">
+                {recipe.title}
+              </h3>
+
+              {recipe.description && (
+                <p className="myrecipes-card-description">
+                  {recipe.description}
+                </p>
+              )}
 
               <div className="myrecipes-card-meta">
-                {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
-                {recipe.difficulty && <span>• {recipe.difficulty}</span>}
+                {recipe.cookTime && (
+                  <span>⏱ {recipe.cookTime} min</span>
+                )}
+                {recipe.difficulty && (
+                  <span>• {recipe.difficulty}</span>
+                )}
               </div>
             </div>
           ))}
