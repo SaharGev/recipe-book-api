@@ -12,6 +12,7 @@ import "./RecipeBookDetailsPage.css";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import CommentsSection from "../components/CommentsSection";
+import RecipeCard from "../components/RecipeCard";
 
 
 type Recipe = {
@@ -53,6 +54,7 @@ const { token } = useContext(AuthContext);
   const [friendSearch, setFriendSearch] = useState("");
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareError, setShareError] = useState("");
+  const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
 
   const fetchBook = async () => {
     try {
@@ -80,6 +82,24 @@ const { token } = useContext(AuthContext);
   useEffect(() => {
     fetchBook();
   }, [id]);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const accessToken = token || localStorage.getItem("accessToken");
+        if (!accessToken) return;
+        const res = await fetch("http://localhost:3000/likes", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        const ids = data
+          .filter((l: { targetType: string; targetId: string }) => l.targetType === "recipe")
+          .map((l: { targetId: string }) => l.targetId.toString());
+        setLikedRecipeIds(ids);
+      } catch {}
+    };
+    fetchLikes();
+  }, [token]);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -219,43 +239,11 @@ const { token } = useContext(AuthContext);
         <h3 className="book-section-title">Recipes:</h3>
         <div className="book-recipes-grid">
           {(book.recipes as Recipe[])?.map((recipe) => (
-            <div
+            <RecipeCard
               key={recipe._id}
-              className="myrecipes-card"
-              onClick={() =>
-                navigate(`/recipes/${recipe._id}`)
-              }
-            >
-              <div className="myrecipes-card-preview">
-                {recipe.imageUrl ? (
-                  <img
-                    src={getImageUrl(recipe.imageUrl)}
-                    className="myrecipes-card-image"
-                  />
-                ) : (
-                  <div className="myrecipes-card-image-placeholder" />
-                )}
-              </div>
-
-              <h3 className="myrecipes-card-title">
-                {recipe.title}
-              </h3>
-
-              {recipe.description && (
-                <p className="myrecipes-card-description">
-                  {recipe.description}
-                </p>
-              )}
-
-              <div className="myrecipes-card-meta">
-                {recipe.cookTime && (
-                  <span>⏱ {recipe.cookTime} min</span>
-                )}
-                {recipe.difficulty && (
-                  <span>• {recipe.difficulty}</span>
-                )}
-              </div>
-            </div>
+              recipe={recipe as any}
+              initialLiked={likedRecipeIds.includes(recipe._id)}
+            />
           ))}
         </div>
       </div>
