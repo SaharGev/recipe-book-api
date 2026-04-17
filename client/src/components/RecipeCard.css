@@ -47,25 +47,69 @@
 }
 
 .recipe-like-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
-
   border: none;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-
   width: 24px;
   height: 24px;
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 0;
   font-size: 12px;
   line-height: 1;
   cursor: pointer;
+}
+
+.recipe-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.recipe-card-comments {
+  font-size: 12px;
+  color: #8a8a8a;
+}
+
+.recipe-card-description {
+  font-size: 12px;
+  color: #8a8a8a;
+  margin: 2px 0 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipe-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #8a8a8a;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.recipe-like-comment-row {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+}
+
+.recipe-card-comments {
+  font-size: 11px;
+  color: #1f2d3d;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-weight: 600;
 }

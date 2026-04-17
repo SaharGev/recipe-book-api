@@ -30,3 +30,14 @@ export async function deleteComment(commentId: string, token: string) {
   if (!res.ok) throw new Error(data.message || "Failed to delete comment");
   return data;
 }
+
+export async function getCommentCount(targetType: string, targetId: string): Promise<number> {
+  try {
+    const res = await fetch(`${BASE_URL}?targetType=${targetType}&targetId=${targetId}`);
+    const data = await res.json();
+    if (!res.ok) return 0;
+    return data.length;
+  } catch {
+    return 0;
+  }
+}

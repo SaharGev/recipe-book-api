@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../utils/getImageUrl";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
+import { getCommentCount } from "../services/commentService";
 
 type RecipePreview = {
   imageUrl?: string;
@@ -21,10 +22,15 @@ export default function RecipeBookCard({ _id, title, recipesCount, recipes = [],
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const [liked, setLiked] = useState(initialLiked);
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     setLiked(initialLiked);
   }, [initialLiked]);
+
+  useEffect(() => {
+    getCommentCount("book", _id).then(setCommentCount);
+  }, [_id]);
 
   const handleLikeClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -60,13 +66,16 @@ export default function RecipeBookCard({ _id, title, recipesCount, recipes = [],
     <div className="recipe-book-card" onClick={() => navigate(`/recipe-books/${_id}`)}>
 
       <div className="recipe-preview" style={{ position: "relative" }}>
-        <button
-          type="button"
-          className="recipe-book-like-btn"
-          onClick={handleLikeClick}
-        >
-          {liked ? "❤️" : "♡"}
-        </button>
+        <div className="recipe-book-like-comment-row">
+          {commentCount > 0 && <span className="recipe-card-comments">💬 {commentCount}</span>}
+          <button
+            type="button"
+            className="recipe-book-like-btn"
+            onClick={handleLikeClick}
+          >
+            {liked ? "❤️" : "♡"}
+          </button>
+        </div>
         {[0, 1, 2, 3].map((index) =>
           previewImages[index] ? (
             <img

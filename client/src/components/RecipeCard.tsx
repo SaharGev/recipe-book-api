@@ -6,21 +6,28 @@ import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import { useEffect, useState } from "react";
 import { getImageUrl } from "../utils/getImageUrl";
+import { getCommentCount } from "../services/commentService";
 
 
 type RecipeCardProps = {
   recipe: Recipe;
   initialLiked?: boolean;
+  showDescription?: boolean;
 };
 
-export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardProps) {
+export default function RecipeCard({ recipe, initialLiked = false, showDescription = true }: RecipeCardProps) {
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
     const [liked, setLiked] = useState(initialLiked);
+    const [commentCount, setCommentCount] = useState(0);
 
     useEffect(() => {
       setLiked(initialLiked);
     }, [initialLiked]);
+
+    useEffect(() => {
+      getCommentCount("recipe", recipe._id).then(setCommentCount);
+    }, [recipe._id]);
 
     const imageSrc = getImageUrl(recipe.imageUrl);
 
@@ -44,13 +51,16 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
           onClick={() => navigate(`/recipes/${recipe._id}`)}
         >
             <div className="recipe-card-preview">
-                <button
-                    type="button"
-                    className="recipe-like-btn"
-                    onClick={handleLikeClick}
-                >
-                    {liked ? "❤️" : "♡"}
-                </button>
+                <div className="recipe-like-comment-row">
+                  {commentCount > 0 && <span className="recipe-card-comments">💬 {commentCount}</span>}
+                  <button
+                      type="button"
+                      className="recipe-like-btn"
+                      onClick={handleLikeClick}
+                  >
+                      {liked ? "❤️" : "♡"}
+                  </button>
+                </div>
               {recipe.imageUrl ? (
                 <img
                     src={imageSrc}
@@ -62,9 +72,15 @@ export default function RecipeCard({ recipe, initialLiked = false }: RecipeCardP
                 )}
             </div>
 
-            <div className="recipe-card-content">
+           <div className="recipe-card-content">
                 <h3>{recipe.title}</h3>
-                {recipe.cookTime && <span className="recipe-card-time">{recipe.cookTime} min</span>}
+                {showDescription && recipe.description && (
+                  <p className="recipe-card-description">{recipe.description}</p>
+                )}
+                <div className="recipe-card-meta">
+                  {recipe.cookTime && <span className="recipe-card-time">⏱ {recipe.cookTime} min</span>}
+                  {recipe.difficulty && <span className="recipe-card-time">• {recipe.difficulty}</span>}
+                </div>
             </div>
         </div>
     );

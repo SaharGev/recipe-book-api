@@ -3,19 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
-import { getMyLikes, toggleLike } from "../services/recipeService";
-import { getImageUrl } from "../utils/getImageUrl";
+import { getMyLikes } from "../services/recipeService";
 import PageHeader from "../components/PageHeader";
-
-type Recipe = {
-  _id: string;
-  title: string;
-  description: string;
-  cookTime: number;
-  difficulty: string;
-  instructions?: string;
-  imageUrl?: string;
-};
+import RecipeCard from "../components/RecipeCard";
+import type { Recipe } from "../types/recipe";
 
 type LikeItem = {
   targetType: string;
@@ -125,66 +116,13 @@ export default function MyRecipesPage() {
       )}
 
       <div className="myrecipes-grid">
-        {[...recipes, ...sharedRecipes].map((recipe) => {
-          const isLiked = likedIds.includes(recipe._id);
-
-          return (
-            <div
-              key={recipe._id}
-              className="myrecipes-card"
-              onClick={() => navigate(`/recipes/${recipe._id}`)}
-            >
-              <div className="myrecipes-card-preview">
-              {recipe.imageUrl ? (
-                <img
-                  src={getImageUrl(recipe.imageUrl)}
-                  alt={recipe.title}
-                  className="myrecipes-card-image"
-                />
-              ) : (
-                <div className="myrecipes-card-image-placeholder" />
-              )}
-
-              <button
-                type="button"
-                className="myrecipes-like-btn"
-                onClick={async (e) => {
-                  e.stopPropagation();
-
-                  if (!token) return;
-
-                  try {
-                    const data = await toggleLike(recipe._id, token);
-
-                    setLikedIds((prev) =>
-                      data.action === "liked"
-                        ? [...prev, recipe._id]
-                        : prev.filter((id) => id !== recipe._id)
-                    );
-                  } catch (error) {
-                    console.error("failed to toggle like", error);
-                  }
-                }}
-              >
-                {isLiked ? "❤️" : "♡"}
-              </button>
-            </div>
-
-              <h3 className="myrecipes-card-title">{recipe.title}</h3>
-
-              {recipe.description && (
-                <p className="myrecipes-card-description">
-                  {recipe.description}
-                </p>
-              )}
-
-              <div className="myrecipes-card-meta">
-                {recipe.cookTime && <span>⏱ {recipe.cookTime} min</span>}
-                {recipe.difficulty && <span>• {recipe.difficulty}</span>}
-              </div>
-            </div>
-          );
-        })}
+        {[...recipes, ...sharedRecipes].map((recipe) => (
+          <RecipeCard
+            key={recipe._id}
+            recipe={recipe}
+            initialLiked={likedIds.includes(recipe._id)}
+          />
+        ))}
       </div>
 
       <BottomNav />
