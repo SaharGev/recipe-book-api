@@ -31,7 +31,8 @@
 
 .icon-btn-rbd {
   position: absolute;
-  top: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 38px;
   height: 38px;
   border: none;
@@ -43,7 +44,7 @@
 }
 
 .icon-btn-rbd:hover {
-  transform: scale(1.1); 
+  transform: translateY(-50%) scale(1.1); 
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   background-color: #f0f0f5; 
 }
@@ -54,9 +55,8 @@
 
 .book-content {
   padding: 20px 16px 120px; 
-  text-align: center;       
+  text-align: left;       
 }
-
 .book-title {
   font-size: 26px;
   font-weight: 700;
@@ -344,4 +344,13 @@
   font-weight: 500;
   color: #1f2d3d;
   margin: 0;
+}
+
+.book-header-bar {
+  position: relative;
+  height: 70px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

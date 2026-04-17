@@ -9,6 +9,8 @@ import { apiFetch } from "../services/apiClient";
 import { getImageUrl } from "../utils/getImageUrl";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
+import BottomNav from "../components/BottomNav";
+
 
 
 export default function RecipeDetailsPage() {
@@ -128,7 +130,7 @@ export default function RecipeDetailsPage() {
           <div className="recipe-image-placeholder">
             {recipe.imageUrl ? (
               <img
-                src={recipe.imageUrl}
+                src={getImageUrl(recipe.imageUrl)}
                 alt={recipe.title}
                 className="recipe-main-image"
               />
@@ -138,7 +140,7 @@ export default function RecipeDetailsPage() {
           </div>
 
           {/* TOP BUTTONS */}
-          <button className="icon-btn-rd close-btn-rd" onClick={() => navigate("/my-recipes")}>
+          <button className="icon-btn-rd close-btn-rd" onClick={() => navigate(-1)}>
             ‹
           </button>
 
@@ -271,6 +273,7 @@ export default function RecipeDetailsPage() {
         />
       )}
 
+    <BottomNav />
     </div>
   );
 }

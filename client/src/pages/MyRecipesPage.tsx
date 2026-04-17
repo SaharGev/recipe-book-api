@@ -5,6 +5,7 @@ import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
 import { getMyLikes, toggleLike } from "../services/recipeService";
 import { getImageUrl } from "../utils/getImageUrl";
+import PageHeader from "../components/PageHeader";
 
 type Recipe = {
   _id: string;
@@ -84,13 +85,7 @@ export default function MyRecipesPage() {
   if (recipes.length === 0 && sharedRecipes.length === 0)
   return (
     <div className="myrecipes-page">
-      <button
-          className="icon-btn-mr"
-          onClick={() => navigate(-1)}
-        >
-          ‹
-        </button>
-      <h1 className="myrecipes-page-title">My Recipes</h1>
+      <PageHeader title="My Recipes" />
       <p className="myrecipes-recipes-count">0 Recipes</p>
 
       <div className="myrecipes-add-button-wrapper">
@@ -113,13 +108,7 @@ export default function MyRecipesPage() {
 
   return (
     <div className="myrecipes-page">
-      <button
-          className="icon-btn-mr"
-          onClick={() => navigate(-1)}
-        >
-          ‹
-        </button>
-      <h1 className="myrecipes-page-title">My Recipes</h1>
+      <PageHeader title="My Recipes" />
       <p className="myrecipes-recipes-count">{recipes.length} Recipes</p>
 
       <div className="myrecipes-add-button-wrapper">

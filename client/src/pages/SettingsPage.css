@@ -1,7 +1,7 @@
 .settings-page {
   max-width: 390px;
   margin: 0 auto;
-  padding: 40px 16px 120px;
+  padding: 8px 16px 120px;
   box-sizing: border-box;
   background-color: #ffffff;
   min-height: 100vh;
@@ -29,6 +29,7 @@
 
 .settings-section {
   margin-bottom: 32px;
+  margin-top: 16px;
 }
 
 .settings-section-title {

@@ -7,6 +7,7 @@ import RecipeBookCard from "../components/RecipeBookCard";
 import BottomNav from "../components/BottomNav";
 import type { RecipeBook } from "../types/recipeBook";
 import "./MyRecipeBooksPage.css";
+import PageHeader from "../components/PageHeader";
 
 export default function FavoriteBooksPage() {
   const { token } = useContext(AuthContext);
@@ -55,9 +56,8 @@ export default function FavoriteBooksPage() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="home-page">
-      <button type="button" className="back-btn" onClick={() => navigate(-1)}>← Back</button>
-      <h3 className="section-title mybooks-title">Favorite Books</h3>
+    <div className="mybooks-page">
+      <PageHeader title="Favorite Books" />
 
       {favoriteBooks.length === 0 ? (
         <p>No favorite books yet</p>

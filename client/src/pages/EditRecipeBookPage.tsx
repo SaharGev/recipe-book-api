@@ -5,6 +5,7 @@ import BottomNav from "../components/BottomNav";
 import { getRecipeBookById } from "../services/recipeBookService";
 import { getImageUrl } from "../utils/getImageUrl";
 import "./EditRecipeBookPage.css";
+import PageHeader from "../components/PageHeader";
 
 type Recipe = {
   _id: string;
@@ -103,14 +104,7 @@ export default function EditRecipeBookPage() {
   return (
     <div className="edit-page">
       <div className="edit-card">
-        <div className="edit-header">
-          <button className="icon-btn-rbe close-btn-rbe" onClick={() => navigate(-1)}>
-            ‹
-          </button>
-
-          <h1>Edit Recipe Book</h1>
-        </div>
-
+        <PageHeader title="Edit Recipe Book" />
         <div className="edit-book-form">
           <label>Book Name</label>
           <input
@@ -170,7 +164,7 @@ export default function EditRecipeBookPage() {
                   )}
                 </div>
 
-                <h3 className="recipe-title">{recipe.title}</h3>
+                <h3 className="erb-recipe-title">{recipe.title}</h3>
 
                 <p className="recipe-description">
                   {recipe.description}

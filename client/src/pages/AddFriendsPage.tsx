@@ -5,6 +5,8 @@ import { getImageUrl } from "../utils/getImageUrl";
 import BottomNav from "../components/BottomNav";
 import "./AddFriendsPage.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
+
 
 type UserResult = {
   _id: string;
@@ -77,7 +79,7 @@ export default function AddFriendsPage() {
 
   return (
     <div className="add-friends-page">
-      <h2 className="add-friends-title">Add Friends</h2>
+      <PageHeader title="Add Friends" />
       <p className="add-friends-subtitle">
         Find friends by username, email or phone
       </p>
