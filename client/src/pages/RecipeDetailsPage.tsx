@@ -10,6 +10,8 @@ import { getImageUrl } from "../utils/getImageUrl";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
+import CommentsSection from "../components/CommentsSection";
+
 
 
 
@@ -208,6 +210,12 @@ export default function RecipeDetailsPage() {
               <p className="instructions">{recipe.instructions}</p>
             </>
           )}
+
+          <CommentsSection
+            targetType="recipe"
+            targetId={id || ""}
+            currentUserId={currentUserId}
+          />
 
           {/* SHARED WITH */}
           {(recipe.owner || (recipe.collaborators && recipe.collaborators.length > 0)) && (
