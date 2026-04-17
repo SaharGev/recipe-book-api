@@ -1,21 +1,21 @@
 .edit-page {
-  background-color: #f4f4f8;
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding-bottom: 90px;
+  padding-bottom: 0;
 }
 
 .edit-card {
-  margin-top: 10px;
   width: 100%;
   max-width: 390px;
   background-color: #ffffff;
-  border-radius: 24px;
-  overflow-x: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 0;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 100px;
+  box-sizing: border-box;
 }
 
 .edit-header {
@@ -264,7 +264,7 @@
   display: block;
 }
 
-.recipe-title {
+.erb-recipe-title {
   margin: 6px;
   font-size: 16px;
   font-weight: 600;

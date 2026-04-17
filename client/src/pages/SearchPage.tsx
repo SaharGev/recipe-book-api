@@ -13,6 +13,7 @@ import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 import { getMyLikes, getRecipe } from "../services/recipeService";
 import { getRecipeBookById } from "../services/recipeBookService";
+import PageHeader from "../components/PageHeader";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -21,7 +22,6 @@ export default function SearchPage() {
   const [sections, setSections] = useState<AiSearchSection[]>([]);
   const [recentlyViewedRecipes, setRecentlyViewedRecipes] = useState<Recipe[]>([]);
   const [recentlyViewedBooks, setRecentlyViewedBooks] = useState<RecipeBook[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
   const { token } = useContext(AuthContext);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
@@ -175,15 +175,9 @@ export default function SearchPage() {
     fetchFavoriteBooks();
   }, [likedBookIds, token]);
 
-  const categories = [
-    "Main courses 🍲",
-    "Breakfasts 🍳",
-  ];
-
   return (
     <div className="search-page">
-      <h2 className="search-title">Search</h2>
-
+      <PageHeader title="Search" showBack={false}/>
       <div className="search-input-container">
         <span className="search-icon">🔍</span>
         <input
@@ -192,21 +186,6 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-      </div>
-
-      <div className="search-categories">
-        {categories.map((category) => (
-          <button
-            key={category}
-            type="button"
-            className={`category-chip ${
-              selectedCategory === category ? "active" : ""
-            }`}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
       </div>
 
       {query.trim().length < 2 && (

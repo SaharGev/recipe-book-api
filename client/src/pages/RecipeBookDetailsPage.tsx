@@ -1,6 +1,7 @@
 // client/src/pages/RecipeBookDetailsPage.tsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../components/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import { getRecipeBookById } from "../services/recipeBookService";
@@ -36,6 +37,7 @@ type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
 export default function RecipeBookDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   const [book, setBook] =
     useState<RecipeBookWithPopulated | null>(null);
@@ -49,27 +51,23 @@ export default function RecipeBookDetailsPage() {
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareError, setShareError] = useState("");
 
-  const previewImages =
-    ((book?.recipes as Recipe[]) || [])
-      .slice(-4)
-      .reverse()
-      .map((r) => r.imageUrl)
-      .filter(Boolean);
-
   const fetchBook = async () => {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem("accessToken");
 
-      if (!token || !id) {
+      if (!accessToken || !id) {
         setError("Missing token or book id");
         return;
       }
 
-      const data = await getRecipeBookById(id, token);
-      setBook(data);
-    } catch {
+      const data = await getRecipeBookById(id, accessToken);
+      if (data) setBook(data);
+    } catch (err: any) {
+      if (err?.message?.includes("401") || err?.message?.includes("Unauthorized")) {
+        return;
+      }
       setError("Failed to load recipe book");
     } finally {
       setLoading(false);
@@ -83,22 +81,22 @@ export default function RecipeBookDetailsPage() {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) return;
-        const data = await getFriends(token);
+        const accessToken = token || localStorage.getItem("accessToken");
+        if (!accessToken) return;
+        const data = await getFriends(accessToken);
         setFriends(data);
       } catch {
         setFriends([]);
       }
     };
     fetchFriends();
-  }, []);
+  }, [token]);
 
   const handleShare = async () => {
     try {
       setShareError("");
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
+      const accessToken = token || localStorage.getItem("accessToken");
+      if (!accessToken) return;
 
       const sharedUserIds = book?.collaborators?.map((c) =>
         typeof c.user === "string" ? c.user : c.user._id
@@ -112,7 +110,7 @@ export default function RecipeBookDetailsPage() {
         if (!friend) continue;
         await fetch(`http://localhost:3000/recipe-books/${book?._id}/share`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({ username: friend.username }),
         });
       }
@@ -122,7 +120,7 @@ export default function RecipeBookDetailsPage() {
         if (!friend) continue;
         await fetch(`http://localhost:3000/recipe-books/${book?._id}/unshare`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({ username: friend.username }),
         });
       }
@@ -142,26 +140,7 @@ export default function RecipeBookDetailsPage() {
   return (
     <div className="book-details-page">
       <div className="book-hero">
-        <div className="image-wrapper">
-          <div className="book-cover">
-            {[0, 1, 2, 3].map((index) =>
-              previewImages[index] ? (
-                <img
-                  key={index}
-                  src={getImageUrl(
-                    previewImages[index] as string
-                  )}
-                  className="book-cover-img"
-                />
-              ) : (
-                <div
-                  key={index}
-                  className="book-cover-placeholder"
-                />
-              )
-            )}
-          </div>
-
+        <div className="book-header-bar">
           <button
             className="icon-btn-rbd close-btn-rbd"
             onClick={() => navigate(-1)}
@@ -171,9 +150,7 @@ export default function RecipeBookDetailsPage() {
 
           <button
             className="icon-btn-rbd edit-btn-rbd"
-            onClick={() =>
-              navigate(`/edit-book/${book._id}`)
-            }
+            onClick={() => navigate(`/edit-book/${book._id}`)}
           >
             ✎
           </button>
@@ -200,10 +177,10 @@ export default function RecipeBookDetailsPage() {
           {(book.recipes as Recipe[])?.length || 0} Recipes
         </p>
 
-{book.collaborators && book.collaborators.length > 0 && (
+        {book.collaborators && book.collaborators.length > 0 && (
           <>
-            <h3 className="book-shared-title">Shared with</h3>
-            <div className="shared-with-list">
+            <h3 className="book-shared-title">Shared with:</h3>
+            <div className="shared-with-list shared-with-list--left">
               {book.collaborators.map((c) => {
                 const user = typeof c.user === "string" ? null : c.user;
                 if (!user) return null;
@@ -224,6 +201,7 @@ export default function RecipeBookDetailsPage() {
           </>
         )}
 
+        <h3 className="book-section-title">Recipes:</h3>
         <div className="book-recipes-grid">
           {(book.recipes as Recipe[])?.map((recipe) => (
             <div

@@ -5,6 +5,7 @@ import { getFriends, removeFriend } from "../services/userService";
 import { getImageUrl } from "../utils/getImageUrl";
 import BottomNav from "../components/BottomNav";
 import "./FriendsPage.css";
+import PageHeader from "../components/PageHeader";
 
 type Friend = {
   _id: string;
@@ -46,11 +47,7 @@ export default function FriendsPage() {
 
   return (
     <div className="friends-page">
-      <div className="friends-header">
-        <button type="button" className="back-btn" onClick={() => navigate(-1)}>‹</button>
-        <h2 className="friends-title">Friends</h2>
-      </div>
-
+      <PageHeader title="Friends" />
       <button
         type="button"
         className="friends-add-btn"

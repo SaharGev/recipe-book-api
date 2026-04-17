@@ -5,6 +5,8 @@ import "./CreateRecipeBookPage.css";
 import { AuthContext } from "../components/AuthContext";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
+
 
 interface RecipeBook {
   _id: string;
@@ -39,7 +41,8 @@ export default function CreateRecipeBookPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-      if (!token) return;
+      const accessToken = token || localStorage.getItem("accessToken");
+      if (!accessToken) return;
 
       const bookIdFromUrl = searchParams.get("bookId");
 
@@ -156,14 +159,7 @@ export default function CreateRecipeBookPage() {
 
   return (
     <div className="create-book-page">
-      <div className="page-container">
-          <button
-            className="icon-btn-crb close-btn-crb"
-            onClick={() => navigate(-1)}
-          >
-            ‹
-          </button>
-        <h1 className="page-title">Create Recipe Book</h1>
+      <PageHeader title="Create Recipe Book" />
 
         <div className="accordion-container">
           {/* CREATE BOOK */}
@@ -260,7 +256,6 @@ export default function CreateRecipeBookPage() {
             )}
           </div>
         </div>
-       </div>
      <BottomNav />
     </div>
   );

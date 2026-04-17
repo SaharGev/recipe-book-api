@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 import { signInWithGoogle } from "../services/firebaseService";
 
+
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");

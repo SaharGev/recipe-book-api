@@ -6,6 +6,7 @@ import { getCurrentUser, uploadProfileImage, updateProfileImage, updateCurrentUs
 import { getImageUrl } from "../utils/getImageUrl";
 import "./SettingsPage.css";
 import { logout } from "../services/authService";
+import PageHeader from "../components/PageHeader";
 
 export default function SettingsPage() {
   const { token, refreshToken, setToken, setRefreshToken } = useContext(AuthContext);
@@ -39,11 +40,7 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      <div className="settings-header">
-        <button type="button" className="back-btn" onClick={() => navigate(-1)}>‹</button>
-        <h2 className="settings-title">Settings</h2>
-      </div>
-
+      <PageHeader title="Settings" />
       <div className="settings-section">
         <div className="settings-avatar-wrapper">
         <div className="settings-avatar-container">

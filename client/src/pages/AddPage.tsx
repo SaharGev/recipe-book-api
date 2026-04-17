@@ -2,6 +2,8 @@
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import "../pages/AddPage.css";
+import PageHeader from "../components/PageHeader";
+
 
 export default function AddPage() {
   const navigate = useNavigate();
@@ -9,15 +11,8 @@ export default function AddPage() {
   return (
     <div className="add-options-page">
        <div className="add-page-container">
-         <div className="add-header">
-          <button
-                className="icon-btn-add"
-                onClick={() => navigate(-1)}
-              >
-                ‹
-            </button>
-          <h1 className="page-title">Add Recipe or Book</h1>
-         </div>
+         <PageHeader title="Add Recipe or Book" showBack={false} />
+
         <div className="options-container">
 
           <div

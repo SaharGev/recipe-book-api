@@ -9,6 +9,7 @@ import "./MyRecipeBooksPage.css";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../components/PageHeader";
 
 export default function MyRecipeBooksPage() {
   const { token } = useContext(AuthContext);
@@ -52,14 +53,8 @@ export default function MyRecipeBooksPage() {
   }, [token]);
 
   return (
-    <div className="home-page">
-      <button
-          className="icon-btn-mrb"
-          onClick={() => navigate(-1)}
-        >
-          ‹
-        </button>
-      <h3 className="section-title mybooks-title">My Recipe Books</h3>
+    <div className="mybooks-page">
+      <PageHeader title="My Recipe Books" />
       <p className="mybooks-count">{books.length} Books</p>
       <div className="mybooks-add-button-wrapper">
         <button

@@ -7,6 +7,8 @@ import type { Recipe } from "../types/recipe";
 import { getImageUrl } from "../utils/getImageUrl";
 import { toggleLike } from "../services/recipeService";
 import "./MyRecipesPage.css";
+import PageHeader from "../components/PageHeader";
+
 
 export default function FavoriteRecipesPage() {
   const { token } = useContext(AuthContext);
@@ -56,8 +58,7 @@ export default function FavoriteRecipesPage() {
 
   return (
     <div className="myrecipes-page">
-      <button type="button" className="back-btn" onClick={() => navigate(-1)}>← Back</button>
-      <h1 className="myrecipes-page-title">Favorite Recipes</h1>
+      <PageHeader title="Favorite Recipes" />
       <p className="myrecipes-recipes-count">{favoriteRecipes.length} Recipes</p>
 
       {favoriteRecipes.length === 0 ? (

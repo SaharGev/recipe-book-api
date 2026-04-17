@@ -1,11 +1,11 @@
 /* client/src/pages/AddPage.css */
 .add-options-page {
-  background-color: #f4f4f8;
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   box-sizing: border-box;
-  padding-bottom: 90px;
+  padding-bottom: 0;
 }
 
 .page-title {
@@ -22,6 +22,7 @@
   flex-direction: column;
   gap: 16px; 
   align-items: stretch;
+  margin-top: 24px;
 }
 
 .option-card:hover {
@@ -59,16 +60,15 @@
 }
 
 .add-page-container {
-  margin-top: 10px;
   width: 100%;
-  max-width: 370px;
+  max-width: 390px;
   background-color: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  padding: 24px 16px 90px;
+  border-radius: 0;
+  padding: 0 16px 100px;
   display: flex;
   flex-direction: column;
 }
+
 
 .option-card {
   width: 100%;

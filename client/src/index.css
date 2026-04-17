@@ -9,5 +9,35 @@ body,
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #f4f4f8;
+  display: flex;
+  justify-content: center;
+}
+
+#root {
+  width: 100%;
+  max-width: 390px;
+}
+
+h1 {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #89abf6 !important;
+  text-align: center !important;
+  margin: 0 0 8px 0 !important;
+}
+
+h2 {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: #1f2d3d !important;
+  text-align: center !important;
+  margin: 0 0 8px 0 !important;
+}
+
+h3 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1f2d3d !important;
+  margin: 0 0 8px 0 !important;
 }

@@ -1,9 +1,7 @@
 .search-page {
   min-height: 100vh;
-  background: #f6f6f6;
+  background: #ffffff;
   padding: 24px 16px 100px;
-  max-width: 430px;
-  margin: 0 auto;
 }
 
 .search-input-container {
@@ -102,14 +100,6 @@
 .search-result-card span {
   font-size: 13px;
   color: #888;
-}
-
-.search-categories {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-  overflow-x: auto;
-  padding-bottom: 4px;
 }
 
 .category-chip {

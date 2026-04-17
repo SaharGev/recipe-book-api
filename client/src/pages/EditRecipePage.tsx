@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav";
 import "../pages/EditRecipePage.css";
+import { getImageUrl } from "../utils/getImageUrl";
+import PageHeader from "../components/PageHeader";
 
 export default function EditRecipePage() {
   const { id } = useParams();
@@ -115,7 +117,7 @@ export default function EditRecipePage() {
       }
 
       alert("Recipe updated!");
-      navigate(`/recipes/${id}`);
+      navigate(`/recipes/${id}`, { replace: true });
     } catch (err: unknown) {
       console.error(err);
       alert(err instanceof Error ? "Error updating recipe: " + err.message : "Error updating recipe");
@@ -126,45 +128,39 @@ export default function EditRecipePage() {
     <div className="create-recipe-page">
       <div className="create-recipe-card">
         {/* under title */}
-        <div className="edit-header-row">
-        <button 
-          className="edr-icon-btn edr-close-btn"
-          onClick={() => navigate(`/recipes/${id}`)}
-        >
-          ‹
-        </button>
-
-        <h1 className="edr-recipe-title">Edit Recipe</h1>
-
-        <button
-          className="edr-icon-btn edr-delete-btn"
-          onClick={async () => {
-            if (!window.confirm("Are you sure you want to delete this recipe?")) return;
-            try {
-              const token = localStorage.getItem("accessToken");
-              const res = await fetch(`http://localhost:3000/recipes/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              if (!res.ok) throw new Error("Failed to delete");
-              alert("Recipe deleted!");
-              navigate("/my-recipes");
-            } catch (err: unknown) {
-              console.error(err);
-              alert(err instanceof Error ? err.message : "Error deleting recipe");
-            }
-          }}
-        >
-          🗑
-        </button>
-      </div>
+        <PageHeader 
+          title="Edit Recipe" 
+          rightButton={
+            <button
+              className="edr-icon-btn edr-delete-btn"
+              onClick={async () => {
+                if (!window.confirm("Are you sure you want to delete this recipe?")) return;
+                try {
+                  const token = localStorage.getItem("accessToken");
+                  const res = await fetch(`http://localhost:3000/recipes/${id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  if (!res.ok) throw new Error("Failed to delete");
+                  alert("Recipe deleted!");
+                  navigate("/my-recipes");
+                } catch (err: unknown) {
+                  console.error(err);
+                  alert(err instanceof Error ? err.message : "Error deleting recipe");
+                }
+              }}
+            >
+              🗑
+            </button>
+          }
+        />
 
         {/* Image */}
         <div className="recipe-image-wrapper">
           {imageUrl ? (
             <img src={URL.createObjectURL(imageUrl)} className="edr-recipe-main-image"/>
           ) : existingImage ? (
-            <img src={existingImage} className="edr-recipe-main-image"/>
+            <img src={getImageUrl(existingImage)} className="edr-recipe-main-image"/>
           ) : (
             <div className="edr-recipe-no-image"/>
           )}
