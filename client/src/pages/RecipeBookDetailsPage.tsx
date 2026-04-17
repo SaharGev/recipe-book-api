@@ -11,6 +11,8 @@ import { getImageUrl } from "../utils/getImageUrl";
 import "./RecipeBookDetailsPage.css";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
+import CommentsSection from "../components/CommentsSection";
+
 
 type Recipe = {
   _id: string;
@@ -37,7 +39,8 @@ type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
 export default function RecipeBookDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext);
+const { token } = useContext(AuthContext);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [book, setBook] =
     useState<RecipeBookWithPopulated | null>(null);
@@ -85,6 +88,12 @@ export default function RecipeBookDetailsPage() {
         if (!accessToken) return;
         const data = await getFriends(accessToken);
         setFriends(data);
+
+        const res = await fetch("http://localhost:3000/users/me", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const userData = await res.json();
+        if (res.ok) setCurrentUserId(userData._id);
       } catch {
         setFriends([]);
       }
@@ -200,6 +209,12 @@ export default function RecipeBookDetailsPage() {
             </div>
           </>
         )}
+
+        <CommentsSection
+          targetType="book"
+          targetId={id || ""}
+          currentUserId={currentUserId}
+        />
 
         <h3 className="book-section-title">Recipes:</h3>
         <div className="book-recipes-grid">

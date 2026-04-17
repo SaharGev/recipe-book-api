@@ -108,7 +108,7 @@ const getByTarget = async (req: Request, res: Response) => {
     const comments = await Comment.find({
       targetType: String(targetType),
       targetId: String(targetId),
-    }).sort({ createdAt: -1 });
+    }).populate("userId", "username profileImageUrl").sort({ createdAt: -1 });
 
     return res.status(200).json(comments);
   } catch (err) {
