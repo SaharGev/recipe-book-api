@@ -140,3 +140,16 @@
   font-weight: 600;
   color: #1f2d3d;
 }
+
+.comments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.comments-toggle {
+  font-size: 14px;
+  color: #89abf6;
+}
