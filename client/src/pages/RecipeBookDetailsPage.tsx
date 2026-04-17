@@ -54,6 +54,7 @@ const { token } = useContext(AuthContext);
   const [friendSearch, setFriendSearch] = useState("");
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareError, setShareError] = useState("");
+  const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
 
   const fetchBook = async () => {
     try {
@@ -81,6 +82,24 @@ const { token } = useContext(AuthContext);
   useEffect(() => {
     fetchBook();
   }, [id]);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const accessToken = token || localStorage.getItem("accessToken");
+        if (!accessToken) return;
+        const res = await fetch("http://localhost:3000/likes", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const data = await res.json();
+        const ids = data
+          .filter((l: { targetType: string; targetId: string }) => l.targetType === "recipe")
+          .map((l: { targetId: string }) => l.targetId.toString());
+        setLikedRecipeIds(ids);
+      } catch {}
+    };
+    fetchLikes();
+  }, [token]);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -223,7 +242,7 @@ const { token } = useContext(AuthContext);
             <RecipeCard
               key={recipe._id}
               recipe={recipe as any}
-              initialLiked={false}
+              initialLiked={likedRecipeIds.includes(recipe._id)}
             />
           ))}
         </div>
