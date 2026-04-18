@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
@@ -19,30 +19,47 @@ export default function MyRecipesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState<string[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
+
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      if (!token) {
-        setError("User not logged in");
-        setLoading(false);
-        return;
+  const fetchRecipes = useCallback(async (pageToLoad = 1) => {
+    if (!token) {
+      setError("User not logged in");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      if (pageToLoad === 1) setLoading(true);
+      else setLoadingMore(true);
+
+      const res = await fetch(`http://localhost:3000/recipes/my?page=${pageToLoad}&limit=6`, {
+        headers: { Authorization: "Bearer " + token },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Failed to fetch recipes");
       }
 
-      try {
-        const res = await fetch("http://localhost:3000/recipes/my", {
-          headers: { Authorization: "Bearer " + token },
-        });
+      const data = await res.json();
 
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Failed to fetch recipes");
-        }
+      if (pageToLoad === 1) {
+        setRecipes(data.recipes);
+      } else {
+        setRecipes((prev) => [...prev, ...data.recipes]);
+      }
 
-        const data: Recipe[] = await res.json();
-        setRecipes(data);
+      setTotal(data.total);
+      setHasMore(data.hasMore);
 
+      if (pageToLoad === 1) {
         const sharedRes = await fetch("http://localhost:3000/recipes/shared-with-me", {
           headers: { Authorization: "Bearer " + token },
         });
@@ -50,26 +67,50 @@ export default function MyRecipesPage() {
         setSharedRecipes(sharedData);
 
         const likes = await getMyLikes(token);
-
         const likedRecipeIds = (likes as LikeItem[])
           .filter((l) => l.targetType === "recipe")
           .map((l) => l.targetId.toString());
-
         setLikedIds(likedRecipeIds);
-
-        console.log("likedRecipeIds:", likedRecipeIds);
-        console.log("recipes ids:", data.map((recipe) => recipe._id));
-        
-      } catch (err: unknown) {
-        if (err instanceof Error) setError(err.message);
-        else setError("Unknown error occurred");
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchRecipes();
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError("Unknown error occurred");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   }, [token]);
+
+  const hasMoreRef = useRef(hasMore);
+  const loadingMoreRef = useRef(loadingMore);
+  const pageRef = useRef(page);
+
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { loadingMoreRef.current = loadingMore; }, [loadingMore]);
+  useEffect(() => { pageRef.current = page; }, [page]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!observerRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
+          const nextPage = pageRef.current + 1;
+          pageRef.current = nextPage;
+          setPage(nextPage);
+          fetchRecipes(nextPage);
+        }
+      },
+      { threshold: 0, rootMargin: "0px" }
+    );
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [fetchRecipes, loading]);
+
+  useEffect(() => {
+    fetchRecipes(1);
+  }, []);
 
   if (loading) return <p className="myrecipes-loading-text">Loading your recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
@@ -100,7 +141,7 @@ export default function MyRecipesPage() {
   return (
     <div className="myrecipes-page">
       <PageHeader title="My Recipes" />
-      <p className="myrecipes-recipes-count">{recipes.length} Recipes</p>
+      <p className="myrecipes-recipes-count">{total} Recipes</p>
 
       <div className="myrecipes-add-button-wrapper">
         <button
@@ -124,6 +165,9 @@ export default function MyRecipesPage() {
           />
         ))}
       </div>
+
+      <div ref={observerRef} style={{ height: "20px", background: "transparent" }} />
+      {loadingMore && <p className="myrecipes-loading-text">Loading more...</p>}
 
       <BottomNav />
     </div>

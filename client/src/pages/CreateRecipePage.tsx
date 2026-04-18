@@ -94,7 +94,7 @@ export default function CreateRecipe() {
 
         <div className="recipe-image-wrapper">
           {imageUrl ? (
-            <img src={URL.createObjectURL(imageUrl)} alt="Recipe" className="recipe-main-image"/>
+            <img src={URL.createObjectURL(imageUrl)} alt="Recipe" className="create-recipe-main-image"/>
           ) : <div className="recipe-no-image"/>}
         </div>
 

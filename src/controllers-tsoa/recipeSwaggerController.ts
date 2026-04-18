@@ -7,6 +7,7 @@ import {
   Path,
   Post,
   Put,
+  Query,
   Route,
   Security,
   Tags,
@@ -67,6 +68,14 @@ interface ShareRecipeResponse {
   recipe: RecipeSwaggerResponse;
 }
 
+interface PaginatedRecipesResponse {
+  recipes: RecipeSwaggerResponse[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
 @Route("recipes")
 @Tags("Recipes")
 export class RecipeSwaggerController extends Controller {
@@ -106,14 +115,23 @@ export class RecipeSwaggerController extends Controller {
   }
 
   /**
-   * Get current user's recipes
+   * Get current user's recipes with pagination
    */
   @SuccessResponse("200", "OK")
   @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
   @Security("bearerAuth")
   @Get("my")
-  public async getMyRecipes(): Promise<RecipeSwaggerResponse[]> {
-    return [];
+  public async getMyRecipes(
+    @Query() page?: number,
+    @Query() limit?: number
+  ): Promise<PaginatedRecipesResponse> {
+    return {
+      recipes: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      hasMore: false,
+    };
   }
 
   /**

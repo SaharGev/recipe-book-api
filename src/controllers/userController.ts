@@ -217,11 +217,24 @@ const getFriends = async (req: AuthRequest, res: Response) => {
     const userId = req.user?._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
     const user = await User.findById(userId).populate("friends", "username email profileImageUrl");
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    return res.status(200).json({ friends: user.friends });
+    const total = user.friends.length;
+    const friends = (user.friends as any[]).slice(skip, skip + limit);
+
+    return res.status(200).json({
+      friends,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Failed to get friends" });
   }

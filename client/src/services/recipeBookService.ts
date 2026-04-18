@@ -1,8 +1,12 @@
 // src/services/recipeBookService.ts
 import { apiFetch } from "./apiClient";
 
-export async function getMyRecipeBooks(token: string) {
-  const response = await apiFetch("http://localhost:3000/recipe-books/my", {}, token);
+export async function getMyRecipeBooks(token: string, page = 1, limit = 6) {
+  const response = await apiFetch(
+    `http://localhost:3000/recipe-books/my?page=${page}&limit=${limit}`,
+    {},
+    token
+  );
 
   const data = await response.json();
 

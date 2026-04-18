@@ -67,8 +67,22 @@ const getMyRecipes = async (req: AuthRequest, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const myRecipes = await Recipe.find({ owner: userId });
-    return res.json(myRecipes);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await Recipe.countDocuments({ owner: userId });
+    const myRecipes = await Recipe.find({ owner: userId })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      recipes: myRecipes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
   } catch (err: any) {
     res.status(500).send('Error fetching my recipes');
   } 
