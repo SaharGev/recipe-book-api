@@ -12,6 +12,7 @@
   max-width: 390px;
   background-color: #ffffff;
   border-radius: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   padding-bottom: 100px;
@@ -36,7 +37,7 @@
   background: linear-gradient(135deg, #f1f0f7, #e6e4f2);
 }
 
-.recipe-main-image {
+.create-recipe-main-image {
   width: 100%;
   height: 100%;
   object-fit: cover;

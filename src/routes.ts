@@ -98,10 +98,14 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "FriendsListResponse": {
+    "PaginatedFriendsResponse": {
         "dataType": "refObject",
         "properties": {
             "friends": {"dataType":"array","array":{"dataType":"refObject","ref":"FriendSwaggerResponse"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
+            "hasMore": {"dataType":"boolean","required":true},
         },
         "additionalProperties": true,
     },
@@ -176,6 +180,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PaginatedRecipesResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "recipes": {"dataType":"array","array":{"dataType":"refObject","ref":"RecipeSwaggerResponse"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
+            "hasMore": {"dataType":"boolean","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UpdateRecipeRequest": {
         "dataType": "refObject",
         "properties": {
@@ -242,6 +258,19 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "message": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PaginatedRecipeBooksResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "recipeBooks": {"dataType":"array","array":{"dataType":"refObject","ref":"RecipeBookSwaggerResponse"},"required":true},
+            "total": {"dataType":"double","required":true},
+            "page": {"dataType":"double","required":true},
+            "totalPages": {"dataType":"double","required":true},
+            "hasMore": {"dataType":"boolean","required":true},
         },
         "additionalProperties": true,
     },
@@ -581,6 +610,8 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserSwaggerController_getFriends: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/users/friends',
             authenticateMiddleware([{"bearerAuth":[]}]),
@@ -802,6 +833,8 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsRecipeSwaggerController_getMyRecipes: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/recipes/my',
             authenticateMiddleware([{"bearerAuth":[]}]),
@@ -820,6 +853,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getMyRecipes',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeSwaggerController_getSharedWithMe: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/recipes/shared-with-me',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController.prototype.getSharedWithMe)),
+
+            async function RecipeSwaggerController_getSharedWithMe(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeSwaggerController_getSharedWithMe, request, response });
+
+                const controller = new RecipeSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getSharedWithMe',
                 controller,
                 response,
                 next,
@@ -1147,6 +1210,8 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsRecipeBookSwaggerController_getMyRecipeBooks: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/recipe-books/my',
             authenticateMiddleware([{"bearerAuth":[]}]),
@@ -1165,6 +1230,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getMyRecipeBooks',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeBookSwaggerController_getSharedWithMe: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/recipe-books/shared-with-me',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController.prototype.getSharedWithMe)),
+
+            async function RecipeBookSwaggerController_getSharedWithMe(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeBookSwaggerController_getSharedWithMe, request, response });
+
+                const controller = new RecipeBookSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getSharedWithMe',
                 controller,
                 response,
                 next,

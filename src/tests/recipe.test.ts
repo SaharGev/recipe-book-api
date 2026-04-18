@@ -104,14 +104,14 @@ describe("Recipe API", () => {
 
   test("Get My Recipes of the owner who send the request - public and private", async () => {
     const response = await request(app).get("/recipes/my")
-    .set("Authorization", "Bearer " + loginUser.accessToken)  ;
+    .set("Authorization", "Bearer " + loginUser.accessToken);
     expect(response.status).toBe(200);
-    const myRecipes = response.body;
-    expect(myRecipes.length).toBe(recipesList.length);
+    const { recipes: myRecipes, total } = response.body;
+    expect(total).toBe(recipesList.length);
     myRecipes.forEach((recipe: any) => {
       expect(recipe.owner).toBe(loginUser._id);
     });
-    const othersRecipes = response.body.filter((r: any) => r.owner !== loginUser._id);
+    const othersRecipes = myRecipes.filter((r: any) => r.owner !== loginUser._id);
     expect(othersRecipes.length).toBe(0); 
   });
 

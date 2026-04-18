@@ -82,7 +82,7 @@ export default function CreateRecipeBookPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok) setRecipes(data || []);
+      if (res.ok) setRecipes(data.recipes || []);
       else alert(data.message || "Error fetching recipes");
     } catch (err) {
       console.error(err);

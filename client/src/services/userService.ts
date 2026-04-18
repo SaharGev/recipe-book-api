@@ -79,6 +79,19 @@ export async function getFriends(token: string) {
   return data.friends;
 }
 
+export async function getFriendsPaginated(token: string, page = 1, limit = 10) {
+  const response = await apiFetch(
+    `http://localhost:3000/users/friends?page=${page}&limit=${limit}`,
+    {},
+    token
+  );
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch friends");
+  }
+  return data;
+}
+
 export async function addFriend(token: string, identifier: string) {
   const response = await apiFetch("http://localhost:3000/users/friends", {
     method: "POST",

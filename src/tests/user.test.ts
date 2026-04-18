@@ -386,4 +386,40 @@ describe("User API", () => {
     expect(response.body.users.length).toBe(1);
     expect(response.body.users[0].username).toBe("fullMatchUser");
   });
+
+  test("GET /users/friends - supports pagination", async () => {
+    await User.updateMany({}, { $set: { friends: [] } });
+    const user1 = await getlogedInUser(app);
+
+    // add 8 friends
+    for (let i = 0; i < 8; i++) {
+      const friend = await getLoggedInCustomUser(app, {
+        email: `pagfriend${i}@test.com`,
+        username: `pagFriend${i}`,
+        password: "testpassword",
+      });
+      await request(app)
+        .post("/users/friends")
+        .set("Authorization", "Bearer " + user1.accessToken)
+        .send({ identifier: friend.email });
+    }
+
+    // page 1 - should return 5
+    const page1 = await request(app)
+      .get("/users/friends?page=1&limit=5")
+      .set("Authorization", "Bearer " + user1.accessToken);
+
+    expect(page1.status).toBe(200);
+    expect(page1.body.friends.length).toBe(5);
+    expect(page1.body.hasMore).toBe(true);
+
+    // page 2 - should return remaining
+    const page2 = await request(app)
+      .get("/users/friends?page=2&limit=5")
+      .set("Authorization", "Bearer " + user1.accessToken);
+
+    expect(page2.status).toBe(200);
+    expect(page2.body.friends.length).toBeGreaterThan(0);
+    expect(page2.body.hasMore).toBe(false);
+  });
 });

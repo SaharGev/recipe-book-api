@@ -98,7 +98,7 @@
   flex-direction: column;
 }
 
-label {
+.create-recipe-content label {
   color: #1f2d3d;
   font-weight: 500;
   font-size: 14px;
@@ -106,9 +106,9 @@ label {
   display: block;
 }
 
-input,
-textarea,
-select {
+.create-recipe-content input,
+.create-recipe-content textarea,
+.create-recipe-content select {
   width: 100%;
   padding: 12px 16px;
   border: none;
@@ -118,7 +118,7 @@ select {
   margin-bottom: 12px;
 }
 
-textarea {
+.create-recipe-content textarea {
   min-height: 100px;
   resize: vertical;
 }

@@ -48,6 +48,15 @@ interface SearchUserResult {
   username: string;
 }
 
+interface PaginatedRecipeBooksResponse {
+  message: string;
+  recipeBooks: RecipeBookSwaggerResponse[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
 @Route("recipe-books")
 @Tags("Recipe Books")
 export class RecipeBookSwaggerController extends Controller {
@@ -111,8 +120,18 @@ export class RecipeBookSwaggerController extends Controller {
   @SuccessResponse("200", "OK")
   @Security("bearerAuth")
   @Get("my")
-  public async getMyRecipeBooks(): Promise<RecipeBookSwaggerResponse[]> {
-    return [];
+  public async getMyRecipeBooks(
+    @Query() page?: number,
+    @Query() limit?: number
+  ): Promise<PaginatedRecipeBooksResponse> {
+    return {
+      message: "My recipe books fetched successfully",
+      recipeBooks: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      hasMore: false,
+    };
   }
 
   /**

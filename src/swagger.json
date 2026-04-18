@@ -127,17 +127,36 @@
 				"type": "object",
 				"additionalProperties": true
 			},
-			"FriendsListResponse": {
+			"PaginatedFriendsResponse": {
 				"properties": {
 					"friends": {
 						"items": {
 							"$ref": "#/components/schemas/FriendSwaggerResponse"
 						},
 						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"hasMore": {
+						"type": "boolean"
 					}
 				},
 				"required": [
-					"friends"
+					"friends",
+					"total",
+					"page",
+					"totalPages",
+					"hasMore"
 				],
 				"type": "object",
 				"additionalProperties": true
@@ -298,6 +317,40 @@
 				"type": "object",
 				"additionalProperties": true
 			},
+			"PaginatedRecipesResponse": {
+				"properties": {
+					"recipes": {
+						"items": {
+							"$ref": "#/components/schemas/RecipeSwaggerResponse"
+						},
+						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"hasMore": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"recipes",
+					"total",
+					"page",
+					"totalPages",
+					"hasMore"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
 			"UpdateRecipeRequest": {
 				"properties": {
 					"title": {
@@ -448,6 +501,44 @@
 				},
 				"required": [
 					"message"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"PaginatedRecipeBooksResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"recipeBooks": {
+						"items": {
+							"$ref": "#/components/schemas/RecipeBookSwaggerResponse"
+						},
+						"type": "array"
+					},
+					"total": {
+						"type": "number",
+						"format": "double"
+					},
+					"page": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"hasMore": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"message",
+					"recipeBooks",
+					"total",
+					"page",
+					"totalPages",
+					"hasMore"
 				],
 				"type": "object",
 				"additionalProperties": true
@@ -1111,7 +1202,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/FriendsListResponse"
+									"$ref": "#/components/schemas/PaginatedFriendsResponse"
 								}
 							}
 						}
@@ -1136,7 +1227,26 @@
 						"bearerAuth": []
 					}
 				],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			},
 			"post": {
 				"operationId": "AddFriend",
@@ -1498,6 +1608,62 @@
 						"content": {
 							"application/json": {
 								"schema": {
+									"$ref": "#/components/schemas/PaginatedRecipesResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get current user's recipes with pagination",
+				"tags": [
+					"Recipes"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/recipes/shared-with-me": {
+			"get": {
+				"operationId": "GetSharedWithMe",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
 									"items": {
 										"$ref": "#/components/schemas/RecipeSwaggerResponse"
 									},
@@ -1517,7 +1683,7 @@
 						}
 					}
 				},
-				"description": "Get current user's recipes",
+				"description": "Get recipes shared with current user",
 				"tags": [
 					"Recipes"
 				],
@@ -2161,6 +2327,52 @@
 						"content": {
 							"application/json": {
 								"schema": {
+									"$ref": "#/components/schemas/PaginatedRecipeBooksResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get my recipe books",
+				"tags": [
+					"Recipe Books"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/recipe-books/shared-with-me": {
+			"get": {
+				"operationId": "GetSharedWithMe",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
 									"items": {
 										"$ref": "#/components/schemas/RecipeBookSwaggerResponse"
 									},
@@ -2168,9 +2380,19 @@
 								}
 							}
 						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeBookSwaggerMessageResponse"
+								}
+							}
+						}
 					}
 				},
-				"description": "Get my recipe books",
+				"description": "Get recipe books shared with current user",
 				"tags": [
 					"Recipe Books"
 				],

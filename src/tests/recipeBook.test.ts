@@ -197,7 +197,7 @@ describe("RecipeBook API", () => {
       });
 
       const response = await request(app)
-        .get("/recipe-books")
+        .get("/recipe-books/my?limit=100") 
         .set("Authorization", "Bearer " + loginUser.accessToken);
 
       expect(response.status).toBe(200);
@@ -216,6 +216,7 @@ describe("RecipeBook API", () => {
     });
 
     test("Get only my recipe books", async () => {
+      await RecipeBook.deleteMany();
       // Books owned by the user
       const ownedBookResp1 = await createRecipeBook(app, loginUser.accessToken, {
         name: "My Book 1",
@@ -807,4 +808,37 @@ describe("RecipeBook API", () => {
     expect(bookIds).toContain(bookId);
   });
 
-  });
+  test("GET /recipe-books/my - supports pagination", async () => {
+    await RecipeBook.deleteMany();
+    // create 8 books
+    for (let i = 0; i < 8; i++) {
+      await createRecipeBook(app, loginUser.accessToken, {
+        name: `Pagination Book ${i}`,
+        description: "Test pagination",
+        isPublic: false,
+      });
+    }
+
+    // page 1 - should return 6
+    const page1 = await request(app)
+        .get("/recipe-books/my?page=1&limit=6")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(page1.status).toBe(200);
+      expect(page1.body.recipeBooks.length).toBe(6);
+      expect(page1.body.total).toBe(8);
+      expect(page1.body.hasMore).toBe(true);
+      expect(page1.body.page).toBe(1);
+
+      // page 2 - should return 2
+      const page2 = await request(app)
+        .get("/recipe-books/my?page=2&limit=6")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(page2.status).toBe(200);
+      expect(page2.body.recipeBooks.length).toBe(2);
+      expect(page2.body.hasMore).toBe(false);
+      
+    });
+
+});

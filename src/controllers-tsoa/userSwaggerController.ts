@@ -65,6 +65,14 @@ interface RecentlyViewedBookSwaggerItem {
   name: string;
 }
 
+interface PaginatedFriendsResponse {
+  friends: FriendSwaggerResponse[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
 @Route("users")
 @Tags("Users")
 export class UserSwaggerController extends Controller {
@@ -153,8 +161,11 @@ export class UserSwaggerController extends Controller {
   @Response<UserSwaggerMessageResponse>("401", "Unauthorized")
   @Security("bearerAuth")
   @Get("friends")
-  public async getFriends(): Promise<FriendsListResponse> {
-    return { friends: [] };
+  public async getFriends(
+    @Query() page?: number,
+    @Query() limit?: number
+  ): Promise<PaginatedFriendsResponse> {
+    return { friends: [], total: 0, page: 1, totalPages: 1, hasMore: false };
   }
 
   /**

@@ -130,7 +130,7 @@ export default function AddFriendsPage() {
         <button
           type="button"
           className="add-friends-done-btn"
-          onClick={() => fromFriends ? navigate("/friends") : navigate("/home")}
+          onClick={() => fromFriends ? navigate("/friends", { replace: true }) : navigate("/home", { replace: true })}
         >
           Done
         </button>
@@ -138,7 +138,7 @@ export default function AddFriendsPage() {
           <button
             type="button"
             className="add-friends-skip-btn"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/home", { replace: true })}
           >
             Skip
           </button>
