@@ -841,4 +841,65 @@ describe("RecipeBook API", () => {
       
     });
 
+    test("GET /recipe-books/public - returns only public books with pagination", async () => {
+      await RecipeBook.deleteMany();
+
+      // create 4 public books
+      for (let i = 0; i < 4; i++) {
+        await createRecipeBook(app, loginUser.accessToken, {
+          name: `Public Book ${i}`,
+          description: "test",
+          isPublic: true,
+        });
+      }
+
+      // create 2 private books
+      for (let i = 0; i < 2; i++) {
+        await createRecipeBook(app, loginUser.accessToken, {
+          name: `Private Book ${i}`,
+          description: "test",
+          isPublic: false,
+        });
+      }
+
+      const response = await request(app)
+        .get("/recipe-books/public?page=1&limit=6")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(response.status).toBe(200);
+      expect(response.body.recipeBooks.length).toBe(4);
+      expect(response.body.total).toBe(4);
+      expect(response.body.hasMore).toBe(false);
+      response.body.recipeBooks.forEach((b: any) => {
+        expect(b.isPublic).toBe(true);
+      });
+    });
+
+    test("GET /recipe-books/public - pagination works correctly", async () => {
+      await RecipeBook.deleteMany();
+
+      for (let i = 0; i < 8; i++) {
+        await createRecipeBook(app, loginUser.accessToken, {
+          name: `Public Pag Book ${i}`,
+          description: "test",
+          isPublic: true,
+        });
+      }
+
+      const page1 = await request(app)
+        .get("/recipe-books/public?page=1&limit=6")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(page1.status).toBe(200);
+      expect(page1.body.recipeBooks.length).toBe(6);
+      expect(page1.body.hasMore).toBe(true);
+
+      const page2 = await request(app)
+        .get("/recipe-books/public?page=2&limit=6")
+        .set("Authorization", "Bearer " + loginUser.accessToken);
+
+      expect(page2.status).toBe(200);
+      expect(page2.body.recipeBooks.length).toBe(2);
+      expect(page2.body.hasMore).toBe(false);
+    });
 });

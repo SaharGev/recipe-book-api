@@ -10,6 +10,7 @@ router.post('/', authenticate, recipeController.createNewRecipe);
 router.get('/', authenticate, recipeController.getAllRecipes);
 router.get('/my', authenticate, recipeController.getMyRecipes);
 router.get('/shared-with-me', authenticate, recipeController.getSharedWithMe);
+router.get('/public', authenticate, recipeController.getPublicRecipes);
 router.get('/:id', authenticate, recipeController.getRecipeById);
 router.put('/:id', authenticate, recipeController.updateRecipe);
 router.delete('/:id', authenticate, recipeController.deleteRecipe);

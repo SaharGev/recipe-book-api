@@ -35,6 +35,7 @@ type Collaborator = {
 
 type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
   collaborators: Collaborator[];
+  isPublic: boolean; 
 };
 
 export default function RecipeBookDetailsPage() {
@@ -166,6 +167,11 @@ const { token } = useContext(AuthContext);
   if (error) return <p>{error}</p>;
   if (!book) return <p>Book not found</p>;
 
+  const isOwner = currentUserId && book.owner && 
+  (typeof book.owner === "string" 
+    ? book.owner === currentUserId 
+    : (book.owner as any)._id === currentUserId);
+
   return (
     <div className="book-details-page">
       <div className="book-hero">
@@ -177,25 +183,29 @@ const { token } = useContext(AuthContext);
             ‹
           </button>
 
-          <button
-            className="icon-btn-rbd edit-btn-rbd"
-            onClick={() => navigate(`/edit-book/${book._id}`)}
-          >
-            ✎
-          </button>
+          {isOwner && (
+            <button
+              className="icon-btn-rbd edit-btn-rbd"
+              onClick={() => navigate(`/edit-book/${book._id}`)}
+            >
+              ✎
+            </button>
+          )}
 
-          <button
-            className="icon-btn-rbd share-btn-rbd"
-            onClick={() => {
-              const sharedIds = book?.collaborators?.map((c) =>
-                typeof c.user === "string" ? c.user : c.user._id
-              ) || [];
-              setSelectedFriendIds(sharedIds);
-              setShowShareModal(true);
-            }}
-          >
-            <BsShare />
-          </button>
+          {isOwner && !book.isPublic && (
+            <button
+              className="icon-btn-rbd share-btn-rbd"
+              onClick={() => {
+                const sharedIds = book?.collaborators?.map((c) =>
+                  typeof c.user === "string" ? c.user : c.user._id
+                ) || [];
+                setSelectedFriendIds(sharedIds);
+                setShowShareModal(true);
+              }}
+            >
+              <BsShare />
+            </button>
+          )}
         </div>
       </div>
 
@@ -206,7 +216,7 @@ const { token } = useContext(AuthContext);
           {(book.recipes as Recipe[])?.length || 0} Recipes
         </p>
 
-        {book.collaborators && book.collaborators.length > 0 && (
+        {isOwner && !book.isPublic && book.collaborators && book.collaborators.length > 0 && (
           <>
             <h3 className="book-shared-title">Shared with:</h3>
             <div className="shared-with-list shared-with-list--left">
@@ -237,15 +247,19 @@ const { token } = useContext(AuthContext);
         />
 
         <h3 className="book-section-title">Recipes:</h3>
-        <div className="book-recipes-grid">
-          {(book.recipes as Recipe[])?.map((recipe) => (
-            <RecipeCard
-              key={recipe._id}
-              recipe={recipe as any}
-              initialLiked={likedRecipeIds.includes(recipe._id)}
-            />
-          ))}
-        </div>
+        {(book.recipes as Recipe[])?.length === 0 ? (
+          <p className="book-empty-text">No recipes in this book yet 🍳</p>
+        ) : (
+          <div className="book-recipes-grid">
+            {(book.recipes as Recipe[])?.map((recipe) => (
+              <RecipeCard
+                key={recipe._id}
+                recipe={recipe as any}
+                initialLiked={likedRecipeIds.includes(recipe._id)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {showShareModal && (

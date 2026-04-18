@@ -305,6 +305,35 @@ const unshareRecipe = async (req: AuthRequest, res: Response) => {
   }
 };
 
+const getPublicRecipes = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await Recipe.countDocuments({ isPublic: true });
+    const recipes = await Recipe.find({ isPublic: true })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    return res.json({
+      recipes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
+  } catch (err: any) {
+    res.status(500).send('Error fetching public recipes');
+  }
+};
+
 export default { createNewRecipe,
   getAllRecipes,
   getMyRecipes,
@@ -314,5 +343,6 @@ export default { createNewRecipe,
   deleteRecipe,
   updateRecipeImage,
   shareRecipe,
-  unshareRecipe
+  unshareRecipe,
+  getPublicRecipes 
 };

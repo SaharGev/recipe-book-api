@@ -146,6 +146,26 @@ export class RecipeSwaggerController extends Controller {
   }
 
   /**
+   * Get public recipes with pagination
+   */
+  @SuccessResponse("200", "OK")
+  @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
+  @Security("bearerAuth")
+  @Get("public")
+  public async getPublicRecipes(
+    @Query() page?: number,
+    @Query() limit?: number
+  ): Promise<PaginatedRecipesResponse> {
+    return {
+      recipes: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      hasMore: false,
+    };
+  }
+
+  /**
    * Get recipe by id
    */
   @SuccessResponse("200", "OK")

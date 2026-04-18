@@ -54,3 +54,19 @@ export async function getMyLikes(token: string) {
 
   return data;
 }
+
+export async function getPublicRecipes(token: string, page = 1, limit = 6) {
+  const response = await apiFetch(
+    `http://localhost:3000/recipes/public?page=${page}&limit=${limit}`,
+    {},
+    token
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch public recipes");
+  }
+
+  return data;
+}

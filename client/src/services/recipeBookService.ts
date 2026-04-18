@@ -48,3 +48,18 @@ export async function searchUsers(query: string, token: string) {
   return data;
 }
 
+export async function getPublicRecipeBooks(token: string, page = 1, limit = 6) {
+  const response = await apiFetch(
+    `http://localhost:3000/recipe-books/public?page=${page}&limit=${limit}`,
+    {},
+    token
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch public recipe books");
+  }
+
+  return data;
+}
