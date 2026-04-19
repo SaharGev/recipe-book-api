@@ -712,4 +712,66 @@ describe("Recipe API", () => {
     const titles = response.body.map((r: any) => r.title);
     expect(titles).toContain("Shared With Me Recipe");
   });
+
+  test("GET /recipes/public - returns only public recipes with pagination", async () => {
+    await Recipe.deleteMany();
+
+    // create 4 public recipes
+    for (let i = 0; i < 4; i++) {
+      await request(app)
+        .post("/recipes")
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({ ...recipesList[0], title: `Public Recipe ${i}`, isPublic: true });
+    }
+
+    // create 2 private recipes
+    for (let i = 0; i < 2; i++) {
+      await request(app)
+        .post("/recipes")
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({ ...recipesList[1], title: `Private Recipe ${i}`, isPublic: false });
+    }
+
+    const response = await request(app)
+      .get("/recipes/public?page=1&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(response.status).toBe(200);
+    expect(response.body.recipes.length).toBe(4);
+    expect(response.body.total).toBe(4);
+    expect(response.body.hasMore).toBe(false);
+    response.body.recipes.forEach((r: any) => {
+      expect(r.isPublic).toBe(true);
+    });
+  });
+
+  test("GET /recipes/public - pagination works correctly", async () => {
+    await Recipe.deleteMany();
+
+    // create 8 public recipes
+    for (let i = 0; i < 8; i++) {
+      await request(app)
+        .post("/recipes")
+        .set("Authorization", "Bearer " + loginUser.accessToken)
+        .send({ ...recipesList[0], title: `Public Pag Recipe ${i}`, isPublic: true });
+    }
+
+    // page 1
+    const page1 = await request(app)
+      .get("/recipes/public?page=1&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page1.status).toBe(200);
+    expect(page1.body.recipes.length).toBe(6);
+    expect(page1.body.hasMore).toBe(true);
+
+    // page 2
+    const page2 = await request(app)
+      .get("/recipes/public?page=2&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page2.status).toBe(200);
+    expect(page2.body.recipes.length).toBe(2);
+    expect(page2.body.hasMore).toBe(false);
+  });
 });

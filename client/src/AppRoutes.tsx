@@ -20,6 +20,8 @@ import CompleteProfilePage from "./pages/CompleteProfilePage";
 import AddFriendsPage from "./pages/AddFriendsPage";
 import FriendsPage from "./pages/FriendsPage";
 import EditRecipeBookPage from "./pages/EditRecipeBookPage";
+import PublicRecipesPage from "./pages/PublicRecipesPage";
+import PublicBooksPage from "./pages/PublicBooksPage";
 
 export default function AppRoutes() {
   const { token } = useContext(AuthContext);
@@ -46,6 +48,8 @@ export default function AppRoutes() {
         <Route path="/add-friends" element={token ? <AddFriendsPage /> : <Navigate to="/" />} />
         <Route path="/friends" element={token ? <FriendsPage /> : <Navigate to="/" />} />
         <Route path="/edit-book/:id" element={token ? <EditRecipeBookPage /> : <Navigate to="/" />} />
+        <Route path="/public-recipes" element={token ? <PublicRecipesPage /> : <Navigate to="/" />} />
+        <Route path="/public-books" element={token ? <PublicBooksPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

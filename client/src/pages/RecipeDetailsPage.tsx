@@ -123,6 +123,11 @@ export default function RecipeDetailsPage() {
 
   if (!recipe) return <p>Loading...</p>;
 
+  const isOwner = currentUserId && recipe.owner && 
+    (typeof recipe.owner === "string" 
+      ? recipe.owner === currentUserId 
+      : recipe.owner._id === currentUserId);
+
   return (
     <div className="recipe-page-wrapper">
       <div className="recipe-details-page">
@@ -146,22 +151,26 @@ export default function RecipeDetailsPage() {
             ‹
           </button>
 
-          <button
-            className="icon-btn-rd edit-btn-rd"
-            onClick={() => navigate(`/edit-recipe/${recipe._id}`)}
-          >
-            ✎
-          </button>
+          {isOwner && (
+            <button
+              className="icon-btn-rd edit-btn-rd"
+              onClick={() => navigate(`/edit-recipe/${recipe._id}`)}
+            >
+              ✎
+            </button>
+          )}
 
-          <button
-            className="icon-btn-rd share-btn-rd"
+          {isOwner && !recipe.isPublic && (
+            <button
+              className="icon-btn-rd share-btn-rd"
               onClick={() => {
                 setSelectedFriendIds([...sharedUserIds]);
                 setShowShareModal(true);
               }}
-          >
-            <BsShare />
-          </button>
+            >
+              <BsShare />
+            </button>
+          )}
 
         </div>
 
@@ -218,7 +227,7 @@ export default function RecipeDetailsPage() {
           />
 
           {/* SHARED WITH */}
-          {(recipe.owner || (recipe.collaborators && recipe.collaborators.length > 0)) && (
+          {isOwner && !recipe.isPublic && (recipe.collaborators && recipe.collaborators.length > 0) && (
             <>
               <h3>Shared with</h3>
               <div className="shared-with-list">
