@@ -15,12 +15,24 @@ type LikeItem = {
 export default function SharedRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
 
   const { token } = useContext(AuthContext);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+  const hasMoreRef = useRef(hasMore);
+  const loadingMoreRef = useRef(loadingMore);
+  const pageRef = useRef(page);
 
-  const fetchRecipes = useCallback(async () => {
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { loadingMoreRef.current = loadingMore; }, [loadingMore]);
+  useEffect(() => { pageRef.current = page; }, [page]);
+
+  const fetchRecipes = useCallback(async (pageToLoad = 1) => {
     if (!token) {
       setError("User not logged in");
       setLoading(false);
@@ -28,27 +40,55 @@ export default function SharedRecipesPage() {
     }
 
     try {
-      setLoading(true);
-      const data = await getSharedWithMeRecipes(token);
-      setRecipes(data || []);
+      if (pageToLoad === 1) setLoading(true);
+      else setLoadingMore(true);
 
-      const likes = await getMyLikes(token);
-      const likedRecipeIds = (likes as LikeItem[])
-        .filter((l) => l.targetType === "recipe")
-        .map((l) => l.targetId.toString());
-      setLikedIds(likedRecipeIds);
+      const data = await getSharedWithMeRecipes(token, pageToLoad, 6);
+
+      if (pageToLoad === 1) {
+        setRecipes(data.recipes);
+        const likes = await getMyLikes(token);
+        const likedRecipeIds = (likes as LikeItem[])
+          .filter((l) => l.targetType === "recipe")
+          .map((l) => l.targetId.toString());
+        setLikedIds(likedRecipeIds);
+      } else {
+        setRecipes((prev) => [...prev, ...data.recipes]);
+      }
+
+      setTotal(data.total);
+      setHasMore(data.hasMore);
 
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("Unknown error occurred");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [token]);
 
   useEffect(() => {
-    fetchRecipes();
+    fetchRecipes(1);
   }, [token]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!observerRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMoreRef.current && !loadingMoreRef.current) {
+          const nextPage = pageRef.current + 1;
+          pageRef.current = nextPage;
+          setPage(nextPage);
+          fetchRecipes(nextPage);
+        }
+      },
+      { threshold: 0, rootMargin: "0px" }
+    );
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [fetchRecipes, loading]);
 
   if (loading) return <p className="myrecipes-loading-text">Loading shared recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
@@ -65,7 +105,7 @@ export default function SharedRecipesPage() {
   return (
     <div className="myrecipes-page">
       <PageHeader title="Shared with me" />
-      <p className="myrecipes-recipes-count">{recipes.length} Recipes</p>
+      <p className="myrecipes-recipes-count">{total} Recipes</p>
 
       <div className="myrecipes-grid">
         {recipes.map((recipe) => (
@@ -76,6 +116,9 @@ export default function SharedRecipesPage() {
           />
         ))}
       </div>
+
+      <div ref={observerRef} style={{ height: "20px" }} />
+      {loadingMore && <p className="myrecipes-loading-text">Loading more...</p>}
 
       <BottomNav />
     </div>

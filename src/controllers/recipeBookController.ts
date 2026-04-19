@@ -167,7 +167,10 @@ const getRecipeBookById = async (req: AuthRequest, res: Response) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
     const { bookId } = req.params;
-    const recipeBook = await RecipeBook.findById(bookId).populate("recipes").populate("owner", "username").populate("collaborators.user", "username profileImageUrl");    if (!recipeBook) {
+    const recipeBook = await RecipeBook.findById(bookId)
+      .populate("recipes").populate("owner", "username").populate("collaborators.user", "username profileImageUrl")
+      .populate("owner", "username profileImageUrl");
+    if (!recipeBook) {
         return res.status(404).json({ message: "Recipe book not found" });
     }
     const isOwner = recipeBook.owner && recipeBook.owner._id && 

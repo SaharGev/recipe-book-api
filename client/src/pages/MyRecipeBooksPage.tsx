@@ -12,7 +12,6 @@ import PageHeader from "../components/PageHeader";
 export default function MyRecipeBooksPage() {
   const { token } = useContext(AuthContext);
   const [books, setBooks] = useState<RecipeBook[]>([]);
-  const [sharedBooks, setSharedBooks] = useState<RecipeBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
@@ -22,7 +21,6 @@ export default function MyRecipeBooksPage() {
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
   const observerRef = useRef<HTMLDivElement | null>(null);
-
   const hasMoreRef = useRef(hasMore);
   const loadingMoreRef = useRef(loadingMore);
   const pageRef = useRef(page);
@@ -42,26 +40,17 @@ export default function MyRecipeBooksPage() {
 
       if (pageToLoad === 1) {
         setBooks(data.recipeBooks);
+        const likes = await getMyLikes(token);
+        const bookIds = likes
+          .filter((like: { targetType: string; targetId: string }) => like.targetType === "book")
+          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
+        setLikedBookIds(bookIds);
       } else {
         setBooks((prev) => [...prev, ...data.recipeBooks]);
       }
 
       setTotal(data.total);
       setHasMore(data.hasMore);
-
-      if (pageToLoad === 1) {
-        const sharedRes = await fetch("http://localhost:3000/recipe-books/shared-with-me", {
-          headers: { Authorization: "Bearer " + token },
-        });
-        const sharedData = await sharedRes.json();
-        setSharedBooks(sharedData.recipeBooks || []);
-
-        const likes = await getMyLikes(token);
-        const bookIds = likes
-          .filter((like: { targetType: string; targetId: string }) => like.targetType === "book")
-          .map((like: { targetType: string; targetId: string }) => like.targetId.toString());
-        setLikedBookIds(bookIds);
-      }
 
     } catch {
       setError("Failed to load books");
@@ -110,7 +99,7 @@ export default function MyRecipeBooksPage() {
         <p>Loading books...</p>
       ) : error ? (
         <p>{error}</p>
-      ) : books.length === 0 && sharedBooks.length === 0 ? (
+      ) : books.length === 0 ? (
         <div className="mybooks-empty-state">
           <p className="mybooks-empty-text">
             No books yet 📚<br />
@@ -119,7 +108,7 @@ export default function MyRecipeBooksPage() {
         </div>
       ) : (
         <div className="books-feed">
-          {[...books, ...sharedBooks].map((book) => (
+          {books.map((book) => (
             <RecipeBookCard
               key={book._id}
               _id={book._id}

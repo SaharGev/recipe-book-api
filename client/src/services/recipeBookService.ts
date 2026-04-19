@@ -64,9 +64,9 @@ export async function getPublicRecipeBooks(token: string, page = 1, limit = 6) {
   return data;
 }
 
-export async function getSharedWithMeBooks(token: string) {
+export async function getSharedWithMeBooks(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    "http://localhost:3000/recipe-books/shared-with-me",
+    `http://localhost:3000/recipe-books/shared-with-me?page=${page}&limit=${limit}`,
     {},
     token
   );

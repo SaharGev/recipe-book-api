@@ -15,7 +15,6 @@ type LikeItem = {
 
 export default function MyRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [sharedRecipes, setSharedRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState<string[]>([]);
@@ -27,6 +26,13 @@ export default function MyRecipesPage() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const hasMoreRef = useRef(hasMore);
+  const loadingMoreRef = useRef(loadingMore);
+  const pageRef = useRef(page);
+
+  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
+  useEffect(() => { loadingMoreRef.current = loadingMore; }, [loadingMore]);
+  useEffect(() => { pageRef.current = page; }, [page]);
 
   const fetchRecipes = useCallback(async (pageToLoad = 1) => {
     if (!token) {
@@ -52,26 +58,17 @@ export default function MyRecipesPage() {
 
       if (pageToLoad === 1) {
         setRecipes(data.recipes);
+        const likes = await getMyLikes(token);
+        const likedRecipeIds = (likes as LikeItem[])
+          .filter((l) => l.targetType === "recipe")
+          .map((l) => l.targetId.toString());
+        setLikedIds(likedRecipeIds);
       } else {
         setRecipes((prev) => [...prev, ...data.recipes]);
       }
 
       setTotal(data.total);
       setHasMore(data.hasMore);
-
-      if (pageToLoad === 1) {
-        const sharedRes = await fetch("http://localhost:3000/recipes/shared-with-me", {
-          headers: { Authorization: "Bearer " + token },
-        });
-        const sharedData: Recipe[] = await sharedRes.json();
-        setSharedRecipes(sharedData);
-
-        const likes = await getMyLikes(token);
-        const likedRecipeIds = (likes as LikeItem[])
-          .filter((l) => l.targetType === "recipe")
-          .map((l) => l.targetId.toString());
-        setLikedIds(likedRecipeIds);
-      }
 
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
@@ -81,14 +78,6 @@ export default function MyRecipesPage() {
       setLoadingMore(false);
     }
   }, [token]);
-
-  const hasMoreRef = useRef(hasMore);
-  const loadingMoreRef = useRef(loadingMore);
-  const pageRef = useRef(page);
-
-  useEffect(() => { hasMoreRef.current = hasMore; }, [hasMore]);
-  useEffect(() => { loadingMoreRef.current = loadingMore; }, [loadingMore]);
-  useEffect(() => { pageRef.current = page; }, [page]);
 
   useEffect(() => {
     if (loading) return;
@@ -110,54 +99,40 @@ export default function MyRecipesPage() {
 
   useEffect(() => {
     fetchRecipes(1);
-  }, []);
+  }, [token]);
 
   if (loading) return <p className="myrecipes-loading-text">Loading your recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
-  if (recipes.length === 0 && sharedRecipes.length === 0)
-  return (
-    <div className="myrecipes-page">
-      <PageHeader title="My Recipes" />
-      <p className="myrecipes-recipes-count">0 Recipes</p>
 
-      <div className="myrecipes-add-button-wrapper">
-        <button
-          className="myrecipes-add-button"
-          onClick={() => navigate("/createRecipe")}
-        >
-          + Add Recipe
-        </button>
+  if (recipes.length === 0)
+    return (
+      <div className="myrecipes-page">
+        <PageHeader title="My Recipes" />
+        <p className="myrecipes-recipes-count">0 Recipes</p>
+        <div className="myrecipes-add-button-wrapper">
+          <button className="myrecipes-add-button" onClick={() => navigate("/createRecipe")}>
+            + Add Recipe
+          </button>
+        </div>
+        <p className="myrecipes-empty-text">
+          No recipes yet 🍳<br />
+          Start by adding your first recipe!
+        </p>
+        <BottomNav />
       </div>
-
-      <p className="myrecipes-empty-text">
-        No recipes yet 🍳<br />
-        Start by adding your first recipe!
-      </p>
-
-      <BottomNav />
-    </div>
-  );
+    );
 
   return (
     <div className="myrecipes-page">
       <PageHeader title="My Recipes" />
       <p className="myrecipes-recipes-count">{total} Recipes</p>
-
       <div className="myrecipes-add-button-wrapper">
-        <button
-          className="myrecipes-add-button"
-          onClick={() => navigate("/createRecipe")}
-        >
+        <button className="myrecipes-add-button" onClick={() => navigate("/createRecipe")}>
           + Add Recipe
         </button>
       </div>
-
-      {sharedRecipes.length > 0 && (
-        <p className="myrecipes-recipes-count">Shared with me ({sharedRecipes.length})</p>
-      )}
-
       <div className="myrecipes-grid">
-        {[...recipes, ...sharedRecipes].map((recipe) => (
+        {recipes.map((recipe) => (
           <RecipeCard
             key={recipe._id}
             recipe={recipe}
@@ -165,10 +140,8 @@ export default function MyRecipesPage() {
           />
         ))}
       </div>
-
       <div ref={observerRef} style={{ height: "20px", background: "transparent" }} />
       {loadingMore && <p className="myrecipes-loading-text">Loading more...</p>}
-
       <BottomNav />
     </div>
   );

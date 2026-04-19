@@ -102,9 +102,9 @@ export default function SearchPage() {
     const fetchShared = async () => {
       try {
         if (!token) return;
-        const recipesData = await getSharedWithMeRecipes(token);
-        setSharedRecipes(recipesData || []);
-        const booksData = await getSharedWithMeBooks(token);
+        const recipesData = await getSharedWithMeRecipes(token, 1, 6);
+        setSharedRecipes(recipesData.recipes || []);
+        const booksData = await getSharedWithMeBooks(token, 1, 6);
         setSharedBooks(booksData.recipeBooks || []);
       } catch {
         setSharedRecipes([]);
@@ -337,7 +337,7 @@ export default function SearchPage() {
               />
             )
           )}
-          
+
         </>
       )}
 
