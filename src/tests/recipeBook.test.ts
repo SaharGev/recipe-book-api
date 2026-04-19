@@ -808,6 +808,43 @@ describe("RecipeBook API", () => {
     expect(bookIds).toContain(bookId);
   });
 
+  test("GET /recipe-books/shared-with-me - supports pagination", async () => {
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "sharedbookpag@example.com",
+      username: "sharedbookpaguser",
+      password: "password123",
+    });
+
+    // create 8 books and share them
+    for (let i = 0; i < 8; i++) {
+      const bookResp = await createRecipeBook(app, otherUser.accessToken, {
+        name: `Shared Pag Book ${i}`,
+        description: "test",
+        isPublic: false,
+      });
+
+      await request(app)
+        .post(`/recipe-books/${bookResp.body._id}/share`)
+        .set("Authorization", "Bearer " + otherUser.accessToken)
+        .send({ username: loginUser.username });
+    }
+
+    const page1 = await request(app)
+      .get("/recipe-books/shared-with-me?page=1&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page1.status).toBe(200);
+    expect(page1.body.recipeBooks.length).toBe(6);
+    expect(page1.body.hasMore).toBe(true);
+
+    const page2 = await request(app)
+      .get("/recipe-books/shared-with-me?page=2&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page2.status).toBe(200);
+    expect(page2.body.hasMore).toBe(false);
+  });
+
   test("GET /recipe-books/my - supports pagination", async () => {
     await RecipeBook.deleteMany();
     // create 8 books

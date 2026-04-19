@@ -1,16 +1,14 @@
 import { useEffect, useState, useContext, useRef, useCallback } from "react";
-import BottomNav from "../components/BottomNav";
-import RecipeBookCard from "../components/RecipeBookCard";
-import { getMyRecipeBooks } from "../services/recipeBookService";
-import { getMyLikes } from "../services/recipeService";
-import type { RecipeBook } from "../types/recipeBook";
-import "./MyRecipeBooksPage.css";
 import { AuthContext } from "../components/AuthContext";
-import { useNavigate } from "react-router-dom";
+import BottomNav from "../components/BottomNav";
+import "./MyRecipeBooksPage.css";
+import { getMyLikes } from "../services/recipeService";
+import { getSharedWithMeBooks } from "../services/recipeBookService";
 import PageHeader from "../components/PageHeader";
+import RecipeBookCard from "../components/RecipeBookCard";
+import type { RecipeBook } from "../types/recipeBook";
 
-export default function MyRecipeBooksPage() {
-  const { token } = useContext(AuthContext);
+export default function SharedBooksPage() {
   const [books, setBooks] = useState<RecipeBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -19,7 +17,8 @@ export default function MyRecipeBooksPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
-  const navigate = useNavigate();
+
+  const { token } = useContext(AuthContext);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const hasMoreRef = useRef(hasMore);
   const loadingMoreRef = useRef(loadingMore);
@@ -30,13 +29,17 @@ export default function MyRecipeBooksPage() {
   useEffect(() => { pageRef.current = page; }, [page]);
 
   const fetchBooks = useCallback(async (pageToLoad = 1) => {
+    if (!token) {
+      setError("User not logged in");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (pageToLoad === 1) setLoading(true);
       else setLoadingMore(true);
-      setError("");
-      if (!token) return;
 
-      const data = await getMyRecipeBooks(token, pageToLoad, 6);
+      const data = await getSharedWithMeBooks(token, pageToLoad, 6);
 
       if (pageToLoad === 1) {
         setBooks(data.recipeBooks);
@@ -52,8 +55,9 @@ export default function MyRecipeBooksPage() {
       setTotal(data.total);
       setHasMore(data.hasMore);
 
-    } catch {
-      setError("Failed to load books");
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError("Unknown error occurred");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -82,44 +86,35 @@ export default function MyRecipeBooksPage() {
     return () => observer.disconnect();
   }, [fetchBooks, loading]);
 
+  if (loading) return <p>Loading shared books...</p>;
+  if (error) return <p>{error}</p>;
+
+  if (books.length === 0)
+    return (
+      <div className="mybooks-page">
+        <PageHeader title="Shared with me" />
+        <p className="mybooks-empty-text">No books shared with you yet 📚</p>
+        <BottomNav />
+      </div>
+    );
+
   return (
     <div className="mybooks-page">
-      <PageHeader title="My Recipe Books" />
+      <PageHeader title="Shared with me - Books" />
       <p className="mybooks-count">{total} Books</p>
-      <div className="mybooks-add-button-wrapper">
-        <button
-          className="mybooks-add-button"
-          onClick={() => navigate("/createRecipeBook")}
-        >
-          + Add Book
-        </button>
-      </div>
 
-      {loading ? (
-        <p>Loading books...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : books.length === 0 ? (
-        <div className="mybooks-empty-state">
-          <p className="mybooks-empty-text">
-            No books yet 📚<br />
-            Start by creating your first recipe book!
-          </p>
-        </div>
-      ) : (
-        <div className="books-feed">
-          {books.map((book) => (
-            <RecipeBookCard
-              key={book._id}
-              _id={book._id}
-              title={book.name}
-              recipesCount={book.recipes?.length || 0}
-              recipes={book.recipes as { imageUrl?: string }[]}
-              initialLiked={likedBookIds.includes(book._id)}
-            />
-          ))}
-        </div>
-      )}
+      <div className="books-feed">
+        {books.map((book) => (
+          <RecipeBookCard
+            key={book._id}
+            _id={book._id}
+            title={book.name}
+            recipesCount={book.recipes?.length || 0}
+            recipes={book.recipes as { imageUrl?: string }[]}
+            initialLiked={likedBookIds.includes(book._id)}
+          />
+        ))}
+      </div>
 
       <div ref={observerRef} style={{ height: "20px" }} />
       {loadingMore && <p>Loading more...</p>}

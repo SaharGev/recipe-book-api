@@ -167,7 +167,10 @@ const getRecipeBookById = async (req: AuthRequest, res: Response) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
     const { bookId } = req.params;
-    const recipeBook = await RecipeBook.findById(bookId).populate("recipes").populate("owner", "username").populate("collaborators.user", "username profileImageUrl");    if (!recipeBook) {
+    const recipeBook = await RecipeBook.findById(bookId)
+      .populate("recipes").populate("owner", "username").populate("collaborators.user", "username profileImageUrl")
+      .populate("owner", "username profileImageUrl");
+    if (!recipeBook) {
         return res.status(404).json({ message: "Recipe book not found" });
     }
     const isOwner = recipeBook.owner && recipeBook.owner._id && 
@@ -439,17 +442,40 @@ const duplicateRecipeBook = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
 const getSharedWithMe = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await RecipeBook.countDocuments({
+      "collaborators.user": userId,
+      owner: { $ne: userId },
+    });
+
     const recipeBooks = await RecipeBook.find({
       "collaborators.user": userId,
       owner: { $ne: userId },
-    }).populate("recipes").populate("owner", "username").populate("collaborators.user", "username");
-    res.status(200).json({ recipeBooks });
+    })
+      .populate("recipes")
+      .populate("owner", "username")
+      .populate("collaborators.user", "username")
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      recipeBooks,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
   } catch (err: any) {
     res.status(500).json({ message: "Error fetching shared recipe books" });
   }

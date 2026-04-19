@@ -91,7 +91,7 @@ export default function EditRecipeBookPage() {
     }
 
     alert("Book updated!");
-    navigate(`/recipe-books/${id}`);
+    navigate(`/recipe-books/${id}`, { replace: true });
 
   } catch (err) {
     console.error(err);

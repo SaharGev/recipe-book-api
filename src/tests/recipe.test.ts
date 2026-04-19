@@ -689,7 +689,6 @@ describe("Recipe API", () => {
       password: "testpassword",
     });
 
-    // other user creates a recipe
     const createResponse = await request(app)
       .post("/recipes")
       .set("Authorization", "Bearer " + otherUser.accessToken)
@@ -697,20 +696,55 @@ describe("Recipe API", () => {
     expect(createResponse.status).toBe(201);
     const recipeId = createResponse.body._id;
 
-    // other user shares it with loginUser
     await request(app)
       .post(`/recipes/${recipeId}/share`)
       .set("Authorization", "Bearer " + otherUser.accessToken)
       .send({ email: loginUser.email });
 
-    // loginUser gets shared recipes
     const response = await request(app)
       .get("/recipes/shared-with-me")
       .set("Authorization", "Bearer " + loginUser.accessToken);
 
     expect(response.status).toBe(200);
-    const titles = response.body.map((r: any) => r.title);
+    expect(response.body).toHaveProperty("recipes");
+    const titles = response.body.recipes.map((r: any) => r.title);
     expect(titles).toContain("Shared With Me Recipe");
+  });
+
+  test("GET /recipes/shared-with-me - supports pagination", async () => {
+    const otherUser = await getLoggedInCustomUser(app, {
+      email: "sharedpag@test.com",
+      username: "sharedPagUser",
+      password: "testpassword",
+    });
+
+    // create 8 recipes and share them
+    for (let i = 0; i < 8; i++) {
+      const createResp = await request(app)
+        .post("/recipes")
+        .set("Authorization", "Bearer " + otherUser.accessToken)
+        .send({ ...recipesList[0], title: `Shared Pag Recipe ${i}`, isPublic: false });
+      
+      await request(app)
+        .post(`/recipes/${createResp.body._id}/share`)
+        .set("Authorization", "Bearer " + otherUser.accessToken)
+        .send({ email: loginUser.email });
+    }
+
+    const page1 = await request(app)
+      .get("/recipes/shared-with-me?page=1&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page1.status).toBe(200);
+    expect(page1.body.recipes.length).toBe(6);
+    expect(page1.body.hasMore).toBe(true);
+
+    const page2 = await request(app)
+      .get("/recipes/shared-with-me?page=2&limit=6")
+      .set("Authorization", "Bearer " + loginUser.accessToken);
+
+    expect(page2.status).toBe(200);
+    expect(page2.body.hasMore).toBe(false);
   });
 
   test("GET /recipes/public - returns only public recipes with pagination", async () => {

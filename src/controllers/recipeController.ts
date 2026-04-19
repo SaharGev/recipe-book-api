@@ -51,11 +51,30 @@ const getSharedWithMe = async (req: AuthRequest, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const recipes = await Recipe.find({
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await Recipe.countDocuments({
       "collaborators.user": userId,
       owner: { $ne: userId },
     });
-    return res.json(recipes);
+
+    const recipes = await Recipe.find({
+      "collaborators.user": userId,
+      owner: { $ne: userId },
+    })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      recipes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
   } catch (err: any) {
     res.status(500).send("Error fetching shared recipes");
   }
@@ -96,11 +115,15 @@ const getRecipeById = async (req: AuthRequest, res: Response) => {
     }
     const recipeId = req.params.id;
     const recipe = await Recipe.findById(recipeId)
+      .populate("owner", "username profileImageUrl")
       .populate("collaborators.user", "username profileImageUrl");
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
-    const isOwner = recipe.owner.toString() === userId.toString();
+    const isOwner = recipe.owner && 
+      (typeof recipe.owner === "object" 
+        ? (recipe.owner as any)._id.toString() === userId.toString()
+        : (recipe.owner as any).toString() === userId.toString());
     const isCollaborator = recipe.collaborators.some(
       (c: any) => {
         const collabId = typeof c.user === "object" ? c.user._id.toString() : c.user.toString();

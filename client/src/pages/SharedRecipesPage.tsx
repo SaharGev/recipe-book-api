@@ -1,9 +1,8 @@
 import { useEffect, useState, useContext, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/AuthContext";
 import BottomNav from "../components/BottomNav";
 import "./MyRecipesPage.css";
-import { getMyLikes } from "../services/recipeService";
+import { getMyLikes, getSharedWithMeRecipes } from "../services/recipeService";
 import PageHeader from "../components/PageHeader";
 import RecipeCard from "../components/RecipeCard";
 import type { Recipe } from "../types/recipe";
@@ -13,17 +12,16 @@ type LikeItem = {
   targetId: string;
 };
 
-export default function MyRecipesPage() {
+export default function SharedRecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [likedIds, setLikedIds] = useState<string[]>([]);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
 
-  const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const observerRef = useRef<HTMLDivElement | null>(null);
   const hasMoreRef = useRef(hasMore);
@@ -45,16 +43,7 @@ export default function MyRecipesPage() {
       if (pageToLoad === 1) setLoading(true);
       else setLoadingMore(true);
 
-      const res = await fetch(`http://localhost:3000/recipes/my?page=${pageToLoad}&limit=6`, {
-        headers: { Authorization: "Bearer " + token },
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to fetch recipes");
-      }
-
-      const data = await res.json();
+      const data = await getSharedWithMeRecipes(token, pageToLoad, 6);
 
       if (pageToLoad === 1) {
         setRecipes(data.recipes);
@@ -80,6 +69,10 @@ export default function MyRecipesPage() {
   }, [token]);
 
   useEffect(() => {
+    fetchRecipes(1);
+  }, [token]);
+
+  useEffect(() => {
     if (loading) return;
     if (!observerRef.current) return;
     const observer = new IntersectionObserver(
@@ -97,40 +90,23 @@ export default function MyRecipesPage() {
     return () => observer.disconnect();
   }, [fetchRecipes, loading]);
 
-  useEffect(() => {
-    fetchRecipes(1);
-  }, [token]);
-
-  if (loading) return <p className="myrecipes-loading-text">Loading your recipes...</p>;
+  if (loading) return <p className="myrecipes-loading-text">Loading shared recipes...</p>;
   if (error) return <p className="myrecipes-error-text">{error}</p>;
 
   if (recipes.length === 0)
     return (
       <div className="myrecipes-page">
-        <PageHeader title="My Recipes" />
-        <p className="myrecipes-recipes-count">0 Recipes</p>
-        <div className="myrecipes-add-button-wrapper">
-          <button className="myrecipes-add-button" onClick={() => navigate("/createRecipe")}>
-            + Add Recipe
-          </button>
-        </div>
-        <p className="myrecipes-empty-text">
-          No recipes yet 🍳<br />
-          Start by adding your first recipe!
-        </p>
+        <PageHeader title="Shared with me" />
+        <p className="myrecipes-empty-text">No recipes shared with you yet 🍳</p>
         <BottomNav />
       </div>
     );
 
   return (
     <div className="myrecipes-page">
-      <PageHeader title="My Recipes" />
+      <PageHeader title="Shared with me" />
       <p className="myrecipes-recipes-count">{total} Recipes</p>
-      <div className="myrecipes-add-button-wrapper">
-        <button className="myrecipes-add-button" onClick={() => navigate("/createRecipe")}>
-          + Add Recipe
-        </button>
-      </div>
+
       <div className="myrecipes-grid">
         {recipes.map((recipe) => (
           <RecipeCard
@@ -140,8 +116,10 @@ export default function MyRecipesPage() {
           />
         ))}
       </div>
-      <div ref={observerRef} style={{ height: "20px", background: "transparent" }} />
+
+      <div ref={observerRef} style={{ height: "20px" }} />
       {loadingMore && <p className="myrecipes-loading-text">Loading more...</p>}
+
       <BottomNav />
     </div>
   );

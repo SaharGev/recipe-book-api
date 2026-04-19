@@ -30,6 +30,9 @@ export default function RecipeDetailsPage() {
   const [friends, setFriends] = useState<{ _id: string; username: string; email: string; profileImageUrl?: string }[]>([]);
   const [friendSearch, setFriendSearch] = useState("");
   const [sharedUserIds, setSharedUserIds] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
+  const [isSharedOpen, setIsSharedOpen] = useState(false);
+
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -48,11 +51,15 @@ export default function RecipeDetailsPage() {
         if (!token) return;
         const res = await apiFetch("http://localhost:3000/users/me", {}, token);
         const data = await res.json();
-        if (res.ok) setCurrentUserId(data._id);
+        if (res.ok) {
+          setCurrentUserId(data._id);
+          setCurrentUser(data);
+        }
       } catch {}
     };
     fetchCurrentUser();
   }, [token]);
+    
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -227,11 +234,21 @@ export default function RecipeDetailsPage() {
           />
 
           {/* SHARED WITH */}
-          {isOwner && !recipe.isPublic && (recipe.collaborators && recipe.collaborators.length > 0) && (
+          {!recipe.isPublic && (
+            recipe.owner || (recipe.collaborators && recipe.collaborators.length > 0)
+          ) && (
             <>
-              <h3>Shared with</h3>
+              <div 
+                className="comments-header"
+                onClick={() => setIsSharedOpen(!isSharedOpen)}
+              >
+                <h3 style={{ margin: 0 }}>Shared with</h3>
+                <span className="comments-toggle">{isSharedOpen ? "▲" : "▼"}</span>
+              </div>
+
+              {isSharedOpen && (
               <div className="shared-with-list">
-                {recipe.owner && typeof recipe.owner === "object" && recipe.owner._id !== currentUserId && (
+                {recipe.owner && typeof recipe.owner === "object" && (
                   <div className="shared-with-item">
                     <div className="share-friend-avatar">
                       {recipe.owner.profileImageUrl ? (
@@ -244,24 +261,42 @@ export default function RecipeDetailsPage() {
                     <span className="shared-with-badge">Owner</span>
                   </div>
                 )}
-                {recipe.collaborators && recipe.collaborators.filter((c: any) => {
-                  const uid = typeof c.user === "object" ? c.user._id : c.user;
-                  return uid !== currentUserId;
-                }).map((c: any) => (
-                  <div key={c.user._id || c.user} className="shared-with-item">
+
+                {!isOwner && currentUser && (
+                  <div className="shared-with-item">
                     <div className="share-friend-avatar">
-                      {c.user.profileImageUrl ? (
-                        <img src={getImageUrl(c.user.profileImageUrl)} alt={c.user.username} />
+                      {currentUser.profileImageUrl ? (
+                        <img src={getImageUrl(currentUser.profileImageUrl)} alt={currentUser.username} />
                       ) : (
                         <div className="share-friend-avatar-placeholder" />
                       )}
                     </div>
-                    <p className="shared-with-username">{c.user.username || "Unknown"}</p>
+                    <p className="shared-with-username">{currentUser.username}</p>
                   </div>
-                ))}
+                )}
+
+                {recipe.collaborators && recipe.collaborators
+                  .filter((c: any) => {
+                    const uid = typeof c.user === "object" ? c.user._id : c.user;
+                    return uid !== currentUserId;
+                  })
+                  .map((c: any) => (
+                    <div key={c.user._id || c.user} className="shared-with-item">
+                      <div className="share-friend-avatar">
+                        {c.user.profileImageUrl ? (
+                          <img src={getImageUrl(c.user.profileImageUrl)} alt={c.user.username} />
+                        ) : (
+                          <div className="share-friend-avatar-placeholder" />
+                        )}
+                      </div>
+                      <p className="shared-with-username">{c.user.username || "Unknown"}</p>
+                    </div>
+                  ))}
               </div>
+              )}
             </>
           )}
+
         </div>
       </div>
       {showShareModal && (

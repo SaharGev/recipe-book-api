@@ -35,7 +35,12 @@ type Collaborator = {
 
 type RecipeBookWithPopulated = Omit<RecipeBook, "collaborators"> & {
   collaborators: Collaborator[];
-  isPublic: boolean; 
+  isPublic: boolean;
+  owner: {
+    _id: string;
+    username?: string;
+    profileImageUrl?: string;
+  } | string;
 };
 
 export default function RecipeBookDetailsPage() {
@@ -56,7 +61,9 @@ const { token } = useContext(AuthContext);
   const [selectedFriendIds, setSelectedFriendIds] = useState<string[]>([]);
   const [shareError, setShareError] = useState("");
   const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
-
+  const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
+  const [isSharedOpen, setIsSharedOpen] = useState(false);
+  
   const fetchBook = async () => {
     try {
       setLoading(true);
@@ -114,7 +121,10 @@ const { token } = useContext(AuthContext);
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const userData = await res.json();
-        if (res.ok) setCurrentUserId(userData._id);
+        if (res.ok) {
+          setCurrentUserId(userData._id);
+          setCurrentUser(userData);
+        }
       } catch {
         setFriends([]);
       }
@@ -216,27 +226,68 @@ const { token } = useContext(AuthContext);
           {(book.recipes as Recipe[])?.length || 0} Recipes
         </p>
 
-        {isOwner && !book.isPublic && book.collaborators && book.collaborators.length > 0 && (
+        {!book.isPublic && (book.owner || (book.collaborators && book.collaborators.length > 0)) && (
           <>
-            <h3 className="book-shared-title">Shared with:</h3>
-            <div className="shared-with-list shared-with-list--left">
-              {book.collaborators.map((c) => {
-                const user = typeof c.user === "string" ? null : c.user;
-                if (!user) return null;
-                return (
-                  <div key={user._id} className="shared-with-item">
-                    <div className="share-friend-avatar">
-                      {user.profileImageUrl ? (
-                        <img src={getImageUrl(user.profileImageUrl)} alt={user.username} />
-                      ) : (
-                        <div className="share-friend-avatar-placeholder" />
-                      )}
-                    </div>
-                    <p className="shared-with-username">{user.username || "Unknown"}</p>
-                  </div>
-                );
-              })}
+            <div 
+              className="comments-header" 
+              onClick={() => setIsSharedOpen(!isSharedOpen)}
+            >
+              <h3 className="book-shared-title" style={{ margin: 0 }}>Shared with</h3>
+              <span className="comments-toggle">{isSharedOpen ? "▲" : "▼"}</span>
             </div>
+
+            {isSharedOpen && (
+            <div className="shared-with-list shared-with-list--left">
+              {book.owner && typeof book.owner === "object" && (
+                <div className="shared-with-item">
+                  <div className="share-friend-avatar">
+                    {(book.owner as any).profileImageUrl ? (
+                      <img src={getImageUrl((book.owner as any).profileImageUrl)} alt={(book.owner as any).username} />
+                    ) : (
+                      <div className="share-friend-avatar-placeholder" />
+                    )}
+                  </div>
+                  <p className="shared-with-username">{(book.owner as any).username}</p>
+                  <span className="shared-with-badge">Owner</span>
+                </div>
+              )}
+
+              {!isOwner && currentUser && (
+                <div className="shared-with-item">
+                  <div className="share-friend-avatar">
+                    {currentUser.profileImageUrl ? (
+                      <img src={getImageUrl(currentUser.profileImageUrl)} alt={currentUser.username} />
+                    ) : (
+                      <div className="share-friend-avatar-placeholder" />
+                    )}
+                  </div>
+                  <p className="shared-with-username">{currentUser.username}</p>
+                </div>
+              )}
+
+              {book.collaborators && book.collaborators
+                .filter((c) => {
+                  const uid = typeof c.user === "object" ? c.user._id : c.user;
+                  return uid !== currentUserId;
+                })
+                .map((c) => {
+                  const user = typeof c.user === "string" ? null : c.user;
+                  if (!user) return null;
+                  return (
+                    <div key={user._id} className="shared-with-item">
+                      <div className="share-friend-avatar">
+                        {user.profileImageUrl ? (
+                          <img src={getImageUrl(user.profileImageUrl)} alt={user.username} />
+                        ) : (
+                          <div className="share-friend-avatar-placeholder" />
+                        )}
+                      </div>
+                      <p className="shared-with-username">{user.username || "Unknown"}</p>
+                    </div>
+                  );
+                })}
+            </div>
+            )}
           </>
         )}
 

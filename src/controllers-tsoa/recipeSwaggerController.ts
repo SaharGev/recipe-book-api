@@ -141,8 +141,17 @@ export class RecipeSwaggerController extends Controller {
   @Response<RecipeSwaggerMessageResponse>("401", "Unauthorized")
   @Security("bearerAuth")
   @Get("shared-with-me")
-  public async getSharedWithMe(): Promise<RecipeSwaggerResponse[]> {
-    return [];
+  public async getSharedWithMe(
+    @Query() page?: number,
+    @Query() limit?: number
+  ): Promise<PaginatedRecipesResponse> {
+    return {
+      recipes: [],
+      total: 0,
+      page: 1,
+      totalPages: 1,
+      hasMore: false,
+    };
   }
 
   /**
