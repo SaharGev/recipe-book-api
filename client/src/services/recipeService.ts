@@ -70,3 +70,19 @@ export async function getPublicRecipes(token: string, page = 1, limit = 6) {
 
   return data;
 }
+
+export async function getSharedWithMeRecipes(token: string) {
+  const response = await apiFetch(
+    "http://localhost:3000/recipes/shared-with-me",
+    {},
+    token
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch shared recipes");
+  }
+
+  return data;
+}

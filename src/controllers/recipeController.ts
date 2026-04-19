@@ -51,11 +51,30 @@ const getSharedWithMe = async (req: AuthRequest, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const recipes = await Recipe.find({
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await Recipe.countDocuments({
       "collaborators.user": userId,
       owner: { $ne: userId },
     });
-    return res.json(recipes);
+
+    const recipes = await Recipe.find({
+      "collaborators.user": userId,
+      owner: { $ne: userId },
+    })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      recipes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    });
   } catch (err: any) {
     res.status(500).send("Error fetching shared recipes");
   }

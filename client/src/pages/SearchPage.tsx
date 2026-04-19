@@ -11,9 +11,10 @@ import { getRecentlyViewed } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../components/AuthContext";
-import { getMyLikes, getRecipe, getPublicRecipes } from "../services/recipeService";
-import { getRecipeBookById, getPublicRecipeBooks } from "../services/recipeBookService";
+import { getMyLikes, getRecipe, getPublicRecipes, getSharedWithMeRecipes } from "../services/recipeService";
+import { getRecipeBookById, getPublicRecipeBooks, getSharedWithMeBooks } from "../services/recipeBookService";
 import PageHeader from "../components/PageHeader";
+
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -28,6 +29,8 @@ export default function SearchPage() {
   const [favoriteBooks, setFavoriteBooks] = useState<RecipeBook[]>([]);
   const [publicRecipes, setPublicRecipes] = useState<Recipe[]>([]);
   const [publicBooks, setPublicBooks] = useState<RecipeBook[]>([]);
+  const [sharedRecipes, setSharedRecipes] = useState<Recipe[]>([]);
+  const [sharedBooks, setSharedBooks] = useState<RecipeBook[]>([]);
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -93,6 +96,22 @@ export default function SearchPage() {
       }
     };
     fetchPublic();
+  }, [token]);
+
+  useEffect(() => {
+    const fetchShared = async () => {
+      try {
+        if (!token) return;
+        const recipesData = await getSharedWithMeRecipes(token);
+        setSharedRecipes(recipesData || []);
+        const booksData = await getSharedWithMeBooks(token);
+        setSharedBooks(booksData.recipeBooks || []);
+      } catch {
+        setSharedRecipes([]);
+        setSharedBooks([]);
+      }
+    };
+    fetchShared();
   }, [token]);
 
   useEffect(() => {
@@ -217,7 +236,7 @@ export default function SearchPage() {
             () => navigate("/public-recipes"),
             (recipe) => (
               <div key={recipe._id} className="search-card-slot">
-                <RecipeCard recipe={recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
+                <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
               </div>
             )
           )}
@@ -228,12 +247,12 @@ export default function SearchPage() {
             () => navigate("/public-books"),
             (book) => (
               <RecipeBookCard
-                key={book._id}
-                _id={book._id}
-                title={book.name}
-                recipesCount={book.recipes?.length || 0}
-                recipes={book.recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes(book._id)}
+                key={(book as RecipeBook)._id}
+                _id={(book as RecipeBook)._id}
+                title={(book as RecipeBook).name}
+                recipesCount={(book as RecipeBook).recipes?.length || 0}
+                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
               />
             )
           )}
@@ -244,7 +263,7 @@ export default function SearchPage() {
             () => navigate("/my-recipes"),
             (recipe) => (
               <div key={recipe._id} className="search-card-slot">
-                <RecipeCard recipe={recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
+                <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
               </div>
             )
           )}
@@ -255,12 +274,12 @@ export default function SearchPage() {
             () => navigate("/my-recipeBooks"),
             (book) => (
               <RecipeBookCard
-                key={book._id}
-                _id={book._id}
-                title={book.name}
-                recipesCount={book.recipes?.length || 0}
-                recipes={book.recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes(book._id)}
+                key={(book as RecipeBook)._id}
+                _id={(book as RecipeBook)._id}
+                title={(book as RecipeBook).name}
+                recipesCount={(book as RecipeBook).recipes?.length || 0}
+                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
               />
             )
           )}
@@ -271,7 +290,7 @@ export default function SearchPage() {
             () => navigate("/favorite-recipes"),
             (recipe) => (
               <div key={recipe._id} className="search-card-slot">
-                <RecipeCard recipe={recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
+                <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
               </div>
             )
           )}
@@ -281,17 +300,44 @@ export default function SearchPage() {
             favoriteBooks,
             () => navigate("/favorite-books"),
             (book) => (
-              <div key={book._id} className="search-card-slot">
-                <RecipeBookCard
-                  _id={book._id}
-                  title={book.name}
-                  recipesCount={book.recipes?.length || 0}
-                  recipes={book.recipes as { imageUrl?: string }[]}
-                  initialLiked={likedBookIds.includes(book._id)}
-                />
+              <RecipeBookCard
+                key={(book as RecipeBook)._id}
+                _id={(book as RecipeBook)._id}
+                title={(book as RecipeBook).name}
+                recipesCount={(book as RecipeBook).recipes?.length || 0}
+                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+              />
+            )
+          )}
+
+          {renderSection(
+            "Shared with me - Recipes",
+            sharedRecipes,
+            () => navigate("/shared-recipes"),
+            (recipe) => (
+              <div key={recipe._id} className="search-card-slot">
+                <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
               </div>
             )
           )}
+
+          {renderSection(
+            "Shared with me - Books",
+            sharedBooks,
+            () => navigate("/shared-books"),
+            (book) => (
+              <RecipeBookCard
+                key={(book as RecipeBook)._id}
+                _id={(book as RecipeBook)._id}
+                title={(book as RecipeBook).name}
+                recipesCount={(book as RecipeBook).recipes?.length || 0}
+                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+              />
+            )
+          )}
+          
         </>
       )}
 
