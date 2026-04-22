@@ -3,6 +3,28 @@ import bcrypt from "bcrypt";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import User from "../models/userModel";
 import admin from "../config/firebaseAdmin";
+import https from "https";
+import fs from "fs";
+import path from "path";
+
+const downloadGoogleImage = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const filename = `google_${Date.now()}.jpg`;
+    const filepath = path.join(__dirname, "..", "..", "public", filename);
+    const file = fs.createWriteStream(filepath);
+
+    https.get(url, (response) => {
+      response.pipe(file);
+      file.on("finish", () => {
+        file.close();
+        resolve(`/public/${filename}`);
+      });
+    }).on("error", (err) => {
+      fs.unlink(filepath, () => {});
+      reject(err);
+    });
+  });
+};
 
 const sendError = (code: number, message: string, res: Response) => {
   return res.status(code).send({ message });
@@ -145,19 +167,33 @@ const googleLogin = async (req: Request, res: Response) => {
       isNewUser = true;
       const username = (name || email.split("@")[0]).trim();
 
+      let savedPicture = picture;
+      if (picture) {
+        try {
+          savedPicture = await downloadGoogleImage(picture);
+        } catch {
+          savedPicture = picture;
+        }
+      }
+
       user = await User.create({
         username,
         email,
         googleId,
         password: undefined,
         refreshTokens: [],
-        profileImageUrl: picture,
+        profileImageUrl: savedPicture,
       });
     } else {
       if (!user.googleId) user.googleId = googleId;
       if (picture && !user.profileImageUrl) {
-        user.profileImageUrl = picture;
+        try {
+          user.profileImageUrl = await downloadGoogleImage(picture);
+        } catch {
+          user.profileImageUrl = picture;
+        }
       }
+      await user.save();
     }
 
     const tokens = generateTokenPair(user._id.toString());

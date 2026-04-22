@@ -29,6 +29,17 @@ interface LogoutRequest {
   refreshToken: string;
 }
 
+interface GoogleLoginRequest {
+  idToken: string;
+}
+
+interface GoogleLoginResponse {
+  _id: string;
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}
+
 interface AuthResponse {
   _id: string;
   token: string;
@@ -109,6 +120,24 @@ export class AuthSwaggerController extends Controller {
   ): Promise<MessageResponse> {
     return {
       message: "Logged out successfully",
+    };
+  }
+
+  /**
+   * Login or register with Google
+   */
+  @SuccessResponse("200", "OK")
+  @Response<MessageResponse>("400", "Bad Request")
+  @Response<MessageResponse>("401", "Unauthorized")
+  @Post("google")
+  public async googleLogin(
+    @Body() _body: GoogleLoginRequest
+  ): Promise<GoogleLoginResponse> {
+    return {
+      _id: "string",
+      accessToken: "string",
+      refreshToken: "string",
+      isNewUser: false,
     };
   }
 }

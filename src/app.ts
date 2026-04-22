@@ -29,6 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

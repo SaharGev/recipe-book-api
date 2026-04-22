@@ -4,11 +4,23 @@ import initApp from "../app";
 import { Express } from "express";
 import mongoose from "mongoose";
 import { getlogedInUser, createRandomObjectId, getLoggedInCustomUser } from "./utils";
+import Comment from "../models/commentModel";
+import User from "../models/userModel";
 
 let app: Express;
 
 beforeAll(async () => {
   app = await initApp();
+});
+
+beforeEach(async () => {
+  await Comment.deleteMany({});
+  await User.deleteMany({});
+});
+
+afterEach(async () => {
+  await Comment.deleteMany({});
+  await User.deleteMany({});
 });
 
 afterAll((done) => {

@@ -7,7 +7,7 @@ import { AiSearchRequest, AiSearchResponse } from "../types/aiTypes";
 export class AiSwaggerController extends Controller {
 
   @Post("ai-search")
-  @Security("jwt")
+  @Security("bearerAuth")
   @Response<{ message: string }>(401, "Unauthorized")
   @Response<{ message: string }>(500, "Failed to perform AI search")
   public async aiSearch(

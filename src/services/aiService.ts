@@ -8,112 +8,96 @@ export const aiSearchService = async (
   query: string,
   userId: string
 ): Promise<AiSearchResponse> => {
-  // analyze AI query
   const filters: AiRecipeSearchFilters = await aiClient.analyzeQuery(query);
+  console.log("AI filters:", JSON.stringify(filters, null, 2));
 
-  // favorites lookup
   let favoriteRecipeIds: string[] = [];
-
   if (filters.favorites) {
     const favoriteLikes = await Like.find({
       userId,
       targetType: "recipe",
     });
-
     favoriteRecipeIds = favoriteLikes.map((like) => like.targetId.toString());
   }
 
-  // derived flags
-  const hasNoFilters =
-    filters.ingredients.length === 0 &&
-    !filters.difficulty &&
-    !filters.title;
+  // who can see what - user sees their own, public, and shared recipes
+  const accessFilter = {
+    $or: [
+      { owner: userId },
+      { isPublic: true },
+      { "collaborators.user": userId },
+    ],
+  };
 
-  // recipe query object
-  const queryObject: {
-    ingredients?: { $all: RegExp[] };
-    difficulty?: "easy" | "medium" | "hard";
-    category?: string;
-  } = {};
+  // build the recipe search conditions based only on AI filters
+  const recipeConditions: object[] = [];
 
   if (filters.ingredients.length > 0) {
-    queryObject.ingredients = {
-      $all: filters.ingredients.map((ing) => new RegExp(ing, "i")),
-    };
+    recipeConditions.push({
+      ingredients: {
+        $all: filters.ingredients.map((ing) => new RegExp(ing, "i")),
+      },
+    });
   }
 
   if (filters.difficulty) {
-    queryObject.difficulty = filters.difficulty;
+    recipeConditions.push({ difficulty: filters.difficulty });
   }
 
-  // access filters
-  const recipeAccessFilter = {
-    $or: [
-      { owner: userId },
-      { isPublic: true },
-      { "collaborators.user": userId },
-    ],
-  };
+  if (filters.title) {
+    recipeConditions.push({ title: { $regex: filters.title, $options: "i" } });
+  }
 
-  const recipeBookAccessFilter = {
-    $or: [
-      { owner: userId },
-      { isPublic: true },
-      { "collaborators.user": userId },
-    ],
-  };
+  if (filters.category) {
+    recipeConditions.push({
+      $or: [
+        { title: { $regex: filters.category, $options: "i" } },
+        { description: { $regex: filters.category, $options: "i" } },
+      ],
+    });
+  }
 
-  // recipes query
+  // if AI found no filters at all, fall back to searching the raw query
+  if (recipeConditions.length === 0) {
+    recipeConditions.push({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+      ],
+    });
+  }
+
   const recipes = await Recipe.find({
     $and: [
-      recipeAccessFilter,
+      accessFilter,
       ...(filters.favorites ? [{ _id: { $in: favoriteRecipeIds } }] : []),
-      {
-        $or: [
-          ...(Object.keys(queryObject).length > 0 ? [queryObject] : []),
-          ...(filters.title
-            ? [{ title: { $regex: filters.title, $options: "i" } }]
-            : []),
-          ...(hasNoFilters
-            ? [{ title: { $regex: query, $options: "i" } }]
-            : []),
-          ...(filters.category
-            ? [
-                { title: { $regex: filters.category, $options: "i" } },
-                { description: { $regex: filters.category, $options: "i" } },
-                { ingredients: { $in: [filters.category] } },
-              ]
-            : []),
-          ...(query
-            ? [
-                {
-                  $or: [
-                    { title: { $regex: query, $options: "i" } },
-                    { description: { $regex: query, $options: "i" } },
-                  ],
-                },
-              ]
-            : []),
-        ],
-      },
+      { $and: recipeConditions },
     ],
   }).limit(10);
 
-  // recipe books query
-  const recipeBooks = await RecipeBook.find({
-      $and: [
-        recipeBookAccessFilter,
-        {
-          $or: [
-            ...(filters.recipeBookName
-              ? [{ name: { $regex: filters.recipeBookName, $options: "i" } }]
-              : []),
-            { name: { $regex: query, $options: "i" } },
-            { description: { $regex: query, $options: "i" } },
-          ],
-        },
+  const recipeBookConditions: object[] = [];
+
+  if (filters.recipeBookName) {
+    recipeBookConditions.push({
+      $or: [
+        { name: { $regex: filters.recipeBookName, $options: "i" } },
+        { description: { $regex: filters.recipeBookName, $options: "i" } },
       ],
-  }).populate("recipes").limit(10);
+    });
+  } else {
+    recipeBookConditions.push({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+      ],
+    });
+  }
+
+  const recipeBooks = await RecipeBook.find({
+    $and: [accessFilter, { $or: recipeBookConditions }],
+  })
+    .populate("recipes")
+    .limit(10);
 
   return {
     originalQuery: query,

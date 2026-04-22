@@ -118,7 +118,7 @@ export default function LoginPage() {
         </button>
 
         <div className="login-footer-text">
-          Already have an account? <Link to="/register">Sign up</Link>
+          Don't have an account? <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>

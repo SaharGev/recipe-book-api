@@ -8,9 +8,7 @@ export interface AiRecipeSearchFilters {
   title?: string;
   category?: string;
   recipeBookName?: string;
-  shared?: boolean;
   favorites?: boolean;
-  recentlyViewed?: boolean;
 }
 
 export interface AiSearchSection {

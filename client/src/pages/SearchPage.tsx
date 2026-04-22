@@ -31,6 +31,7 @@ export default function SearchPage() {
   const [publicBooks, setPublicBooks] = useState<RecipeBook[]>([]);
   const [sharedRecipes, setSharedRecipes] = useState<Recipe[]>([]);
   const [sharedBooks, setSharedBooks] = useState<RecipeBook[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -45,9 +46,11 @@ export default function SearchPage() {
   );
 
   const handleSearch = async () => {
+    if (searchLoading || query.trim().length < 2) return;
     try {
       setSearchLoading(true);
       setSearchError("");
+      setHasSearched(true);
       const data = await aiSearch(query, token);
       setSections(data.sections);
     } catch {
@@ -58,14 +61,10 @@ export default function SearchPage() {
   };
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    if (query.trim().length === 0) {
       setSections([]);
-      return;
+      setHasSearched(false);
     }
-    const timeout = setTimeout(() => {
-      handleSearch();
-    }, 400);
-    return () => clearTimeout(timeout);
   }, [query]);
 
   useEffect(() => {
@@ -219,16 +218,30 @@ export default function SearchPage() {
     <div className="search-page">
       <PageHeader title="Search" showBack={false} />
       <div className="search-input-container">
-        <span className="search-icon">🔍</span>
-        <input
-          type="text"
-          placeholder="Search a recipe..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Search a recipe..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && query.trim().length >= 2 && !searchLoading) {
+                handleSearch();
+              }
+            }}
+          />
+        </div>
+        <button
+          className="search-submit-btn"
+          onClick={handleSearch}
+          disabled={query.trim().length < 2 || searchLoading}
+        >
+          Search
+        </button>
       </div>
 
-      {query.trim().length < 2 && (
+      {!hasSearched && (
         <>
           {renderSection(
             "Public Recipes",
@@ -337,17 +350,16 @@ export default function SearchPage() {
               />
             )
           )}
-
         </>
       )}
 
       {searchLoading && <p>Searching...</p>}
       {searchError && <p>{searchError}</p>}
 
-      {query.trim().length >= 2 && !searchLoading && (
+      {hasSearched && !searchLoading && (
         <>
           {recipesSection && recipesSection.items.length > 0 && (
-            <>
+            <div className="search-section">
               <h3 className="search-section-title">Recipes found</h3>
               <div className={`search-results-section ${recipesSection.items.length === 1 ? "single-result" : ""}`}>
                 {recipesSection.items.map((recipe) => (
@@ -356,11 +368,11 @@ export default function SearchPage() {
                   </div>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {recipeBooksSection && recipeBooksSection.items.length > 0 && (
-            <>
+            <div className="search-section">
               <h3 className="search-section-title">Recipe books found</h3>
               <div className="search-results-section">
                 {recipeBooksSection.items.map((book) => (
@@ -374,7 +386,7 @@ export default function SearchPage() {
                   />
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {sections.every((section) => section.items.length === 0) && (

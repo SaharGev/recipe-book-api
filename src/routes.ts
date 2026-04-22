@@ -424,6 +424,25 @@ const models: TsoaRoute.Models = {
         "additionalProperties": true,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GoogleLoginResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": {"dataType":"string","required":true},
+            "accessToken": {"dataType":"string","required":true},
+            "refreshToken": {"dataType":"string","required":true},
+            "isNewUser": {"dataType":"boolean","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GoogleLoginRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "idToken": {"dataType":"string","required":true},
+        },
+        "additionalProperties": true,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AiRecipeSearchFilters": {
         "dataType": "refObject",
         "properties": {
@@ -432,9 +451,7 @@ const models: TsoaRoute.Models = {
             "title": {"dataType":"string"},
             "category": {"dataType":"string"},
             "recipeBookName": {"dataType":"string"},
-            "shared": {"dataType":"boolean"},
             "favorites": {"dataType":"boolean"},
-            "recentlyViewed": {"dataType":"boolean"},
         },
         "additionalProperties": true,
     },
@@ -865,6 +882,8 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsRecipeSwaggerController_getSharedWithMe: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/recipes/shared-with-me',
             authenticateMiddleware([{"bearerAuth":[]}]),
@@ -883,6 +902,38 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getSharedWithMe',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeSwaggerController_getPublicRecipes: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
+        };
+        app.get('/recipes/public',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeSwaggerController.prototype.getPublicRecipes)),
+
+            async function RecipeSwaggerController_getPublicRecipes(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeSwaggerController_getPublicRecipes, request, response });
+
+                const controller = new RecipeSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getPublicRecipes',
                 controller,
                 response,
                 next,
@@ -1242,6 +1293,8 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsRecipeBookSwaggerController_getSharedWithMe: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/recipe-books/shared-with-me',
             authenticateMiddleware([{"bearerAuth":[]}]),
@@ -1260,6 +1313,38 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getSharedWithMe',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsRecipeBookSwaggerController_getPublicRecipeBooks: Record<string, TsoaRoute.ParameterSchema> = {
+                page: {"in":"query","name":"page","dataType":"double"},
+                limit: {"in":"query","name":"limit","dataType":"double"},
+        };
+        app.get('/recipe-books/public',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(RecipeBookSwaggerController.prototype.getPublicRecipeBooks)),
+
+            async function RecipeBookSwaggerController_getPublicRecipeBooks(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsRecipeBookSwaggerController_getPublicRecipeBooks, request, response });
+
+                const controller = new RecipeBookSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'getPublicRecipeBooks',
                 controller,
                 response,
                 next,
@@ -1797,12 +1882,42 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsAuthSwaggerController_googleLogin: Record<string, TsoaRoute.ParameterSchema> = {
+                _body: {"in":"body","name":"_body","required":true,"ref":"GoogleLoginRequest"},
+        };
+        app.post('/auth/google',
+            ...(fetchMiddlewares<RequestHandler>(AuthSwaggerController)),
+            ...(fetchMiddlewares<RequestHandler>(AuthSwaggerController.prototype.googleLogin)),
+
+            async function AuthSwaggerController_googleLogin(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsAuthSwaggerController_googleLogin, request, response });
+
+                const controller = new AuthSwaggerController();
+
+              await templateService.apiHandler({
+                methodName: 'googleLogin',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAiSwaggerController_aiSearch: Record<string, TsoaRoute.ParameterSchema> = {
                 req: {"in":"request","name":"req","required":true,"dataType":"object"},
                 body: {"in":"body","name":"body","required":true,"ref":"AiSearchRequest"},
         };
         app.post('/ai/ai-search',
-            authenticateMiddleware([{"jwt":[]}]),
+            authenticateMiddleware([{"bearerAuth":[]}]),
             ...(fetchMiddlewares<RequestHandler>(AiSwaggerController)),
             ...(fetchMiddlewares<RequestHandler>(AiSwaggerController.prototype.aiSearch)),
 

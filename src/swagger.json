@@ -824,6 +824,42 @@
 				"type": "object",
 				"additionalProperties": true
 			},
+			"GoogleLoginResponse": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"accessToken": {
+						"type": "string"
+					},
+					"refreshToken": {
+						"type": "string"
+					},
+					"isNewUser": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"_id",
+					"accessToken",
+					"refreshToken",
+					"isNewUser"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
+			"GoogleLoginRequest": {
+				"properties": {
+					"idToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"idToken"
+				],
+				"type": "object",
+				"additionalProperties": true
+			},
 			"AiRecipeSearchFilters": {
 				"properties": {
 					"ingredients": {
@@ -849,13 +885,7 @@
 					"recipeBookName": {
 						"type": "string"
 					},
-					"shared": {
-						"type": "boolean"
-					},
 					"favorites": {
-						"type": "boolean"
-					},
-					"recentlyViewed": {
 						"type": "boolean"
 					}
 				},
@@ -1664,10 +1694,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RecipeSwaggerResponse"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedRecipesResponse"
 								}
 							}
 						}
@@ -1692,7 +1719,82 @@
 						"bearerAuth": []
 					}
 				],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/recipes/public": {
+			"get": {
+				"operationId": "GetPublicRecipes",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaginatedRecipesResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get public recipes with pagination",
+				"tags": [
+					"Recipes"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/recipes/{id}": {
@@ -2373,10 +2475,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RecipeBookSwaggerResponse"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedRecipeBooksResponse"
 								}
 							}
 						}
@@ -2401,7 +2500,82 @@
 						"bearerAuth": []
 					}
 				],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/recipe-books/public": {
+			"get": {
+				"operationId": "GetPublicRecipeBooks",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaginatedRecipeBooksResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RecipeBookSwaggerMessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Get public recipe books with pagination",
+				"tags": [
+					"Recipe Books"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/recipe-books/{bookId}": {
@@ -3279,6 +3453,59 @@
 				}
 			}
 		},
+		"/auth/google": {
+			"post": {
+				"operationId": "GoogleLogin",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GoogleLoginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Login or register with Google",
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GoogleLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/ai/ai-search": {
 			"post": {
 				"operationId": "AiSearch",
@@ -3335,7 +3562,7 @@
 				],
 				"security": [
 					{
-						"jwt": []
+						"bearerAuth": []
 					}
 				],
 				"parameters": [],
