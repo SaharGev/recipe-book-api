@@ -275,7 +275,7 @@ export default function SearchPage() {
           {renderSection(
             "Recently viewed recipes",
             recentlyViewedRecipes,
-            () => navigate("/my-recipes"),
+            () => navigate("/recently-viewed-recipes"),
             (recipe) => (
               <div key={recipe._id} className="search-card-slot">
                 <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
@@ -286,7 +286,7 @@ export default function SearchPage() {
           {renderSection(
             "Recently viewed books",
             recentlyViewedBooks,
-            () => navigate("/my-recipeBooks"),
+            () => navigate("/recently-viewed-books"),
             (book) => (
               <div key={(book as RecipeBook)._id} className="search-card-slot">
                 <RecipeBookCard

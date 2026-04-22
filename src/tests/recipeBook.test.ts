@@ -815,6 +815,8 @@ describe("RecipeBook API", () => {
       password: "password123",
     });
 
+    await RecipeBook.deleteMany({});
+    
     // create 8 books and share them
     for (let i = 0; i < 8; i++) {
       const bookResp = await createRecipeBook(app, otherUser.accessToken, {
