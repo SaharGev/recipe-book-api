@@ -5,10 +5,15 @@
     "target": "es6",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": ["es2021"],
+    "skipLibCheck": true
   },
-  "lib": ["es2015"],
   "exclude": [
-    "./src/tests"
+    "./src/tests",
+    "./client",
+    "node_modules"
   ]
 }
