@@ -65,6 +65,7 @@ const getSharedWithMe = async (req: AuthRequest, res: Response) => {
       "collaborators.user": userId,
       owner: { $ne: userId },
     })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -92,6 +93,7 @@ const getMyRecipes = async (req: AuthRequest, res: Response) => {
 
     const total = await Recipe.countDocuments({ owner: userId });
     const myRecipes = await Recipe.find({ owner: userId })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

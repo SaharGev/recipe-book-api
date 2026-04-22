@@ -99,6 +99,20 @@ export default function CompleteProfilePage() {
           className="settings-save-btn"
           disabled={loading}
           onClick={async () => {
+            const newErrors: { username?: string; phone?: string } = {};
+
+            if (!username.trim() || username.length < 3) {
+              newErrors.username = "Username must be at least 3 characters";
+            }
+
+            if (phone && !/^[0-9]{9,10}$/.test(phone)) {
+              newErrors.phone = "Phone must be 9-10 digits";
+            }
+
+            if (Object.keys(newErrors).length > 0) {
+              setErrors(newErrors);
+              return;
+            }
             try {
               setLoading(true);
               if (!token) return;

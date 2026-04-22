@@ -121,7 +121,7 @@ const getAllRecipeBooks = async (req: AuthRequest, res: Response) => {
     const collaboratedBooksQuery = { "collaborators.user": userId };
     const recipeBooks = await RecipeBook.find({
         $or: [publicBooksQuery, ownedBooksQuery, collaboratedBooksQuery]
-    }).populate("recipes").populate("owner", "username").populate("collaborators.user", "username");
+    }).populate("recipes").populate("owner", "username").populate("collaborators.user", "username").sort({ createdAt: -1 });
     res.status(200).json({message: "Recipe books fetched successfully", recipeBooks });
     } catch (err: any) {
     res.status(500).json({ message: "Error fetching recipe books", error: err.message });
@@ -144,6 +144,7 @@ const getMyRecipeBooks = async (req: AuthRequest, res: Response) => {
       .populate("recipes")
       .populate("owner", "username")
       .populate("collaborators.user", "username")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -466,6 +467,7 @@ const getSharedWithMe = async (req: AuthRequest, res: Response) => {
       .populate("recipes")
       .populate("owner", "username")
       .populate("collaborators.user", "username")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

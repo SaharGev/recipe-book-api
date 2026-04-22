@@ -11,7 +11,7 @@ import { getImageUrl } from "../utils/getImageUrl";
 import "./RecipeBookDetailsPage.css";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
-import CommentsSection from "../components/CommentsSection";
+import { getCommentCount } from "../services/commentService";
 import RecipeCard from "../components/RecipeCard";
 
 
@@ -63,7 +63,12 @@ const { token } = useContext(AuthContext);
   const [likedRecipeIds, setLikedRecipeIds] = useState<string[]>([]);
   const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
   const [isSharedOpen, setIsSharedOpen] = useState(false);
-  
+  const [commentCount, setCommentCount] = useState(0);
+
+  useEffect(() => {
+    getCommentCount("recipe", id || "").then(setCommentCount);
+  }, [id]);
+
   const fetchBook = async () => {
     try {
       setLoading(true);
@@ -226,6 +231,14 @@ const { token } = useContext(AuthContext);
           {(book.recipes as Recipe[])?.length || 0} Recipes
         </p>
 
+        <button
+          className="comments-nav-btn"
+          onClick={() => navigate(`/comments/recipe/${id}`)}
+        >
+          💬 Comments {commentCount > 0 && `(${commentCount})`}
+          <span style={{ marginLeft: "auto" }}>›</span>
+        </button>
+
         {!book.isPublic && (book.owner || (book.collaborators && book.collaborators.length > 0)) && (
           <>
             <div 
@@ -290,12 +303,6 @@ const { token } = useContext(AuthContext);
             )}
           </>
         )}
-
-        <CommentsSection
-          targetType="book"
-          targetId={id || ""}
-          currentUserId={currentUserId}
-        />
 
         <h3 className="book-section-title">Recipes:</h3>
         {(book.recipes as Recipe[])?.length === 0 ? (

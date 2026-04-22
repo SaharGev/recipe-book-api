@@ -259,22 +259,23 @@ export default function SearchPage() {
             publicBooks,
             () => navigate("/public-books"),
             (book) => (
-              <RecipeBookCard
-                key={(book as RecipeBook)._id}
-                _id={(book as RecipeBook)._id}
-                title={(book as RecipeBook).name}
-                recipesCount={(book as RecipeBook).recipes?.length || 0}
-                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
-                isPublic={(book as any).isPublic}
-              />
+              <div key={(book as RecipeBook)._id} className="search-card-slot">
+                <RecipeBookCard
+                  _id={(book as RecipeBook)._id}
+                  title={(book as RecipeBook).name}
+                  recipesCount={(book as RecipeBook).recipes?.length || 0}
+                  recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                  initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                  isPublic={(book as any).isPublic}
+                />
+              </div>
             )
           )}
 
           {renderSection(
             "Recently viewed recipes",
             recentlyViewedRecipes,
-            () => navigate("/my-recipes"),
+            () => navigate("/recently-viewed-recipes"),
             (recipe) => (
               <div key={recipe._id} className="search-card-slot">
                 <RecipeCard recipe={recipe as Recipe} initialLiked={likedRecipeIds.includes(recipe._id)} />
@@ -285,17 +286,18 @@ export default function SearchPage() {
           {renderSection(
             "Recently viewed books",
             recentlyViewedBooks,
-            () => navigate("/my-recipeBooks"),
+            () => navigate("/recently-viewed-books"),
             (book) => (
-              <RecipeBookCard
-                key={(book as RecipeBook)._id}
-                _id={(book as RecipeBook)._id}
-                title={(book as RecipeBook).name}
-                recipesCount={(book as RecipeBook).recipes?.length || 0}
-                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
-                isPublic={(book as any).isPublic}
-              />
+              <div key={(book as RecipeBook)._id} className="search-card-slot">
+                <RecipeBookCard
+                  _id={(book as RecipeBook)._id}
+                  title={(book as RecipeBook).name}
+                  recipesCount={(book as RecipeBook).recipes?.length || 0}
+                  recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                  initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                  isPublic={(book as any).isPublic}
+                />
+              </div>
             )
           )}
 
@@ -315,15 +317,16 @@ export default function SearchPage() {
             favoriteBooks,
             () => navigate("/favorite-books"),
             (book) => (
-              <RecipeBookCard
-                key={(book as RecipeBook)._id}
-                _id={(book as RecipeBook)._id}
-                title={(book as RecipeBook).name}
-                recipesCount={(book as RecipeBook).recipes?.length || 0}
-                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
-                isPublic={(book as any).isPublic}
-              />
+              <div key={(book as RecipeBook)._id} className="search-card-slot">
+                <RecipeBookCard
+                  _id={(book as RecipeBook)._id}
+                  title={(book as RecipeBook).name}
+                  recipesCount={(book as RecipeBook).recipes?.length || 0}
+                  recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                  initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                  isPublic={(book as any).isPublic}
+                />
+              </div>
             )
           )}
 
@@ -343,15 +346,16 @@ export default function SearchPage() {
             sharedBooks,
             () => navigate("/shared-books"),
             (book) => (
-              <RecipeBookCard
-                key={(book as RecipeBook)._id}
-                _id={(book as RecipeBook)._id}
-                title={(book as RecipeBook).name}
-                recipesCount={(book as RecipeBook).recipes?.length || 0}
-                recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
-                initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
-                isPublic={(book as any).isPublic}
-              />
+              <div key={(book as RecipeBook)._id} className="search-card-slot">
+                <RecipeBookCard
+                  _id={(book as RecipeBook)._id}
+                  title={(book as RecipeBook).name}
+                  recipesCount={(book as RecipeBook).recipes?.length || 0}
+                  recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
+                  initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                  isPublic={(book as any).isPublic}
+                />
+              </div>
             )
           )}
         </>
@@ -380,15 +384,16 @@ export default function SearchPage() {
               <h3 className="search-section-title">Recipe books found</h3>
               <div className="search-results-section">
                 {recipeBooksSection.items.map((book) => (
-                  <RecipeBookCard
-                    key={book._id}
-                    _id={book._id}
-                    title={book.name}
-                    recipesCount={book.recipes?.length || 0}
-                    recipes={book.recipes as { imageUrl?: string }[]}
-                    initialLiked={likedBookIds.includes(book._id)}
-                    isPublic={(book as any).isPublic}
-                  />
+                  <div key={book._id} className="search-card-slot">
+                    <RecipeBookCard
+                      _id={book._id}
+                      title={book.name}
+                      recipesCount={book.recipes?.length || 0}
+                      recipes={book.recipes as { imageUrl?: string }[]}
+                      initialLiked={likedBookIds.includes(book._id)}
+                      isPublic={(book as any).isPublic}
+                    />
+                  </div>
                 ))}
               </div>
             </div>

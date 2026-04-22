@@ -22,6 +22,27 @@ export default function RegisterPage() {
   e.preventDefault();
   setError("");
 
+    if (!username.trim() || username.length < 3) {
+    setError("Username must be at least 3 characters");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    setError("Please enter a valid email address");
+    return;
+  }
+
+  if (phone && !/^[0-9]{9,10}$/.test(phone)) {
+    setError("Phone must be 9-10 digits");
+    return;
+  }
+
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters");
+    return;
+  }
+
   try {
     const data = await register(username, email, phone, password);
 

@@ -92,6 +92,8 @@
   color: #8a8a8a;
   justify-content: center;
   margin-top: 2px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .recipe-like-comment-row {

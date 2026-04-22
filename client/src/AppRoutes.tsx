@@ -24,6 +24,10 @@ import PublicRecipesPage from "./pages/PublicRecipesPage";
 import PublicBooksPage from "./pages/PublicBooksPage";
 import SharedRecipesPage from "./pages/SharedRecipesPage";
 import SharedBooksPage from "./pages/SharedBooksPage";
+import CommentsPage from "./pages/CommentsPage";
+import RecentlyViewedRecipesPage from "./pages/RecentlyViewedRecipesPage";
+import RecentlyViewedBooksPage from "./pages/RecentlyViewedBooksPage";
+
 
 export default function AppRoutes() {
   const { token } = useContext(AuthContext);
@@ -54,6 +58,9 @@ export default function AppRoutes() {
         <Route path="/public-books" element={token ? <PublicBooksPage /> : <Navigate to="/" />} />
         <Route path="/shared-recipes" element={token ? <SharedRecipesPage /> : <Navigate to="/" />} />
         <Route path="/shared-books" element={token ? <SharedBooksPage /> : <Navigate to="/" />} />
+        <Route path="/comments/:targetType/:targetId" element={token ? <CommentsPage /> : <Navigate to="/" />} />
+        <Route path="/recently-viewed-recipes" element={token ? <RecentlyViewedRecipesPage /> : <Navigate to="/" />} />
+        <Route path="/recently-viewed-books" element={token ? <RecentlyViewedBooksPage /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

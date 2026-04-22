@@ -28,7 +28,7 @@ export default function CommentsSection({ targetType, targetId, currentUserId }:
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     const fetchComments = async () => {

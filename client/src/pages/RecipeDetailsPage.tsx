@@ -10,9 +10,25 @@ import { getImageUrl } from "../utils/getImageUrl";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
-import CommentsSection from "../components/CommentsSection";
+import { getCommentCount } from "../services/commentService";
 
-
+function InstructionStepItem({ text }: { text: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <div className="step-row-view">
+      <button
+        type="button"
+        className={`step-checkbox ${done ? "step-done" : ""}`}
+        onClick={() => setDone(!done)}
+      >
+        {done ? "✓" : ""}
+      </button>
+      <span className={done ? "step-text step-text-done" : "step-text"}>
+        {text}
+      </span>
+    </div>
+  );
+}
 
 
 export default function RecipeDetailsPage() {
@@ -32,7 +48,11 @@ export default function RecipeDetailsPage() {
   const [sharedUserIds, setSharedUserIds] = useState<string[]>([]);
   const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
   const [isSharedOpen, setIsSharedOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
+  useEffect(() => {
+    getCommentCount("recipe", id || "").then(setCommentCount);
+  }, [id]);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -223,15 +243,21 @@ export default function RecipeDetailsPage() {
           {recipe.instructions && (
             <>
               <h3>Instructions</h3>
-              <p className="instructions">{recipe.instructions}</p>
+              <div className="instructions-list">
+                {recipe.instructions.split("\n").filter(Boolean).map((step, i) => (
+                  <InstructionStepItem key={i} text={step.replace(/^\d+\.\s*/, "")} />
+                ))}
+              </div>
             </>
           )}
 
-          <CommentsSection
-            targetType="recipe"
-            targetId={id || ""}
-            currentUserId={currentUserId}
-          />
+          <button
+            className="comments-nav-btn"
+            onClick={() => navigate(`/comments/recipe/${id}`)}
+          >
+            💬 Comments {commentCount > 0 && `(${commentCount})`}
+            <span style={{ marginLeft: "auto" }}>›</span>
+          </button>
 
           {/* SHARED WITH */}
           {!recipe.isPublic && (

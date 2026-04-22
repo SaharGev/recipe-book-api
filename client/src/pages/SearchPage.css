@@ -74,7 +74,14 @@
 }
 
 .search-results-section > * {
-  flex: 0 0 160px;
+  flex: 0 0 auto;
+}
+
+.search-card-slot {
+  flex: 0 0 175px;
+  width: 175px;
+  display: flex;
+  flex-direction: column;
 }
 
 .search-section {
