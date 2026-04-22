@@ -68,6 +68,21 @@ export default function EditRecipeBookPage() {
     }
   };
 
+  const handleDeleteBook = async () => {
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`http://localhost:3000/recipe-books/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      navigate("/my-recipeBooks");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error deleting book");
+    }
+  };
+
   const handleUpdateBook = async () => {
   try {
     const token = localStorage.getItem("accessToken");
@@ -182,7 +197,10 @@ export default function EditRecipeBookPage() {
 
         <div className="update-book-wrapper">
           <button className="update-book-btn" onClick={handleUpdateBook}>
-              Update Book
+            Update Book
+          </button>
+          <button className="delete-book-btn" onClick={handleDeleteBook}>
+            Delete Book
           </button>
         </div>
        </div>

@@ -12,7 +12,23 @@ import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
 import CommentsSection from "../components/CommentsSection";
 
-
+function InstructionStepItem({ text }: { text: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <div className="step-row-view">
+      <button
+        type="button"
+        className={`step-checkbox ${done ? "step-done" : ""}`}
+        onClick={() => setDone(!done)}
+      >
+        {done ? "✓" : ""}
+      </button>
+      <span className={done ? "step-text step-text-done" : "step-text"}>
+        {text}
+      </span>
+    </div>
+  );
+}
 
 
 export default function RecipeDetailsPage() {
@@ -223,7 +239,11 @@ export default function RecipeDetailsPage() {
           {recipe.instructions && (
             <>
               <h3>Instructions</h3>
-              <p className="instructions">{recipe.instructions}</p>
+              <div className="instructions-list">
+                {recipe.instructions.split("\n").filter(Boolean).map((step, i) => (
+                  <InstructionStepItem key={i} text={step.replace(/^\d+\.\s*/, "")} />
+                ))}
+              </div>
             </>
           )}
 
