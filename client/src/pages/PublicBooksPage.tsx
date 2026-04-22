@@ -112,6 +112,7 @@ export default function PublicBooksPage() {
             recipesCount={book.recipes?.length || 0}
             recipes={book.recipes as { imageUrl?: string }[]}
             initialLiked={likedBookIds.includes(book._id)}
+            isPublic={(book as any).isPublic}
           />
         ))}
       </div>

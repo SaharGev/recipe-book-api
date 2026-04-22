@@ -266,6 +266,7 @@ export default function SearchPage() {
                 recipesCount={(book as RecipeBook).recipes?.length || 0}
                 recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
                 initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                isPublic={(book as any).isPublic}
               />
             )
           )}
@@ -293,6 +294,7 @@ export default function SearchPage() {
                 recipesCount={(book as RecipeBook).recipes?.length || 0}
                 recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
                 initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                isPublic={(book as any).isPublic}
               />
             )
           )}
@@ -320,6 +322,7 @@ export default function SearchPage() {
                 recipesCount={(book as RecipeBook).recipes?.length || 0}
                 recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
                 initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                isPublic={(book as any).isPublic}
               />
             )
           )}
@@ -347,6 +350,7 @@ export default function SearchPage() {
                 recipesCount={(book as RecipeBook).recipes?.length || 0}
                 recipes={(book as RecipeBook).recipes as { imageUrl?: string }[]}
                 initialLiked={likedBookIds.includes((book as RecipeBook)._id)}
+                isPublic={(book as any).isPublic}
               />
             )
           )}
@@ -383,6 +387,7 @@ export default function SearchPage() {
                     recipesCount={book.recipes?.length || 0}
                     recipes={book.recipes as { imageUrl?: string }[]}
                     initialLiked={likedBookIds.includes(book._id)}
+                    isPublic={(book as any).isPublic}
                   />
                 ))}
               </div>

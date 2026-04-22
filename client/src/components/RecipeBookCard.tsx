@@ -15,10 +15,11 @@ type RecipeBookCardProps = {
   recipesCount: number;
   recipes?: RecipePreview[];
   initialLiked?: boolean;
+  isPublic?: boolean;
   onLikeToggle?: (id: string, liked: boolean) => void;
 };
 
-export default function RecipeBookCard({ _id, title, recipesCount, recipes = [], initialLiked = false, onLikeToggle }: RecipeBookCardProps) {
+export default function RecipeBookCard({ _id, title, recipesCount, recipes = [], initialLiked = false, isPublic, onLikeToggle }: RecipeBookCardProps) {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const [liked, setLiked] = useState(initialLiked);
@@ -91,7 +92,7 @@ export default function RecipeBookCard({ _id, title, recipesCount, recipes = [],
       </div>
       
       <h3>{title}</h3>
-      <p>{recipesCount} recipes</p>
+      <p>{recipesCount} recipes {isPublic !== undefined && (isPublic ? "🌍" : "🔒")}</p>
     </div>
   );
 }

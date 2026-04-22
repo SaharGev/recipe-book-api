@@ -78,7 +78,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && <div className="login-error">{error}</div>}          <div className="forgot-password">Forgot password?</div>
+          {error && <div className="login-error">{error}</div>}
           <button className="login-button" type="submit">
             Login
           </button>

@@ -80,6 +80,9 @@ export default function RecipeCard({ recipe, initialLiked = false, showDescripti
                 <div className="recipe-card-meta">
                   {recipe.cookTime && <span className="recipe-card-time">⏱ {recipe.cookTime} min</span>}
                   {recipe.difficulty && <span className="recipe-card-time">• {recipe.difficulty}</span>}
+                  {recipe.isPublic !== undefined && (
+                    <span className="recipe-card-time">• {recipe.isPublic ? "🌍" : "🔒"}</span>
+                  )}
                 </div>
             </div>
         </div>
