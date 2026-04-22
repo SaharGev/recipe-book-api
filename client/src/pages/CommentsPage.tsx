@@ -24,6 +24,10 @@ export default function CommentsPage() {
     fetchUser();
   }, [token]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   
   return (
     <div style={{ minHeight: "100vh", background: "#fff", padding: "24px 16px 100px" }}>

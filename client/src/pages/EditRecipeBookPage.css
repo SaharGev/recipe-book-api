@@ -240,7 +240,8 @@
 .update-book-wrapper {
   padding: 20px 16px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .card-description-erb {

@@ -119,6 +119,25 @@ export default function SettingsPage() {
           className="settings-save-btn"
           disabled={loading}
           onClick={async () => {
+            const newErrors: { username?: string; email?: string; phone?: string } = {};
+
+            if (!username.trim() || username.length < 3) {
+              newErrors.username = "Username must be at least 3 characters";
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+              newErrors.email = "Please enter a valid email address";
+            }
+
+            if (phone && !/^[0-9]{9,10}$/.test(phone)) {
+              newErrors.phone = "Phone must be 9-10 digits";
+            }
+
+            if (Object.keys(newErrors).length > 0) {
+              setErrors(newErrors);
+              return;
+            }
             try {
               setLoading(true);
               setMessage("");
