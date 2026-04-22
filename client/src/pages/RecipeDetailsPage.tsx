@@ -10,7 +10,7 @@ import { getImageUrl } from "../utils/getImageUrl";
 import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
-import CommentsSection from "../components/CommentsSection";
+import { getCommentCount } from "../services/commentService";
 
 function InstructionStepItem({ text }: { text: string }) {
   const [done, setDone] = useState(false);
@@ -48,7 +48,11 @@ export default function RecipeDetailsPage() {
   const [sharedUserIds, setSharedUserIds] = useState<string[]>([]);
   const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
   const [isSharedOpen, setIsSharedOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
+  useEffect(() => {
+    getCommentCount("recipe", id || "").then(setCommentCount);
+  }, [id]);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -247,11 +251,13 @@ export default function RecipeDetailsPage() {
             </>
           )}
 
-          <CommentsSection
-            targetType="recipe"
-            targetId={id || ""}
-            currentUserId={currentUserId}
-          />
+          <button
+            className="comments-nav-btn"
+            onClick={() => navigate(`/comments/recipe/${id}`)}
+          >
+            💬 Comments {commentCount > 0 && `(${commentCount})`}
+            <span style={{ marginLeft: "auto" }}>›</span>
+          </button>
 
           {/* SHARED WITH */}
           {!recipe.isPublic && (

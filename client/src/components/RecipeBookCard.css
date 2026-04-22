@@ -4,9 +4,11 @@
   gap: 6px;
   padding: 6px;
   border-radius: 14px;
-
   background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .recipe-book-card h3 {
@@ -14,12 +16,14 @@
   font-size: 16px;
   font-weight: 600;
   color: #1f2d3d;
+  text-align: center;
 }
 
 .recipe-book-card p {
   margin: 0;
   font-size: 14px;
   color: #8a8a8a;
+  text-align: center;
 }
 
 .recipe-preview {
@@ -34,7 +38,7 @@
 
 .recipe-thumb {
   width: 100%;
-  height: 78px;
+  height: 80px;
   object-fit: cover;
   display: block;
 }

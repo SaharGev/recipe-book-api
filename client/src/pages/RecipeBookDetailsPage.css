@@ -354,3 +354,31 @@
   align-items: center;
   justify-content: center;
 }
+
+.comments-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  background: #f6f6f6;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2d3d;
+  cursor: pointer;
+  text-align: left;
+}
+
+.comments-nav-btn span {
+  margin-left: auto;
+  font-size: 22px;
+  color: #8eabeb;
+}
+
+.comments-nav-btn:hover {
+  background: #eef1fb;
+}
