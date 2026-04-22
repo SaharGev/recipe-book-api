@@ -4,6 +4,7 @@ import { AuthContext } from "../components/AuthContext";
 import { updateCurrentUser, uploadProfileImage, updateProfileImage, getCurrentUser } from "../services/userService";
 import { getImageUrl } from "../utils/getImageUrl";
 import "./SettingsPage.css";
+import PageHeader from "../components/PageHeader";
 
 export default function CompleteProfilePage() {
   const { token } = useContext(AuthContext);
@@ -34,9 +35,7 @@ export default function CompleteProfilePage() {
 
   return (
     <div className="settings-page">
-      <h2 className="settings-title" style={{ textAlign: "center", marginBottom: "24px" }}>
-        Complete Your Profile
-      </h2>
+      <PageHeader title="Complete Your Profile" />
 
       <div className="settings-section">
         <div className="settings-avatar-wrapper">
