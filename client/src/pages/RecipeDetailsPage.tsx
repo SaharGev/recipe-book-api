@@ -49,6 +49,7 @@ export default function RecipeDetailsPage() {
   const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
   const [isSharedOpen, setIsSharedOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
     getCommentCount("recipe", id || "").then(setCommentCount);
@@ -89,6 +90,7 @@ export default function RecipeDetailsPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 403) setForbidden(true);
         return;
       }
 
@@ -148,6 +150,15 @@ export default function RecipeDetailsPage() {
     }
   };
 
+  if (forbidden) return (
+    <div className="recipe-page-wrapper">
+      <div style={{ textAlign: "center", padding: "40px" }}>
+        <h2>🔒 Private Recipe</h2>
+        <p>This recipe is private and cannot be accessed.</p>
+        <button onClick={() => navigate(-1)}>Go Back</button>
+      </div>
+    </div>
+  );
   if (!recipe) return <p>Loading...</p>;
 
   const isOwner = currentUserId && recipe.owner && 
