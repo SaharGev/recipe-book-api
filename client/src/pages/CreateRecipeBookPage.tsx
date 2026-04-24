@@ -53,7 +53,7 @@ export default function CreateRecipeBookPage() {
 
     const fetchBooks = async () => {
       try {
-        const res = await fetch("http://localhost:3000/recipe-books/my", {
+        const res = await fetch("/recipe-books/my", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const text = await res.text();
@@ -78,7 +78,7 @@ export default function CreateRecipeBookPage() {
 
   const fetchRecipes = async () => {
     try {
-      const res = await fetch("http://localhost:3000/recipes/my", {
+      const res = await fetch("/recipes/my", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -102,7 +102,7 @@ export default function CreateRecipeBookPage() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/recipe-books", {
+      const res = await fetch("/recipe-books", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export default function CreateRecipeBookPage() {
     }
     try {
       const res = await fetch(
-        `http://localhost:3000/recipe-books/${selectedBookId}/recipes/${selectedRecipeId}`,
+        `/recipe-books/${selectedBookId}/recipes/${selectedRecipeId}`,
         {
           method: "POST",
           headers: {

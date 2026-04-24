@@ -130,7 +130,7 @@ export default function RegisterPage() {
           onClick={async () => {
             try {
               const idToken = await signInWithGoogle();
-              const response = await fetch("http://localhost:3000/auth/google", {
+              const response = await fetch("/auth/google", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ idToken }),

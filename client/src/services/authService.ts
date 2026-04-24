@@ -1,7 +1,7 @@
 export async function login(identifier: string, password: string) {
   const isEmail = identifier.includes("@");
 
-  const response = await fetch("http://localhost:3000/auth/login", {
+  const response = await fetch("/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export async function login(identifier: string, password: string) {
 }
 
 export async function logout(refreshToken: string) {
-  const response = await fetch("http://localhost:3000/auth/logout", {
+  const response = await fetch("/auth/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function logout(refreshToken: string) {
 export async function getRecentlyViewed() {
   const token = localStorage.getItem("accessToken");
 
-  const response = await fetch("http://localhost:3000/users/me/recently-viewed", {
+  const response = await fetch("/users/me/recently-viewed", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -65,7 +65,7 @@ export async function refreshAccessToken(): Promise<string | null> {
 
   if (!refreshToken) return null;
 
-  const response = await fetch("http://localhost:3000/auth/refresh", {
+  const response = await fetch("/auth/refresh", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

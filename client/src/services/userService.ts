@@ -2,7 +2,7 @@ import type { User } from "../types/user";
 import { apiFetch } from "./apiClient";
 
 export async function getCurrentUser(token: string): Promise<User> {
-  const response = await apiFetch("http://localhost:3000/users/me", {}, token);
+  const response = await apiFetch("/users/me", {}, token);
 
   const data = await response.json();
 
@@ -14,7 +14,7 @@ export async function getCurrentUser(token: string): Promise<User> {
 }
 
 export async function updateCurrentUser(token: string, data: { username?: string; email?: string; phone?: string }) {
-  const response = await apiFetch("http://localhost:3000/users/me", {
+  const response = await apiFetch("/users/me", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export async function updateCurrentUser(token: string, data: { username?: string
 }
 
 export async function updateProfileImage(token: string, imageUrl: string) {
-  const response = await apiFetch("http://localhost:3000/users/profile-image", {
+  const response = await apiFetch("/users/profile-image", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function uploadProfileImage(token: string, file: File): Promise<str
   const formData = new FormData();
   formData.append("image", file);
 
-  const response = await apiFetch("http://localhost:3000/upload/image", {
+  const response = await apiFetch("/upload/image", {
     method: "POST",
     body: formData,
   }, token);
@@ -68,7 +68,7 @@ export async function uploadProfileImage(token: string, file: File): Promise<str
 }
 
 export async function getFriends(token: string) {
-  const response = await apiFetch("http://localhost:3000/users/friends", {}, token);
+  const response = await apiFetch("/users/friends", {}, token);
 
   const data = await response.json();
 
@@ -81,7 +81,7 @@ export async function getFriends(token: string) {
 
 export async function getFriendsPaginated(token: string, page = 1, limit = 10) {
   const response = await apiFetch(
-    `http://localhost:3000/users/friends?page=${page}&limit=${limit}`,
+    `/users/friends?page=${page}&limit=${limit}`,
     {},
     token
   );
@@ -93,7 +93,7 @@ export async function getFriendsPaginated(token: string, page = 1, limit = 10) {
 }
 
 export async function addFriend(token: string, identifier: string) {
-  const response = await apiFetch("http://localhost:3000/users/friends", {
+  const response = await apiFetch("/users/friends", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ identifier }),
@@ -109,7 +109,7 @@ export async function addFriend(token: string, identifier: string) {
 }
 
 export async function removeFriend(token: string, friendId: string) {
-  const response = await apiFetch(`http://localhost:3000/users/friends/${friendId}`, {
+  const response = await apiFetch(`/users/friends/${friendId}`, {
     method: "DELETE",
   }, token);
 
@@ -124,7 +124,7 @@ export async function removeFriend(token: string, friendId: string) {
 
 export async function searchUsers(token: string, query: string) {
   const response = await apiFetch(
-    `http://localhost:3000/users/search?query=${encodeURIComponent(query)}`,
+    `/users/search?query=${encodeURIComponent(query)}`,
     {},
     token
   );

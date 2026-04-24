@@ -69,7 +69,7 @@ export default function RecipeDetailsPage() {
     const fetchCurrentUser = async () => {
       try {
         if (!token) return;
-        const res = await apiFetch("http://localhost:3000/users/me", {}, token);
+        const res = await apiFetch("/users/me", {}, token);
         const data = await res.json();
         if (res.ok) {
           setCurrentUserId(data._id);
@@ -84,7 +84,7 @@ export default function RecipeDetailsPage() {
   useEffect(() => {
     const fetchRecipe = async () => {
       if (!accessToken) return;
-      const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, accessToken);
+      const res = await apiFetch(`/recipes/${id}`, {}, accessToken);
 
       const data = await res.json();
 
@@ -114,7 +114,7 @@ export default function RecipeDetailsPage() {
       for (const friendId of toShare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        const response = await fetch(`http://localhost:3000/recipes/${id}/share`, {
+        const response = await fetch(`/recipes/${id}/share`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -129,7 +129,7 @@ export default function RecipeDetailsPage() {
       for (const friendId of toUnshare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        const response = await fetch(`http://localhost:3000/recipes/${id}/unshare`, {
+        const response = await fetch(`/recipes/${id}/unshare`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

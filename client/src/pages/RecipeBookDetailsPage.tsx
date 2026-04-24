@@ -101,7 +101,7 @@ const { token } = useContext(AuthContext);
       try {
         const accessToken = token || localStorage.getItem("accessToken");
         if (!accessToken) return;
-        const res = await fetch("http://localhost:3000/likes", {
+        const res = await fetch("/likes", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await res.json();
@@ -122,7 +122,7 @@ const { token } = useContext(AuthContext);
         const data = await getFriends(accessToken);
         setFriends(data);
 
-        const res = await fetch("http://localhost:3000/users/me", {
+        const res = await fetch("/users/me", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const userData = await res.json();
@@ -153,7 +153,7 @@ const { token } = useContext(AuthContext);
       for (const friendId of toShare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        await fetch(`http://localhost:3000/recipe-books/${book?._id}/share`, {
+        await fetch(`/recipe-books/${book?._id}/share`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({ username: friend.username }),
@@ -163,7 +163,7 @@ const { token } = useContext(AuthContext);
       for (const friendId of toUnshare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        await fetch(`http://localhost:3000/recipe-books/${book?._id}/unshare`, {
+        await fetch(`/recipe-books/${book?._id}/unshare`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({ username: friend.username }),

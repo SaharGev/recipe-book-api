@@ -54,7 +54,7 @@ export default function EditRecipePage() {
     if (!id || !token) return;
     const fetchRecipe = async () => {
       try {
-        const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, token);
+        const res = await apiFetch(`/recipes/${id}`, {}, token);
         const data = await res.json();
         setTitle(data.title);
         setDescription(data.description || "");
@@ -120,7 +120,7 @@ export default function EditRecipePage() {
       if (imageUrl) {
         const imageData = new FormData();
         imageData.append("image", imageUrl);
-        const uploadRes = await apiFetch("http://localhost:3000/upload/image", {
+        const uploadRes = await apiFetch("/upload/image", {
           method: "POST",
           body: imageData,
         }, token);
@@ -130,7 +130,7 @@ export default function EditRecipePage() {
 
       const instructions = steps.map((s, i) => `${i + 1}. ${s.text}`).join("\n");
 
-      const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {
+      const res = await apiFetch(`/recipes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -155,7 +155,7 @@ export default function EditRecipePage() {
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this recipe?")) return;
     try {
-      const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {
+      const res = await apiFetch(`/recipes/${id}`, {
         method: "DELETE",
       }, token);
       if (!res.ok) throw new Error("Failed to delete");

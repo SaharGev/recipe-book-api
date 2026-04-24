@@ -53,7 +53,7 @@ export default function EditRecipeBookPage() {
       const token = localStorage.getItem("accessToken");
 
       await fetch(
-        `http://localhost:3000/recipe-books/${id}/recipes/${recipeId}`,
+        `/recipe-books/${id}/recipes/${recipeId}`,
         {
           method: "DELETE",
           headers: {
@@ -72,7 +72,7 @@ export default function EditRecipeBookPage() {
     if (!window.confirm("Are you sure you want to delete this book?")) return;
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:3000/recipe-books/${id}`, {
+      const res = await fetch(`/recipe-books/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -87,7 +87,7 @@ export default function EditRecipeBookPage() {
   try {
     const token = localStorage.getItem("accessToken");
 
-    const res = await fetch(`http://localhost:3000/recipe-books/${id}`, {
+    const res = await fetch(`/recipe-books/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

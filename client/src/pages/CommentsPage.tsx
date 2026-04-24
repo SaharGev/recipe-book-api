@@ -16,7 +16,7 @@ export default function CommentsPage() {
       try {
         const accessToken = token || localStorage.getItem("accessToken");
         if (!accessToken) return;
-        const res = await apiFetch("http://localhost:3000/users/me", {}, accessToken);
+        const res = await apiFetch("/users/me", {}, accessToken);
         const data = await res.json();
         if (res.ok) setCurrentUserId(data._id);
       } catch {}
