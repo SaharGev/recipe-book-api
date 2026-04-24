@@ -11,6 +11,7 @@ import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
 import { getCommentCount } from "../services/commentService";
+import PageHeader from "../components/PageHeader";
 
 function InstructionStepItem({ text }: { text: string }) {
   const [done, setDone] = useState(false);
@@ -155,15 +156,13 @@ export default function RecipeDetailsPage() {
       ? recipe.owner === currentUserId 
       : recipe.owner._id === currentUserId);
 
-  if (forbidden) return (
+    if (forbidden) return (
       <div className="recipe-page-wrapper">
+        <PageHeader title="Private Recipe" />
         <div className="private-recipe-container">
           <div className="lock-icon">🔒</div>
           <h2>Private Recipe</h2>
           <p>This recipe is private and cannot be accessed.</p>
-          <button className="save-btn" onClick={() => navigate(-1)}>
-            Go Back
-          </button>
         </div>
       </div>
     );
