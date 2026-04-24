@@ -150,21 +150,24 @@ export default function RecipeDetailsPage() {
     }
   };
 
-  if (forbidden) return (
-    <div className="recipe-page-wrapper">
-      <div style={{ textAlign: "center", padding: "40px" }}>
-        <h2>🔒 Private Recipe</h2>
-        <p>This recipe is private and cannot be accessed.</p>
-        <button onClick={() => navigate(-1)}>Go Back</button>
-      </div>
-    </div>
-  );
-  if (!recipe) return <p>Loading...</p>;
-
-  const isOwner = currentUserId && recipe.owner && 
+  const isOwner = currentUserId && recipe && recipe.owner &&
     (typeof recipe.owner === "string" 
       ? recipe.owner === currentUserId 
       : recipe.owner._id === currentUserId);
+
+  if (forbidden) return (
+      <div className="recipe-page-wrapper">
+        <div className="private-recipe-container">
+          <div className="lock-icon">🔒</div>
+          <h2>Private Recipe</h2>
+          <p>This recipe is private and cannot be accessed.</p>
+          <button className="save-btn" onClick={() => navigate(-1)}>
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+    if (!recipe) return <p>Loading...</p>;
 
   return (
     <div className="recipe-page-wrapper">

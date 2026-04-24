@@ -385,3 +385,27 @@ h3 {
   text-decoration: line-through;
   color: #aaa;
 }
+
+.private-recipe-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.private-recipe-container .lock-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.private-recipe-container h2 {
+  color: #6c63ff;
+  margin-bottom: 8px;
+}
+
+.private-recipe-container p {
+  color: #888;
+  margin-bottom: 32px;
+}
