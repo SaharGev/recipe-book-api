@@ -3,7 +3,7 @@ import { apiFetch } from "./apiClient";
 
 export async function getMyRecipeBooks(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    `http://localhost:3000/recipe-books/my?page=${page}&limit=${limit}`,
+    `/recipe-books/my?page=${page}&limit=${limit}`,
     {},
     token
   );
@@ -18,7 +18,7 @@ export async function getMyRecipeBooks(token: string, page = 1, limit = 6) {
 }
 
 export async function getRecipeBookById(id: string, token: string) {
-  const response = await apiFetch(`http://localhost:3000/recipe-books/${id}`, {}, token);
+  const response = await apiFetch(`/recipe-books/${id}`, {}, token);
 
   const data = await response.json();
 
@@ -31,7 +31,7 @@ export async function getRecipeBookById(id: string, token: string) {
 
 export async function searchUsers(query: string, token: string) {
   const res = await fetch(
-    `http://localhost:3000/recipe-books/search-users?query=${query}`,
+    `/recipe-books/search-users?query=${query}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ export async function searchUsers(query: string, token: string) {
 
 export async function getPublicRecipeBooks(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    `http://localhost:3000/recipe-books/public?page=${page}&limit=${limit}`,
+    `/recipe-books/public?page=${page}&limit=${limit}`,
     {},
     token
   );
@@ -66,7 +66,7 @@ export async function getPublicRecipeBooks(token: string, page = 1, limit = 6) {
 
 export async function getSharedWithMeBooks(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    `http://localhost:3000/recipe-books/shared-with-me?page=${page}&limit=${limit}`,
+    `/recipe-books/shared-with-me?page=${page}&limit=${limit}`,
     {},
     token
   );

@@ -18,7 +18,8 @@
     "testUser": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/user.test.ts",
     "testAi": "tsc && jest --runInBand --detectOpenHandles --forceExit ./src/tests/ai.test.ts",
     "tsoa:spec": "tsoa spec",
-    "tsoa:routes": "tsoa routes"
+    "tsoa:routes": "tsoa routes",
+    "prod": "tsc -p tsconfig_prod.json && pm2 restart ecosystem.config.js --env production"
   },
   "keywords": [],
   "author": "Sahar & Hadas",

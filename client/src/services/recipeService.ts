@@ -1,7 +1,7 @@
 import { apiFetch } from "./apiClient";
 
 export async function getRecipe(id: string, token: string) {
-  const response = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, token);
+  const response = await apiFetch(`/recipes/${id}`, {}, token);
 
   if (!response.ok) {
     throw new Error("Failed to fetch recipe");
@@ -11,7 +11,7 @@ export async function getRecipe(id: string, token: string) {
 }
 
 export async function getMyRecipes(token: string) {
-  const response = await apiFetch("http://localhost:3000/recipes/my", {}, token);
+  const response = await apiFetch("/recipes/my", {}, token);
 
   const data = await response.json();
 
@@ -23,7 +23,7 @@ export async function getMyRecipes(token: string) {
 }
 
 export async function toggleLike(recipeId: string, token: string) {
-  const response = await apiFetch("http://localhost:3000/likes", {
+  const response = await apiFetch("/likes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export async function toggleLike(recipeId: string, token: string) {
 }
 
 export async function getMyLikes(token: string) {
-  const response = await apiFetch("http://localhost:3000/likes", {}, token);
+  const response = await apiFetch("/likes", {}, token);
 
   const data = await response.json();
 
@@ -57,7 +57,7 @@ export async function getMyLikes(token: string) {
 
 export async function getPublicRecipes(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    `http://localhost:3000/recipes/public?page=${page}&limit=${limit}`,
+    `/recipes/public?page=${page}&limit=${limit}`,
     {},
     token
   );
@@ -73,7 +73,7 @@ export async function getPublicRecipes(token: string, page = 1, limit = 6) {
 
 export async function getSharedWithMeRecipes(token: string, page = 1, limit = 6) {
   const response = await apiFetch(
-    `http://localhost:3000/recipes/shared-with-me?page=${page}&limit=${limit}`,
+    `/recipes/shared-with-me?page=${page}&limit=${limit}`,
     {},
     token
   );

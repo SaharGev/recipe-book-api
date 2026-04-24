@@ -45,7 +45,7 @@ export default function MyRecipesPage() {
       if (pageToLoad === 1) setLoading(true);
       else setLoadingMore(true);
 
-      const res = await fetch(`http://localhost:3000/recipes/my?page=${pageToLoad}&limit=6`, {
+      const res = await fetch(`/recipes/my?page=${pageToLoad}&limit=6`, {
         headers: { Authorization: "Bearer " + token },
       });
 

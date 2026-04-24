@@ -10,7 +10,7 @@ import path from "path";
 const downloadGoogleImage = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const filename = `google_${Date.now()}.jpg`;
-    const filepath = path.join(__dirname, "..", "..", "public", filename);
+    const filepath = path.join(process.cwd(), "public", filename);
     const file = fs.createWriteStream(filepath);
 
     https.get(url, (response) => {

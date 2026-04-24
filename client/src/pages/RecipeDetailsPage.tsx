@@ -11,6 +11,7 @@ import { BsShare } from "react-icons/bs";
 import ShareModal from "../components/ShareModal";
 import BottomNav from "../components/BottomNav";
 import { getCommentCount } from "../services/commentService";
+import PageHeader from "../components/PageHeader";
 
 function InstructionStepItem({ text }: { text: string }) {
   const [done, setDone] = useState(false);
@@ -49,6 +50,7 @@ export default function RecipeDetailsPage() {
   const [currentUser, setCurrentUser] = useState<{ _id: string; username: string; profileImageUrl?: string } | null>(null);
   const [isSharedOpen, setIsSharedOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
     getCommentCount("recipe", id || "").then(setCommentCount);
@@ -69,7 +71,7 @@ export default function RecipeDetailsPage() {
     const fetchCurrentUser = async () => {
       try {
         if (!token) return;
-        const res = await apiFetch("http://localhost:3000/users/me", {}, token);
+        const res = await apiFetch("/users/me", {}, token);
         const data = await res.json();
         if (res.ok) {
           setCurrentUserId(data._id);
@@ -84,11 +86,12 @@ export default function RecipeDetailsPage() {
   useEffect(() => {
     const fetchRecipe = async () => {
       if (!accessToken) return;
-      const res = await apiFetch(`http://localhost:3000/recipes/${id}`, {}, accessToken);
+      const res = await apiFetch(`/recipes/${id}`, {}, accessToken);
 
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 403) setForbidden(true);
         return;
       }
 
@@ -114,7 +117,7 @@ export default function RecipeDetailsPage() {
       for (const friendId of toShare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        const response = await fetch(`http://localhost:3000/recipes/${id}/share`, {
+        const response = await fetch(`/recipes/${id}/share`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -129,7 +132,7 @@ export default function RecipeDetailsPage() {
       for (const friendId of toUnshare) {
         const friend = friends.find(f => f._id === friendId);
         if (!friend) continue;
-        const response = await fetch(`http://localhost:3000/recipes/${id}/unshare`, {
+        const response = await fetch(`/recipes/${id}/unshare`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -148,12 +151,22 @@ export default function RecipeDetailsPage() {
     }
   };
 
-  if (!recipe) return <p>Loading...</p>;
-
-  const isOwner = currentUserId && recipe.owner && 
+  const isOwner = currentUserId && recipe && recipe.owner &&
     (typeof recipe.owner === "string" 
       ? recipe.owner === currentUserId 
       : recipe.owner._id === currentUserId);
+
+    if (forbidden) return (
+      <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
+        <PageHeader title="" />
+        <div className="private-recipe-container">
+          <div className="lock-icon">🔒</div>
+          <h2>Private Recipe</h2>
+          <p>This recipe is private and cannot be accessed.</p>
+        </div>
+      </div>
+    );
+    if (!recipe) return <p>Loading...</p>;
 
   return (
     <div className="recipe-page-wrapper">

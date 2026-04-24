@@ -82,7 +82,7 @@ export default function CreateRecipe() {
         const imageData = new FormData();
         imageData.append("image", imageUrl);
 
-        const uploadRes = await apiFetch("http://localhost:3000/upload/image", {
+        const uploadRes = await apiFetch("/upload/image", {
           method: "POST",
           body: imageData,
         }, token);
@@ -93,7 +93,7 @@ export default function CreateRecipe() {
 
       const instructions = steps.map((s, i) => `${i + 1}. ${s.text}`).join("\n");
 
-      const res = await apiFetch("http://localhost:3000/recipes", {
+      const res = await apiFetch("/recipes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

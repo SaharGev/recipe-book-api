@@ -25,7 +25,7 @@ interface AiSearchResponse {
 }
 
 export async function aiSearch(query: string, token: string | null = null): Promise<AiSearchResponse> {
-  const response = await apiFetch("http://localhost:3000/ai/ai-search", {
+  const response = await apiFetch("/ai/ai-search", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

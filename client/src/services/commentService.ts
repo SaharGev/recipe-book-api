@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/comments";
+const BASE_URL = "/comments";
 
 export async function getComments(targetType: string, targetId: string) {
   const res = await fetch(`${BASE_URL}?targetType=${targetType}&targetId=${targetId}`);

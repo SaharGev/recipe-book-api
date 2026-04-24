@@ -37,7 +37,7 @@ export default function RecipeBookCard({ _id, title, recipesCount, recipes = [],
     e.stopPropagation();
     try {
       if (!token) return;
-      const response = await fetch("http://localhost:3000/likes", {
+      const response = await fetch("/likes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

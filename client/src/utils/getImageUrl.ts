@@ -5,5 +5,5 @@ export function getImageUrl(imageUrl?: string): string {
     return imageUrl;
   }
 
-  return `http://localhost:3000${imageUrl}`;
+  return `${imageUrl}`;
 }
