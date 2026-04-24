@@ -157,14 +157,14 @@ export default function RecipeDetailsPage() {
       : recipe.owner._id === currentUserId);
 
     if (forbidden) return (
-      <>
+      <div style={{ backgroundColor: "white", minHeight: "100vh" }}>
         <PageHeader title="" />
         <div className="private-recipe-container">
           <div className="lock-icon">🔒</div>
           <h2>Private Recipe</h2>
           <p>This recipe is private and cannot be accessed.</p>
         </div>
-      </>
+      </div>
     );
     if (!recipe) return <p>Loading...</p>;
 
